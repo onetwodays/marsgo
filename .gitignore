@@ -1,0 +1,7 @@
+*.log
+.idea/
+*.exe
+*.tmp
+*.bak
+*.swp
+*.test
