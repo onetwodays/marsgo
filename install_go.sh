@@ -2,7 +2,7 @@
 GOVERSION="go1.14.linux-amd64"
 cd ~
 wget https://dl.google.com/go/${GOVERSION}.tar.gz
-tar -C /usr/local -xzf ${GOVERSION}.tar.gz
+sudo tar -C /usr/local -xzf ${GOVERSION}.tar.gz
 
 mkdir go-path
 echo "#git config  --global  http.proxy     http://jiantuo:jt666%40fg@fg.hopex.com:13128" >> ~/.bashrc
