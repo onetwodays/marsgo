@@ -4,11 +4,14 @@ cd ~
 wget https://dl.google.com/go/${GOVERSION}.tar.gz
 sudo tar -C /usr/local -xzf ${GOVERSION}.tar.gz
 
-mkdir go-path
+mkdir -p ~/go-path/src
+mkdir -p ~/go-path/bin
+mkdir -p ~/go-path/pkg
+
 echo "#git config  --global  http.proxy     http://jiantuo:jt666%40fg@fg.hopex.com:13128" >> ~/.bashrc
 echo "#git config  --global  https.proxy   https://jiantuo:jt666%40fg@fg.hopex.com:13128" >> ~/.bashrc
 echo "ulimit -c unlimited" >> ~/.bashrc
-echo "export GOROOT=/usr/lib/${GOVERSION}/go" >> ~/.bashrc
+echo "export GOROOT=/usr/lib/go" >> ~/.bashrc
 echo "export GOPATH=~/go-path" >> ~/.bashrc
 echo "export GOBIN=$GOROOT/bin" >> ~/.bashrc
 echo "export PATH=$PATH:$GOBIN:$GOPATH/bin"  >> ~/.bashrc
