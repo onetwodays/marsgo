@@ -20,4 +20,4 @@ echo "export export GO111MODULE=on"  >> ~/.bashrc
 echo "export GOPROXY=https://goproxy.cn"  >> ~/.bashrc
 echo "#export GOPROXY=https://mirrors.aliyun.com/goproxy/"  >> ~/.bashrc
 echo "#export GOPROXY=https://goproxy.io"  >> ~/.bashrc
-source .bashrc
+source ~/.bashrc
