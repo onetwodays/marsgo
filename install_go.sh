@@ -5,12 +5,16 @@ wget https://dl.google.com/go/${GOVERSION}.tar.gz
 tar -C /usr/local -xzf ${GOVERSION}.tar.gz
 
 mkdir go-path
+echo "#git config  --global  http.proxy     http://jiantuo:jt666%40fg@fg.hopex.com:13128" >> ~/.bashrc
+echo "#git config  --global  https.proxy   https://jiantuo:jt666%40fg@fg.hopex.com:13128" >> ~/.bashrc
 echo "ulimit -c unlimited" >> ~/.bashrc
 echo "export GOROOT=/usr/lib/${GOVERSION}/go" >> ~/.bashrc
 echo "export GOPATH=~/go-path" >> ~/.bashrc
 echo "export GOBIN=$GOROOT/bin" >> ~/.bashrc
 echo "export PATH=$PATH:$GOBIN:$GOPATH/bin"  >> ~/.bashrc
 echo "export ETCDCTL_API=3"  >> ~/.bashrc
-echo "export GOPROXY=https://goproxy.cn"  >> ~/.bashrc
 echo "export export GO111MODULE=on"  >> ~/.bashrc
+echo "export GOPROXY=https://goproxy.cn"  >> ~/.bashrc
+echo "#export GOPROXY=https://mirrors.aliyun.com/goproxy/"  >> ~/.bashrc
+echo "#export GOPROXY=https://goproxy.io"  >> ~/.bashrc
 source .bashrc
