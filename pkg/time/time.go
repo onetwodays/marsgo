@@ -10,7 +10,7 @@ import (
 // Time be used to MySql timestamp converting.
 type Time int64
 
-// Scan scan time.
+// Scan scan time. 把time.Time和string 表示的时间戳转整形时间戳
 func (jt *Time) Scan(src interface{}) (err error) {
 	switch sc := src.(type) {
 	case xtime.Time:
@@ -28,7 +28,7 @@ func (jt Time) Value() (driver.Value, error) {
 	return xtime.Unix(int64(jt), 0), nil
 }
 
-// Time get time.
+// Time get time.time.Time =A Time represents an instant in time with nanosecond precision
 func (jt Time) Time() xtime.Time {
 	return xtime.Unix(int64(jt), 0)
 }
@@ -36,7 +36,7 @@ func (jt Time) Time() xtime.Time {
 // Duration be used toml unmarshal string time, like 1s, 500ms.
 type Duration xtime.Duration
 
-// UnmarshalText unmarshal text to duration.
+// UnmarshalText unmarshal text to duration.ParseDuration parses a duration string
 func (d *Duration) UnmarshalText(text []byte) error {
 	tmp, err := xtime.ParseDuration(string(text))
 	if err == nil {
@@ -45,15 +45,15 @@ func (d *Duration) UnmarshalText(text []byte) error {
 	return err
 }
 
-// Shrink will decrease the duration by comparing with context's timeout duration
+// Shrink(收缩) will decrease(减少) the duration by comparing with context's timeout duration
 // and return new timeout\context\CancelFunc.
 func (d Duration) Shrink(c context.Context) (Duration, context.Context, context.CancelFunc) {
 	if deadline, ok := c.Deadline(); ok {
 		if ctimeout := xtime.Until(deadline); ctimeout < xtime.Duration(d) {
 			// deliver small timeout
-			return Duration(ctimeout), c, func() {}
+			return Duration(ctimeout), c, func() {} //不要管
 		}
 	}
-	ctx, cancel := context.WithTimeout(c, xtime.Duration(d))
+	ctx, cancel := context.WithTimeout(c, xtime.Duration(d)) // 提前到期
 	return d, ctx, cancel
 }
