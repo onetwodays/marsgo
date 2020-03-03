@@ -1,3 +1,5 @@
 #!/usr/bin/env bash
-sudo killall -9 spider.exe
-nohup ./spider.exe  > /dev/null  2>&1 &
+APPNAME="spider.exe"
+sudo killall -9 ${APPNAME}
+nohup ./${APPNAME}  > /dev/null  2>&1 &
+ps -ef|grep  ${APPNAME}

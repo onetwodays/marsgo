@@ -14,6 +14,8 @@ require (
 	github.com/coreos/etcd v3.3.18+incompatible // indirect
 	github.com/dgryski/go-farm v0.0.0-20200201041132-a6ae2369ad13
 	github.com/fsnotify/fsnotify v1.4.7
+	github.com/go-redis/redis v6.15.7+incompatible // indirect
+	github.com/go-redis/redis/v7 v7.2.0 // indirect
 	github.com/go-resty/resty/v2 v2.2.0
 	github.com/go-sql-driver/mysql v1.5.0
 	github.com/go-zookeeper/zk v1.0.1
@@ -21,6 +23,7 @@ require (
 	github.com/gocolly/colly v1.2.0
 	github.com/gogo/protobuf v1.3.1
 	github.com/golang/protobuf v1.3.4
+	github.com/google/wire v0.4.0
 	github.com/json-iterator/go v1.1.9
 	github.com/kennygrant/sanitize v1.2.4 // indirect
 	github.com/montanaflynn/stats v0.6.3
@@ -38,6 +41,7 @@ require (
 	github.com/tsuna/gohbase v0.0.0-20190823190353-a66bcc9075db
 	go.etcd.io/etcd v3.3.18+incompatible
 	golang.org/x/net v0.0.0-20200226121028-0de0cce0169b
+	google.golang.org/genproto v0.0.0-20191216205247-b31c10ee225f
 	google.golang.org/grpc v1.27.1
 	gopkg.in/go-playground/validator.v9 v9.31.0
 	gopkg.in/yaml.v2 v2.2.8

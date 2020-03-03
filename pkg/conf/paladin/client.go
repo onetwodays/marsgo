@@ -25,7 +25,7 @@ type Event struct {
 
 // Watcher is config watcher.
 type Watcher interface {
-	WatchEvent(context.Context, ...string) <-chan Event
+	WatchEvent(context.Context, ...string) <-chan Event  //输出channel
 	Close() error
 }
 

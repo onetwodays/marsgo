@@ -1,5 +1,6 @@
 package paladin
 
+// 类似database/sql的设计.
 import (
 	"fmt"
 	"sort"

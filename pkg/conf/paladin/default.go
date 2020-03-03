@@ -8,12 +8,12 @@ import (
 
 var (
 	// DefaultClient default client.
-	DefaultClient Client
-	confPath      string
+	DefaultClient Client  // 定义了一个接口
+	confPath      string  //配置文件路径或者所在的目录
 )
 
 func init() {
-	flag.StringVar(&confPath, "conf", "", "default config path")
+	flag.StringVar(&confPath, "conf", "", "default config path") //运行程序时必须提供conf选项
 }
 
 // Init init config client.
@@ -22,7 +22,7 @@ func init() {
 // args[0]: driver name, string type
 func Init(args ...interface{}) (err error) {
 	if confPath != "" {
-		DefaultClient, err = NewFile(confPath)
+		DefaultClient, err = NewFile(confPath) // 是配置文件
 	} else {
 		var (
 			driver Driver
@@ -40,7 +40,7 @@ func Init(args ...interface{}) (err error) {
 		if err != nil {
 			return
 		}
-		DefaultClient, err = driver.New()
+		DefaultClient, err = driver.New()  //有远程驱动,让远程驱动生成一个.
 	}
 	if err != nil {
 		return
@@ -48,10 +48,12 @@ func Init(args ...interface{}) (err error) {
 	return
 }
 
-// Watch watch on a key. The configuration implements the setter interface, which is invoked when the configuration changes.
+// Watch watch on a key.
+//The configuration implements the setter interface,
+//which is invoked when the configuration changes.
 func Watch(key string, s Setter) error {
 	v := DefaultClient.Get(key)
-	str, err := v.Raw()
+	str, err := v.Raw()  // 字符串
 	if err != nil {
 		return err
 	}
@@ -60,7 +62,7 @@ func Watch(key string, s Setter) error {
 	}
 	go func() {
 		for event := range WatchEvent(context.Background(), key) {
-			s.Set(event.Value)
+			s.Set(event.Value) // 字符串
 		}
 	}()
 	return nil

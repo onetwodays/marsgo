@@ -22,7 +22,7 @@ var (
 
 type apolloWatcher struct {
 	keys []string // in apollo, they're called namespaces
-	C    chan paladin.Event
+	C    chan paladin.Event // 1个队列,里面放5个事件通知
 }
 
 func newApolloWatcher(keys []string) *apolloWatcher {
@@ -52,7 +52,7 @@ func (aw *apolloWatcher) Handle(event paladin.Event) {
 // apollo is apollo config client.
 type apollo struct {
 	client   *agollo.Client
-	values   *paladin.Map
+	values   *paladin.Map  // 可以看成void* 只是原子性的读写
 	wmu      sync.RWMutex
 	watchers map[*apolloWatcher]struct{}
 }
@@ -78,11 +78,11 @@ func init() {
 }
 
 func addApolloFlags() {
-	flag.StringVar(&confAppID, "apollo.appid", "", "apollo app id")
+	flag.StringVar(&confAppID,   "apollo.appid", "", "apollo app id")
 	flag.StringVar(&confCluster, "apollo.cluster", "", "apollo cluster")
 	flag.StringVar(&confCacheDir, "apollo.cachedir", "/tmp", "apollo cache dir")
 	flag.StringVar(&confMetaAddr, "apollo.metaaddr", "", "apollo meta server addr, e.g. localhost:8080")
-	flag.StringVar(&confNamespaces, "apollo.namespaces", "", "subscribed apollo namespaces, comma separated, e.g. app.yml,mysql.yml")
+	flag.StringVar(&confNamespaces,"apollo.namespaces", "", "subscribed apollo namespaces, comma separated, e.g. app.yml,mysql.yml")
 }
 
 func buildConfigForApollo() (c *Config, err error) {

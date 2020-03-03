@@ -2,6 +2,8 @@ package paladin
 
 import "time"
 
+// 把Value.value 转换成对应的类型的值
+
 // Bool return bool value.
 func Bool(v *Value, def bool) bool {
 	b, err := v.Bool()
@@ -66,7 +68,8 @@ func String(v *Value, def string) string {
 }
 
 // Duration parses a duration string. A duration string is a possibly signed sequence of decimal numbers
-// each with optional fraction and a unit suffix, such as "300ms", "-1.5h" or "2h45m". Valid time units are "ns", "us" (or "µs"), "ms", "s", "m", "h".
+// each with optional fraction and a unit suffix, such as "300ms", "-1.5h" or "2h45m".
+//Valid time units are "ns", "us" (or "µs"), "ms", "s", "m", "h".
 func Duration(v *Value, def time.Duration) time.Duration {
 	dur, err := v.Duration()
 	if err != nil {

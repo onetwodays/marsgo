@@ -5,7 +5,7 @@ import (
 	"reflect"
 	"strconv"
 
-	"github.com/BurntSushi/toml"
+	"github.com/BurntSushi/toml" // Note that a case insensitive match will be tried if an exact match can't be found.
 	"github.com/pkg/errors"
 )
 
@@ -22,11 +22,12 @@ func (m *TOML) Set(text string) error {
 
 // UnmarshalText implemented toml.
 func (m *TOML) UnmarshalText(text []byte) error {
-	raws := map[string]interface{}{}
+	raws := map[string]interface{}{} // 一个key value(interface{}{}) 字典
 	if err := toml.Unmarshal(text, &raws); err != nil {
 		return err
 	}
-	values := map[string]*Value{}
+	values := map[string]*Value{}  // 创建了一个空字典,key-value(*Value)
+
 	for k, v := range raws {
 		k = KeyNamed(k)
 		rv := reflect.ValueOf(v)
@@ -71,3 +72,4 @@ func (m *TOML) UnmarshalText(text []byte) error {
 	m.Store(values)
 	return nil
 }
+

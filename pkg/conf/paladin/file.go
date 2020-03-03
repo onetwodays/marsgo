@@ -12,21 +12,21 @@ import (
 	"sync"
 	"time"
 
-	"github.com/fsnotify/fsnotify"
+	"github.com/fsnotify/fsnotify" // 监控文件变化
 )
 
 const (
-	defaultChSize = 10
+	defaultChSize = 10  // channel长度,change event size
 )
 
-var _ Client = &file{}
+var _ Client = &file{} //验证一下file 是否实现了Client接口
 
 // file is file config client.
 type file struct {
-	values *Map
-	rawVal map[string]*Value
+	values *Map                  // 一大块内存
+	rawVal map[string]*Value     // key -value的形式
 
-	watchChs map[string][]chan Event
+	watchChs map[string][]chan Event // 每个key对应多个事件队列.因为有好几类事件,一类事件可以有多个事件保存在队列里面
 	mx       sync.Mutex
 	wg       sync.WaitGroup
 
@@ -103,11 +103,11 @@ func NewFile(base string) (Client, error) {
 		return nil, err
 	}
 
-	valMap := &Map{}
-	valMap.Store(rawVal)
+	valMap := &Map{}      // 原子性的key-value字典
+	valMap.Store(rawVal)  // key - value 的字典.
 	fc := &file{
-		values:   valMap,
-		rawVal:   rawVal,
+		values:   valMap, // 他俩保存的是同一个变量,文件名-文件内容字符串
+		rawVal:   rawVal, // (map[string]*Value
 		watchChs: make(map[string][]chan Event),
 
 		base: base,
@@ -136,7 +136,7 @@ func (f *file) WatchEvent(ctx context.Context, keys ...string) <-chan Event {
 	defer f.mx.Unlock()
 	ch := make(chan Event, defaultChSize)
 	for _, key := range keys {
-		f.watchChs[key] = append(f.watchChs[key], ch)
+		f.watchChs[key] = append(f.watchChs[key], ch) //才放入一个事件队列.
 	}
 	return ch
 }
@@ -165,7 +165,7 @@ func (f *file) daemon() {
 		switch event.Op {
 		// use vim edit config will trigger rename
 		case fsnotify.Write, fsnotify.Create:
-			f.reloadFile(event.Name)
+			f.reloadFile(event.Name) // Relative path to the file or directory
 		case fsnotify.Chmod:
 		default:
 			log.Printf("unsupport event %s ingored", event)
@@ -190,7 +190,7 @@ func (f *file) reloadFile(name string) {
 	f.values.Store(f.rawVal)
 
 	f.mx.Lock()
-	chs := f.watchChs[key]
+	chs := f.watchChs[key] //key是文件名.,找到这个文件名的对应的事件队列切片
 	f.mx.Unlock()
 
 	for _, ch := range chs {

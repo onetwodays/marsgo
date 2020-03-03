@@ -21,7 +21,7 @@ var (
 // Value is config value, maybe a json/toml/ini/string file.
 type Value struct {
 	val   interface{}
-	slice interface{}
+	slice interface{} //暂时没用到
 	raw   string
 }
 
@@ -38,7 +38,7 @@ func (v *Value) Bool() (bool, error) {
 	if v.val == nil {
 		return false, ErrNotExist
 	}
-	b, ok := v.val.(bool)
+	b, ok := v.val.(bool) // 转型
 	if !ok {
 		return false, ErrTypeAssertion
 	}
@@ -103,7 +103,8 @@ func (v *Value) String() (string, error) {
 }
 
 // Duration parses a duration string. A duration string is a possibly signed sequence of decimal numbers
-// each with optional fraction and a unit suffix, such as "300ms", "-1.5h" or "2h45m". Valid time units are "ns", "us" (or "µs"), "ms", "s", "m", "h".
+// each with optional fraction and a unit suffix, such as "300ms", "-1.5h" or "2h45m".
+// Valid time units are "ns", "us" (or "µs"), "ms", "s", "m", "h".
 func (v *Value) Duration() (time.Duration, error) {
 	s, err := v.String()
 	if err != nil {
@@ -121,19 +122,21 @@ func (v *Value) Raw() (string, error) {
 }
 
 // Slice scan a slice interface, if slice has element it will be discard.
+//把value里面保存的slice 复制到dst表示的切片里面.2个切片元素类型要一样.dst原来的元素被清空.
 func (v *Value) Slice(dst interface{}) error {
 	// NOTE: val is []interface{}, slice is []type
 	if v.val == nil {
 		return ErrNotExist
 	}
 	rv := reflect.ValueOf(dst)
+	// 限制入参必须是指针和切片
 	if rv.Kind() != reflect.Ptr || rv.Elem().Kind() != reflect.Slice {
 		return ErrDifferentTypes
 	}
 	el := rv.Elem()
 	// reset slice len to 0.
 	el.SetLen(0)
-	kind := el.Type().Elem().Kind()
+	kind := el.Type().Elem().Kind() // 每个元素的类型.
 	src, ok := v.val.([]interface{})
 	if !ok {
 		return ErrDifferentTypes

@@ -12,7 +12,7 @@ func KeyNamed(key string) string {
 
 // Map is config map, key(filename) -> value(file).
 type Map struct {
-	values atomic.Value
+	values atomic.Value  //一个结构体.
 }
 
 // Store sets the value of the Value to values map.

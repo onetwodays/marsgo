@@ -1,2 +1,3 @@
 #!/usr/bin/env bash
-sudo killall -9 spider.exe
+APPNAME="spider.exe"
+sudo killall -9 ${APPNAME}

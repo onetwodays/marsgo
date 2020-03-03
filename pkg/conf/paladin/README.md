@@ -136,3 +136,44 @@ func ExampleApolloClient() {
 - **请只用 Golang v1.12.x 以上版本编译执行**
 
 ##### 依赖包
+
+
+#### TOML
+
+TOML是前GitHub CEO， Tom Preston-Werner，于2013年创建的语言，
+其目标是成为一个小规模的易于使用的语义化配置文件格式。
+TOML被设计为可以无二义性的转换为一个**哈希表(Hash table)**。
+TOML是大小写敏感的，必须是UTF-8编码
+
+```cgo
+title = "TOML Example"
+
+[owner]
+name = "Lance Uppercut"
+dob = 1979-05-27T07:32:00-08:00 # 日期是一等公民
+
+[database]
+server = "192.168.1.1"
+ports = [ 8001, 8001, 8002 ]
+connection_max = 5000
+enabled = true
+
+[servers]
+  #你可以使用空格、制表符进行缩进，或者根本不缩进。TOML不关心缩进。
+  [servers.alpha]
+  ip = "10.0.0.1"
+  dc = "eqdc10"
+
+  [servers.beta]
+  ip = "10.0.0.2"
+  dc = "eqdc10"
+
+[clients]
+data = [ ["gamma", "delta"], [1, 2] ]
+
+# 数组内可以混入换行符
+hosts = [
+  "alpha",
+  "omega"
+]
+```
