@@ -3,7 +3,7 @@ package paladin_test
 import (
 	"testing"
 
-	"github.com/bilibili/kratos/pkg/conf/paladin"
+	"marsgo/pkg/conf/paladin"
 
 	"github.com/stretchr/testify/assert"
 )
