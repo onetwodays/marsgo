@@ -10,7 +10,7 @@ import (
 // Time be used to MySql timestamp converting.
 type Time int64
 
-// Scan scan time. 把time.Time和string 表示的时间戳转整形时间戳
+// Scan scan time. 把time.Time和string 表示的时间戳转整数时间戳
 func (jt *Time) Scan(src interface{}) (err error) {
 	switch sc := src.(type) {
 	case xtime.Time:
@@ -40,7 +40,7 @@ type Duration xtime.Duration
 func (d *Duration) UnmarshalText(text []byte) error {
 	tmp, err := xtime.ParseDuration(string(text))
 	if err == nil {
-		*d = Duration(tmp)
+		*d = Duration(tmp) //类型显示转化
 	}
 	return err
 }

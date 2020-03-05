@@ -7,12 +7,12 @@ import (
 )
 
 const (
-	interval time.Duration = time.Millisecond * 500
+	interval time.Duration = time.Millisecond * 500 // 500ms
 )
 
 var (
-	stats CPU
-	usage uint64
+	stats CPU    //一个接口变量,相当于一个指针 ,在init里面初始化,然后在一个携程里调用其函数,赋值给usage
+	usage uint64 //包级变量,
 )
 
 // CPU is cpu stat usage.

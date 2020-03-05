@@ -4,7 +4,7 @@ import (
 	"sync"
 	"time"
 
-	xtime "github.com/bilibili/kratos/pkg/time"
+	xtime "marsgo/pkg/time"
 )
 
 // Config broker config.
@@ -12,11 +12,11 @@ type Config struct {
 	SwitchOff bool // breaker switch,default off.
 
 	// Google
-	K float64
+	K float64 //触发熔断的错误率（K = 1 - 1/错误率）
 
-	Window  xtime.Duration
-	Bucket  int
-	Request int64
+	Window  xtime.Duration //统计桶窗口时间
+	Bucket  int            //统计桶大小
+	Request int64          //触发熔断的最少请求数量（请求少于该值时不会触发熔断）
 }
 
 func (conf *Config) fix() {
@@ -24,13 +24,13 @@ func (conf *Config) fix() {
 		conf.K = 1.5
 	}
 	if conf.Request == 0 {
-		conf.Request = 100
+		conf.Request = 100 //达到100个请求才触发熔断
 	}
 	if conf.Bucket == 0 {
-		conf.Bucket = 10
+		conf.Bucket = 10 //10个桶
 	}
 	if conf.Window == 0 {
-		conf.Window = xtime.Duration(3 * time.Second)
+		conf.Window = xtime.Duration(3 * time.Second) // 3s
 	}
 }
 

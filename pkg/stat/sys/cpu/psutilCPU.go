@@ -21,7 +21,7 @@ func newPsutilCPU(interval time.Duration) (cpu *psutilCPU, err error) {
 
 func (ps *psutilCPU) Usage() (u uint64, err error) {
 	var percents []float64
-	percents, err = cpu.Percent(ps.interval, false)
+	percents, err = cpu.Percent(ps.interval, false) // 统计一定间隔的cpu的使用率
 	if err == nil {
 		u = uint64(percents[0] * 10)
 	}

@@ -23,7 +23,7 @@ type cgroupCPU struct {
 
 func newCgroupCPU() (cpu *cgroupCPU, err error) {
 	var cores int
-	cores, err = pscpu.Counts(true)
+	cores, err = pscpu.Counts(true) // Counts returns the number of physical or logical cores in the system
 	if err != nil || cores == 0 {
 		var cpus []uint64
 		cpus, err = perCPUUsage()

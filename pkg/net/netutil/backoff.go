@@ -5,7 +5,7 @@ import (
 	"time"
 )
 
-// DefaultBackoffConfig uses values specified for backoff in common.
+// DefaultBackoffConfig uses values specified for backoff(远离) in common.
 var DefaultBackoffConfig = BackoffConfig{
 	MaxDelay:  120 * time.Second,
 	BaseDelay: 1.0 * time.Second,

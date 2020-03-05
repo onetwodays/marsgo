@@ -12,7 +12,9 @@ import (
 	"github.com/bilibili/kratos/pkg/stat/metric"
 )
 
-// sreBreaker is a sre CircuitBreaker pattern.
+// sreBreaker is a sre CircuitBreaker pattern. Circuit(电路图)
+// Circuit-Breaker的作用就好似可能失败操作的代理。
+//代理会监控最近发生的错误，然后依据这一信息来决定是否允许操作的继续执行，或者直接立刻返回异常信息
 type sreBreaker struct {
 	stat metric.RollingCounter
 	r    *rand.Rand
