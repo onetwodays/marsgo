@@ -41,6 +41,7 @@ require (
 	github.com/tsuna/gohbase v0.0.0-20190823190353-a66bcc9075db
 	go.etcd.io/etcd v3.3.18+incompatible
 	golang.org/x/net v0.0.0-20200226121028-0de0cce0169b
+	golang.org/x/sys v0.0.0-20200122134326-e047566fdf82
 	google.golang.org/genproto v0.0.0-20191216205247-b31c10ee225f
 	google.golang.org/grpc v1.27.1
 	gopkg.in/go-playground/validator.v9 v9.31.0

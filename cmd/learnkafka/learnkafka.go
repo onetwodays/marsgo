@@ -26,7 +26,7 @@ type deal_t struct {
 
 var (
 	side   int = 1
-	dealId int = 1
+	dealId int = 286
 )
 
 const (
@@ -94,17 +94,17 @@ ProducerLoop:
 		builder.WriteString(strconv.Itoa(int(time.Now().Unix())))
 
 		//code
-		builder.WriteString(`,"`)
+		builder.WriteString(`.100100,"`)
 		builder.WriteString("60000BTCEX0107NA")
-		builder.WriteString(`",`)
+		builder.WriteString(`","`)
 
 		//price
 		builder.WriteString(strconv.Itoa(rand.Intn(400)))
-		builder.WriteString(",")
+		builder.WriteString(`","`)
 
 		//amount
 		builder.WriteString(strconv.Itoa(rand.Intn(1400)))
-		builder.WriteString(",")
+		builder.WriteString(`",`)
 
 		//side
 		builder.WriteString(strconv.Itoa(getSide()))
