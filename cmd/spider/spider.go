@@ -141,6 +141,7 @@ func main()  {
 
             var builder strings.Builder
             builder.WriteString(sql)
+            flag:= 0
 
             tip:=e.ChildText(`span`)
 
@@ -159,47 +160,54 @@ func main()  {
                 long  = strings.TrimSuffix(long,"%")
                 short = strings.TrimSuffix(short,"%")
 
+
+
                 mapValue:= exchange_map[h3]
+                log.Println(h3," 上次数据:long=",mapValue.Long," short=",mapValue.Short)
+                log.Println(h3," 本次数据:long=",long," short=",short)
                 if mapValue.Long==long && mapValue.Short==short{
                     log.Println("本次采集数据跟上次一样没变化")
-                    return
 
                 }else{
-                    mapValue.Long = long
-                    mapValue.Short=short
+                    flag++
+                    value:=LongShort{Short:short,Long:long}
+                    exchange_map[h3]=value
                     log.Println("本次采集数据跟上次发生变化,更新缓存并写入数据库")
+                    fmt.Println("-------------")
+
+                    builder.WriteString(" (")
+
+                    builder.WriteString("'")
+                    builder.WriteString(h3)
+                    builder.WriteString("',")
+
+                    builder.WriteString("'BTC',")
+                    builder.WriteString(long)
+                    builder.WriteString(",")
+
+                    builder.WriteString(short)
+                    builder.WriteString(",")
+
+                    builder.WriteString("'")
+                    builder.WriteString(tip)
+                    builder.WriteString("'),")
                 }
 
 
-                fmt.Println("-------------")
 
-                builder.WriteString(" (")
-
-                builder.WriteString("'")
-                builder.WriteString(h3)
-                builder.WriteString("',")
-
-                builder.WriteString("'BTC',")
-
-
-
-                builder.WriteString(long)
-                builder.WriteString(",")
-
-                builder.WriteString(short)
-                builder.WriteString(",")
-
-                builder.WriteString("'")
-                builder.WriteString(tip)
-                builder.WriteString("'),")
             })
-            sqlex:=builder.String()
-            sqlex= strings.TrimRight(sqlex,",")
-            log.Println(sqlex)
-            _,err:=conPool.Exec(sqlex)
-            if err!=nil{
-                log.Println(sqlex," ",err)
+
+
+            if flag>0{
+                sqlex:=builder.String()
+                sqlex= strings.TrimRight(sqlex,",")
+                log.Println(sqlex)
+                _,err:=conPool.Exec(sqlex)
+                if err!=nil{
+                    log.Println(sqlex," ",err)
+                }
             }
+
 
 
 
