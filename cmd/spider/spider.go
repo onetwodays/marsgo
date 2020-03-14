@@ -65,6 +65,15 @@ func init()  {
 
 }
 
+type LongShort struct {
+    Long string
+    Short string
+}
+
+
+
+
+
 func main()  {
     dsn := fmt.Sprintf("%s:%s@%s(%s:%d)/%s", USERNAME, PASSWORD, NETWORK, SERVER, PORT, DATABASE)
     conPool, err := sql.Open("mysql", dsn)
@@ -80,6 +89,13 @@ func main()  {
     }
 
     sql:="insert into cbbc_base.t_long_short (exchange_name,coincode,longs,shorts,tips) values "
+
+    exchange_map := make(map[string]LongShort,4)
+    exchange_map["Total"]    = LongShort{Short:"0",Long:"0"}
+    exchange_map["Binance"]  = LongShort{Short:"0",Long:"0"}
+    exchange_map["BitMex"]   = LongShort{Short:"0",Long:"0"}
+    exchange_map["Bitfinex"] = LongShort{Short:"0",Long:"0"}
+
 
 
     c := colly.NewCollector()
@@ -136,7 +152,25 @@ func main()  {
                 if len(h3s)>0{
                     h3=h3s[0]
                 }
+
+
                 fmt.Println(i,":",tip,h3,long,short)
+
+                long  = strings.TrimSuffix(long,"%")
+                short = strings.TrimSuffix(short,"%")
+
+                mapValue:= exchange_map[h3]
+                if mapVaue.Long==long && mapValue.Short==short{
+                    log.Println("本次采集数据跟上次一样没变化")
+                    return
+
+                }else{
+                    mapValue.Long = long
+                    mapValue.Short=short
+                    log.Println("本次采集数据跟上次发生变化,更新缓存并写入数据库")
+                }
+
+
                 fmt.Println("-------------")
 
                 builder.WriteString(" (")
@@ -147,10 +181,12 @@ func main()  {
 
                 builder.WriteString("'BTC',")
 
-                builder.WriteString(strings.TrimSuffix(long,"%"))
+
+
+                builder.WriteString(long)
                 builder.WriteString(",")
 
-                builder.WriteString(strings.TrimSuffix(short,"%"))
+                builder.WriteString(short)
                 builder.WriteString(",")
 
                 builder.WriteString("'")
