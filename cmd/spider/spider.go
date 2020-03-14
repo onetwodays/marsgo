@@ -160,7 +160,7 @@ func main()  {
                 short = strings.TrimSuffix(short,"%")
 
                 mapValue:= exchange_map[h3]
-                if mapVaue.Long==long && mapValue.Short==short{
+                if mapValue.Long==long && mapValue.Short==short{
                     log.Println("本次采集数据跟上次一样没变化")
                     return
 
