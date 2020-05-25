@@ -59,7 +59,7 @@ func newPatternRender(format string) Render {
 }
 
 type pattern struct {
-	funcs   []func(map[string]interface{}) string
+	funcs   []func(map[string]interface{}) string //函数切片
 	bufPool sync.Pool
 }
 

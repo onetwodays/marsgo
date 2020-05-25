@@ -13,12 +13,13 @@ import (
 	"sync/atomic"
 	"time"
 
-	"github.com/bilibili/kratos/pkg/conf/env"
-	"github.com/bilibili/kratos/pkg/ecode"
-	"github.com/bilibili/kratos/pkg/log"
-	"github.com/bilibili/kratos/pkg/naming"
-	http "github.com/bilibili/kratos/pkg/net/http/blademaster"
-	xtime "github.com/bilibili/kratos/pkg/time"
+	"marsgo/pkg/conf/env"
+	"marsgo/pkg/ecode"
+	"marsgo/pkg/log"
+	"marsgo/pkg/naming"
+
+	http "marsgo/pkg/net/http/blademaster"
+	xtime "marsgo/pkg/time"
 )
 
 const (
@@ -28,7 +29,7 @@ const (
 	_renewURL    = "http://%s/discovery/renew"
 	_pollURL     = "http://%s/discovery/polls"
 
-	_registerGap = 30 * time.Second
+	_registerGap = 30 * time.Second //30s
 
 	_statusUP = "1"
 

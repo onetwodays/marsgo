@@ -17,10 +17,10 @@ import (
 	"sync"
 	"time"
 
-	"github.com/bilibili/kratos/pkg/conf/env"
-	"github.com/bilibili/kratos/pkg/net/metadata"
-	"github.com/bilibili/kratos/pkg/net/netutil/breaker"
-	xtime "github.com/bilibili/kratos/pkg/time"
+	"marsgo/pkg/conf/env"
+	"marsgo/pkg/net/metadata"
+	"marsgo/pkg/net/netutil/breaker"
+	xtime "marsgo/pkg/time"
 
 	"github.com/gogo/protobuf/proto"
 	pkgerr "github.com/pkg/errors"
@@ -133,11 +133,12 @@ func (client *Client) SetConfig(c *ClientConfig) {
 
 // NewRequest new http request with method, uri, ip, values and headers.
 // TODO(zhoujiahui): param realIP should be removed later.
+// func NewRequest(method, url string, body io.Reader) (*Request, error)
 func (client *Client) NewRequest(method, uri, realIP string, params url.Values) (req *xhttp.Request, err error) {
 	if method == xhttp.MethodGet {
 		req, err = xhttp.NewRequest(xhttp.MethodGet, fmt.Sprintf("%s?%s", uri, params.Encode()), nil)
 	} else {
-		req, err = xhttp.NewRequest(xhttp.MethodPost, uri, strings.NewReader(params.Encode()))
+		req, err = xhttp.NewRequest(xhttp.MethodPost, uri, strings.NewReader(params.Encode())) //字符串
 	}
 	if err != nil {
 		err = pkgerr.Wrapf(err, "method:%s,uri:%s", method, uri)

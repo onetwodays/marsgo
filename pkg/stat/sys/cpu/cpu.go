@@ -57,7 +57,7 @@ type Info struct {
 	Quota     float64
 }
 
-// ReadStat read cpu stat.
+// ReadStat read cpu stat. stat 保存结果值
 func ReadStat(stat *Stat) {
 	stat.Usage = atomic.LoadUint64(&usage)
 }

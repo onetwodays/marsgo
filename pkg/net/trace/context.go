@@ -17,7 +17,7 @@ var (
 	errInvalidTracerString = errors.New("trace: string does not match spancontext string format")
 )
 
-// SpanContext implements opentracing.SpanContext
+// SpanContext implements opentracing.SpanContext 开放式追踪
 type spanContext struct {
 	// TraceID represents globally unique ID of the trace.
 	// Usually generated as a random number.

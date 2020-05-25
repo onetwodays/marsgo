@@ -1,4 +1,4 @@
-// Package errgroup provides synchronization, error propagation, and Context
+// Package errgroup provides synchronization, error propagation(传播), and Context
 // errgroup 包为一组子任务的 goroutine 提供了 goroutine 同步,错误取消功能.
 //
 //errgroup 包含三种常用方式

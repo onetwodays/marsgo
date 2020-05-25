@@ -6,9 +6,9 @@ import (
 	"testing"
 	"time"
 
-	"github.com/bilibili/kratos/pkg/container/pool"
-	"github.com/bilibili/kratos/pkg/testing/lich"
-	xtime "github.com/bilibili/kratos/pkg/time"
+	"marsgo/pkg/container/pool"
+	"marsgo/pkg/testing/lich"
+	xtime "marsgo/pkg/time"
 )
 
 var (
@@ -54,7 +54,7 @@ func DialDefaultServer() (Conn, error) {
 }
 
 func TestMain(m *testing.M) {
-	flag.Set("f", "./test/docker-compose.yaml")
+	flag.Set("f", "./test..ker-compose.yaml")
 	if err := lich.Setup(); err != nil {
 		panic(err)
 	}

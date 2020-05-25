@@ -1,9 +1,9 @@
 package log
 
-// Level of severity.
+// Level of severity.严重性
 type Level int
 
-// Verbose is a boolean type that implements Info, Infov (like Printf) etc.
+// Verbose(详情) is a boolean type that implements Info, Infov (like Printf) etc.
 type Verbose bool
 
 // common log level.

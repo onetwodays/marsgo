@@ -13,12 +13,12 @@ import (
 	"sync/atomic"
 	"time"
 
-	"github.com/bilibili/kratos/pkg/conf/dsn"
-	"github.com/bilibili/kratos/pkg/log"
-	"github.com/bilibili/kratos/pkg/net/criticality"
-	"github.com/bilibili/kratos/pkg/net/ip"
-	"github.com/bilibili/kratos/pkg/net/metadata"
-	xtime "github.com/bilibili/kratos/pkg/time"
+	"marsgo/pkg/conf/dsn"
+	"marsgo/pkg/log"
+	"marsgo/pkg/net/criticality"
+	"marsgo/pkg/net/ip"
+	"marsgo/pkg/net/metadata"
+	xtime "marsgo/pkg/time"
 
 	"github.com/pkg/errors"
 )

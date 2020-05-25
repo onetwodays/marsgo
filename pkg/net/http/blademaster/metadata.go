@@ -7,10 +7,10 @@ import (
 	"strings"
 	"time"
 
-	"github.com/bilibili/kratos/pkg/conf/env"
-	"github.com/bilibili/kratos/pkg/log"
-	"github.com/bilibili/kratos/pkg/net/criticality"
-	"github.com/bilibili/kratos/pkg/net/metadata"
+	"marsgo/pkg/conf/env"
+	"marsgo/pkg/log"
+	"marsgo/pkg/net/criticality"
+	"marsgo/pkg/net/metadata"
 
 	"github.com/pkg/errors"
 )

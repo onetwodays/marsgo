@@ -1,0 +1,1 @@
+sudo  openconnect  staff.hopex.com:10442

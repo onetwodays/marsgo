@@ -5,17 +5,17 @@ go 1.13
 require (
 	github.com/BurntSushi/toml v0.3.1
 	github.com/PuerkitoBio/goquery v1.5.1 // indirect
+	github.com/Shopify/sarama v1.23.1
 	github.com/antchfx/htmlquery v1.2.2 // indirect
 	github.com/antchfx/xmlquery v1.2.3 // indirect
 	github.com/antchfx/xpath v1.1.4 // indirect
 	github.com/bilibili/kratos v0.3.3
 	github.com/cihub/seelog v0.0.0-20170130134532-f561c5e57575
-	github.com/coreos/bbolt v1.3.3 // indirect
-	github.com/coreos/etcd v3.3.18+incompatible // indirect
+	github.com/coreos/bbolt v1.3.4 // indirect
+	github.com/coreos/etcd v3.3.20+incompatible
 	github.com/dgryski/go-farm v0.0.0-20200201041132-a6ae2369ad13
 	github.com/fsnotify/fsnotify v1.4.7
-	github.com/go-redis/redis v6.15.7+incompatible // indirect
-	github.com/go-redis/redis/v7 v7.2.0 // indirect
+	github.com/go-redis/redis/v7 v7.2.0
 	github.com/go-resty/resty/v2 v2.2.0
 	github.com/go-sql-driver/mysql v1.5.0
 	github.com/go-zookeeper/zk v1.0.1
@@ -35,16 +35,24 @@ require (
 	github.com/shirou/gopsutil v2.20.1+incompatible
 	github.com/sirupsen/logrus v1.4.2
 	github.com/skip2/go-qrcode v0.0.0-20191027152451-9434209cb086
+	github.com/spf13/viper v1.3.2
 	github.com/stretchr/testify v1.5.1
 	github.com/temoto/robotstxt v1.1.1 // indirect
 	github.com/tidwall/gjson v1.5.0
 	github.com/tsuna/gohbase v0.0.0-20190823190353-a66bcc9075db
-	go.etcd.io/etcd v3.3.18+incompatible
+	go.etcd.io/etcd v3.3.20+incompatible
 	golang.org/x/net v0.0.0-20200226121028-0de0cce0169b
-	golang.org/x/sys v0.0.0-20200122134326-e047566fdf82
+	golang.org/x/sys v0.0.0-20200202164722-d101bd2416d5
 	google.golang.org/genproto v0.0.0-20191216205247-b31c10ee225f
 	google.golang.org/grpc v1.27.1
 	gopkg.in/go-playground/validator.v9 v9.31.0
 	gopkg.in/yaml.v2 v2.2.8
 
 )
+
+replace (
+	google.golang.org/grpc v1.27.1 => google.golang.org/grpc v1.26.0
+	google.golang.org/grpc v1.29.1 => google.golang.org/grpc v1.26.0
+)
+
+replace github.com/coreos/bbolt v1.3.4 => go.etcd.io/bbolt v1.3.4

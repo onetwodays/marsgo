@@ -22,6 +22,8 @@ var (
 	_ Render = PB{}
 )
 
+
+//全局函数啊
 func writeContentType(w http.ResponseWriter, value []string) {
 	header := w.Header()
 	if val := header["Content-Type"]; len(val) == 0 {

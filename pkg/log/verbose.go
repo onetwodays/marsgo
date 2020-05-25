@@ -29,7 +29,7 @@ func V(v int32) Verbose {
 	)
 	if v < 0 {
 		return Verbose(false)
-	} else if c.V >= v {
+	} else if c.V >= v {  //c是配置文件,配置文件的V的配置
 		return Verbose(true)
 	}
 	if pc, _, _, ok := runtime.Caller(1); ok {
@@ -41,7 +41,7 @@ func V(v int32) Verbose {
 	if slash := strings.LastIndex(file, "/"); slash >= 0 {
 		file = file[slash+1:]
 	}
-	for filter, lvl := range c.Module {
+	for filter, lvl := range c.Module { //c.Module = map[string]int
 		var match bool
 		if match = filter == file; !match {
 			match, _ = filepath.Match(filter, file)

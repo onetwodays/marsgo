@@ -26,10 +26,10 @@
 ## kratos内置breaker的组件
 一般情况下直接使用kratos的组件时都自带了熔断逻辑，并且在提供了对应的breaker配置项。
 目前在kratos内集成熔断器的组件有:
-- RPC client: pkg/net/rpc/warden/client
+- RPC client:  pkg/net/rpc/warden/client
 - Mysql client：pkg/database/sql
-- Tidb client：pkg/database/tidb
-- Http client：pkg/net/http/blademaster
+- Tidb client： pkg/database/tidb
+- Http client： pkg/net/http/blademaster
 
 ## 使用说明
 ```go

@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"time"
 
-	protogen "github.com/bilibili/kratos/pkg/net/trace/proto"
+	protogen "marsgo/pkg/net/trace/proto"
 )
 
 const (
@@ -17,8 +17,8 @@ var _ Trace = &Span{}
 
 // Span is a trace span.
 type Span struct {
-	dapper        *dapper
-	context       spanContext
+	dapper        *dapper //推送数据,服务级别的,里面有serviceName
+	context       spanContext //一个span的基本信息
 	operationName string
 	startTime     time.Time
 	duration      time.Duration

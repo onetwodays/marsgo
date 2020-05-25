@@ -5,3 +5,8 @@
 *.bak
 *.swp
 *.test
+/depends/etcd/d*
+/depends/etcd/goreman
+/ui/dist
+/ui/node_modules
+/ui/src/.umi

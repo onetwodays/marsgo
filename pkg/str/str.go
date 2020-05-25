@@ -28,7 +28,7 @@ func JoinInts(is []int64) string {
 		buf.WriteString(strconv.FormatInt(i, 10))
 		buf.WriteByte(',')
 	}
-	if buf.Len() > 0 {
+	if buf.Len() > 0 { //把最后一个,去掉
 		buf.Truncate(buf.Len() - 1)
 	}
 	s := buf.String()

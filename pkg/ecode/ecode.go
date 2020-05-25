@@ -35,7 +35,7 @@ func add(e int) Code {
 	return Int(e)
 }
 
-// Codes ecode error interface which has a code & message.
+// Codes ecode error interface which has a code & message. 是个接口
 type Codes interface {
 	// sometimes Error return Code in string form
 	// NOTE: don't use Error in monitor report even it also work for now

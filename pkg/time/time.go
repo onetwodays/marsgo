@@ -14,7 +14,7 @@ type Time int64
 func (jt *Time) Scan(src interface{}) (err error) {
 	switch sc := src.(type) {
 	case xtime.Time:
-		*jt = Time(sc.Unix())
+		*jt = Time(sc.Unix()) //本地时间对应的时间戳Unix returns the local Time corresponding to the given Unix time
 	case string:
 		var i int64
 		i, err = strconv.ParseInt(sc, 10, 64)
@@ -46,7 +46,8 @@ func (d *Duration) UnmarshalText(text []byte) error {
 }
 
 // Shrink(收缩) will decrease(减少) the duration by comparing with context's timeout duration
-// and return new timeout\context\CancelFunc.
+// and return new timeout\context\CancelFunc. Until = It is shorthand for t.Sub(time.Now())
+// 假设context的过期时间>d,新的过期时间缩减为d,否则不变
 func (d Duration) Shrink(c context.Context) (Duration, context.Context, context.CancelFunc) {
 	if deadline, ok := c.Deadline(); ok {
 		if ctimeout := xtime.Until(deadline); ctimeout < xtime.Duration(d) {

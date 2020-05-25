@@ -5,12 +5,22 @@ import (
 	"strings"
 )
 
-// ExternalIP get external ip.
+
+// ExternalIP get external(外部) ip.得到外部地址.
 func ExternalIP() (res []string) {
-	inters, err := net.Interfaces()
+	inters, err := net.Interfaces() // Interfaces returns a list of the system's network interfaces.
 	if err != nil {
 		return
 	}
+	/*
+	// An Addr represents a SOCKS-specific address.
+	// Either Name or IP is used exclusively.
+	type Addr struct {
+		Name string // fully-qualified domain name
+		IP   net.IP
+		Port int
+	}
+	 */
 	for _, inter := range inters {
 		if !strings.HasPrefix(inter.Name, "lo") {
 			addrs, err := inter.Addrs()
@@ -57,7 +67,7 @@ func InternalIP() string {
 				continue
 			}
 			for _, addr := range addrs {
-				if ipnet, ok := addr.(*net.IPNet); ok && !ipnet.IP.IsLoopback() {
+				if ipnet, ok := addr.(*net.IPNet); ok && !ipnet.IP.IsLoopback() { //不能是127开头的地址
 					if ipnet.IP.To4() != nil {
 						return ipnet.IP.String()
 					}

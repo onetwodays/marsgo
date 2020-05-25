@@ -7,9 +7,9 @@ import (
 	"strconv"
 	"text/template"
 
-	"github.com/bilibili/kratos/pkg/ecode"
-	"github.com/bilibili/kratos/pkg/net/http/blademaster/binding"
-	"github.com/bilibili/kratos/pkg/net/http/blademaster/render"
+	"marsgo/pkg/ecode"
+	"marsgo/pkg/net/http/blademaster/binding"
+	"marsgo/pkg/net/http/blademaster/render"
 
 	"github.com/gogo/protobuf/proto"
 	"github.com/gogo/protobuf/types"
@@ -17,7 +17,7 @@ import (
 )
 
 const (
-	_abortIndex int8 = math.MaxInt8 / 2
+	_abortIndex int8 = math.MaxInt8 / 2 //_abortIndex =32;
 )
 
 var (
@@ -36,7 +36,7 @@ type Context struct {
 
 	// flow control
 	index    int8
-	handlers []HandlerFunc
+	handlers []HandlerFunc // type HandleFunc func(*Context)
 
 	// Keys is a key/value pair exclusively for the context of each request.
 	Keys map[string]interface{}
@@ -48,7 +48,7 @@ type Context struct {
 
 	RoutePath string
 
-	Params Params
+	Params Params //pair的切片
 }
 
 /************************************/
@@ -59,7 +59,7 @@ type Context struct {
 // It executes the pending handlers in the chain inside the calling handler.
 // See example in godoc.
 func (c *Context) Next() {
-	c.index++
+	c.index++ //我自己已经调用一次了
 	for c.index < int8(len(c.handlers)) {
 		c.handlers[c.index](c)
 		c.index++

@@ -8,7 +8,7 @@ import (
 )
 
 const (
-	_timeFormat = "2006-01-02T15:04:05.999999"
+	_timeFormat = "2006-01-02T15:04:05.999999" //精确到毫秒
 
 	// log level defined in level.go.
 	_levelValue = "level_value"
@@ -67,7 +67,7 @@ type Handler interface {
 func newHandlers(filters []string, handlers ...Handler) *Handlers {
 	set := make(map[string]struct{})
 	for _, k := range filters {
-		set[k] = struct{}{}
+		set[k] = struct{}{} //要过滤的关键字.
 	}
 	return &Handlers{filters: set, handlers: handlers}
 }
@@ -83,9 +83,9 @@ func (hs Handlers) Log(ctx context.Context, lv Level, d ...D) {
 	hasSource := false
 	for i := range d {
 		if _, ok := hs.filters[d[i].Key]; ok {
-			d[i].Value = "***"
+			d[i].Value = "***"  //如果key是要过滤的,就用***代替
 		}
-		if d[i].Key == _source {
+		if d[i].Key == _source { //如果field里面有source字段
 			hasSource = true
 		}
 	}

@@ -1,6 +1,6 @@
 package warden
 
-import "github.com/bilibili/kratos/pkg/stat/metric"
+import "marsgo/pkg/stat/metric"
 
 const (
 	clientNamespace = "grpc_client"

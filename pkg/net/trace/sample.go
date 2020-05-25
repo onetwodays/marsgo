@@ -9,6 +9,7 @@ import (
 const (
 	slotLength = 2048
 )
+//采样???
 
 var ignoreds = []string{"/metrics", "/ping"} // NOTE: add YOUR URL PATH that want ignore
 
@@ -35,9 +36,10 @@ type sampler interface {
 	Close() error
 }
 
+// 下面定义了一个类型和实现了sampler接口.
 type probabilitySampling struct {
 	probability float32
-	slot        [slotLength]int64
+	slot        [slotLength]int64 //2048个槽?什么意思呢?是个数组啊
 }
 
 func (p *probabilitySampling) IsSampled(traceID uint64, operationName string) (bool, float32) {
@@ -46,7 +48,7 @@ func (p *probabilitySampling) IsSampled(traceID uint64, operationName string) (b
 			return false, 0
 		}
 	}
-	now := time.Now().Unix()
+	now := time.Now().Unix() //时间戳
 	idx := oneAtTimeHash(operationName) % slotLength
 	old := atomic.LoadInt64(&p.slot[idx])
 	if old != now {

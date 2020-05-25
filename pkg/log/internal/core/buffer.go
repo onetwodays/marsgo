@@ -4,7 +4,7 @@ import "strconv"
 
 const _size = 1024 // by default, create 1 KiB buffers
 
-// NewBuffer is new buffer
+// NewBuffer is new buffer,没有用到
 func NewBuffer(_size int) *Buffer {
 	return &Buffer{bs: make([]byte, 0, _size)}
 }

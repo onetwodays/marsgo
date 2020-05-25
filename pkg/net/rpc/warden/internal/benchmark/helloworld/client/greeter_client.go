@@ -9,10 +9,10 @@ import (
 	"sync/atomic"
 	"time"
 
-	"github.com/bilibili/kratos/pkg/net/netutil/breaker"
-	"github.com/bilibili/kratos/pkg/net/rpc/warden"
-	pb "github.com/bilibili/kratos/pkg/net/rpc/warden/internal/proto/testproto"
-	xtime "github.com/bilibili/kratos/pkg/time"
+	"marsgo/pkg/net/netutil/breaker"
+	"marsgo/pkg/net/rpc/warden"
+	pb "marsgo/pkg/net/rpc/warden/internal/proto/testproto"
+	xtime "marsgo/pkg/time"
 )
 
 var (

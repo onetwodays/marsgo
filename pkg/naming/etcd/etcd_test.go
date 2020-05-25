@@ -3,11 +3,13 @@ package etcd
 import (
 	"context"
 	"fmt"
-	"github.com/bilibili/kratos/pkg/naming"
-	"go.etcd.io/etcd/clientv3"
-	"google.golang.org/grpc"
 	"testing"
 	"time"
+
+	"go.etcd.io/etcd/clientv3"
+	"google.golang.org/grpc"
+
+	"marsgo/pkg/naming"
 )
 
 func TestNew(t *testing.T) {
@@ -23,14 +25,15 @@ func TestNew(t *testing.T) {
 		fmt.Println("etcd 连接失败")
 		return
 	}
-	app1 := builder.Build("app1")
+	app1 := builder.Build("app1") //服务发现
 
+	//一直监控这个节点是否发生变化
 	go func() {
-		fmt.Printf("Watch \n")
+		fmt.Printf("看下app1 是否有事件到来 \n")
 		for {
 			select {
 			case <-app1.Watch():
-				fmt.Printf("app1 节点发生变化 \n")
+				//fmt.Printf("app1 节点发生变化 \n")
 			}
 
 		}
@@ -38,6 +41,7 @@ func TestNew(t *testing.T) {
 	}()
 	time.Sleep(time.Second)
 
+	//注册2个实例
 	app1Cancel, err := builder.Register(context.Background(), &naming.Instance{
 		AppID:    "app1",
 		Hostname: "h1",
@@ -54,35 +58,43 @@ func TestNew(t *testing.T) {
 		fmt.Println(err)
 	}
 
+	//服务发现app2
 	app2 := builder.Build("app2")
 
 	go func() {
 		fmt.Println("节点列表")
 		for {
-			fmt.Printf("app1: ")
+
+
+
 			r1, _ := app1.Fetch(context.Background())
 			if r1 != nil {
+				app1_info:="app1 info:"
 				for z, ins := range r1.Instances {
-					fmt.Printf("zone: %s :", z)
+
+					app1_info+=fmt.Sprintf("zone:%s",z)
 					for _, in := range ins {
-						fmt.Printf("app: %s host %s \n", in.AppID, in.Hostname)
+						app1_info+=fmt.Sprintf(" app: %s host %s \n", in.AppID, in.Hostname)
 					}
 				}
 			} else {
-				fmt.Printf("\n")
+				fmt.Println("app1 empty")
 			}
-			fmt.Printf("app2: ")
+			fmt.Printf("\n")
+
 			r2, _ := app2.Fetch(context.Background())
 			if r2 != nil {
+				app1_info:="app2 info:"
 				for z, ins := range r2.Instances {
-					fmt.Printf("zone: %s :", z)
+					app1_info+=fmt.Sprintf("zone:%s",z)
 					for _, in := range ins {
-						fmt.Printf("app: %s host %s \n", in.AppID, in.Hostname)
+						app1_info+=fmt.Sprintf(" app: %s host %s \n", in.AppID, in.Hostname)
 					}
 				}
 			} else {
-				fmt.Printf("\n")
+				fmt.Println("app2 empty")
 			}
+			fmt.Printf("\n")
 			time.Sleep(time.Second)
 		}
 	}()

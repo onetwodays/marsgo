@@ -8,10 +8,11 @@ import (
 	"os"
 	"sort"
 
-	"github.com/bilibili/kratos/pkg/conf/env"
-	"github.com/bilibili/kratos/pkg/log"
+	"marsgo/pkg/conf/env"
 
-	"github.com/dgryski/go-farm"
+	"marsgo/pkg/log"
+
+	"github.com/dgryski/go-farm" // go-farm: a pure-Go farmhash implementation
 )
 
 // BuildOptions build options.
@@ -36,7 +37,7 @@ func (f *funcOpt) Apply(opt *BuildOptions) {
 	f.f(opt)
 }
 
-// Filter filter option.
+// Filter filter option.返回的是个接口
 func Filter(schema string, clusters map[string]struct{}) BuildOpt {
 	return &funcOpt{f: func(opt *BuildOptions) {
 		opt.Filter = func(inss map[string][]*Instance) map[string][]*Instance {
@@ -71,6 +72,7 @@ func Filter(schema string, clusters map[string]struct{}) BuildOpt {
 	}}
 }
 
+//返回[]*Instance的size个切片
 func defulatSubset(inss []*Instance, size int) []*Instance {
 	backends := inss
 	if len(backends) <= int(size) {

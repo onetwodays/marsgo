@@ -18,7 +18,7 @@ func newServer(w io.Writer, network, address string) (func() error, error) {
 	}
 	done := make(chan struct{})
 	go func() {
-		conn, err := lis.Accept()
+		conn, err := lis.Accept() //在这里阻塞
 		if err != nil {
 			lis.Close()
 			log.Fatal(err)

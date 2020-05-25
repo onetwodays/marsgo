@@ -6,19 +6,20 @@ import (
 	"math/rand"
 	"time"
 
-	"github.com/bilibili/kratos/pkg/conf/env"
-	"github.com/bilibili/kratos/pkg/net/ip"
+	"marsgo/pkg/conf/env"
+	"marsgo/pkg/net/ip"
 
 	"github.com/pkg/errors"
 )
 
-var _hostHash byte
+var _hostHash byte // 0~256
 
 func init() {
 	rand.Seed(time.Now().UnixNano())
-	_hostHash = byte(oneAtTimeHash(env.Hostname))
+	_hostHash = byte(oneAtTimeHash(env.Hostname)) //主机名称.初始化
 }
 
+//收集一些信息而已.
 func extendTag() (tags []Tag) {
 	tags = append(tags,
 		TagString("region", env.Region),
@@ -31,7 +32,7 @@ func extendTag() (tags []Tag) {
 
 func genID() uint64 {
 	var b [8]byte
-	// i think this code will not survive to 2106-02-07
+	// i think this code will not survive(生存) to 2106-02-07
 	binary.BigEndian.PutUint32(b[4:], uint32(time.Now().Unix())>>8)
 	b[4] = _hostHash
 	binary.BigEndian.PutUint32(b[:4], uint32(rand.Int31()))
@@ -39,14 +40,14 @@ func genID() uint64 {
 }
 
 type stackTracer interface {
-	StackTrace() errors.StackTrace
+	StackTrace() errors.StackTrace //调用堆栈
 }
 
 type ctxKey string
 
-var _ctxkey ctxKey = "kratos/pkg/net/trace.trace"
+var _ctxkey ctxKey = "marsgo/pkg/net/trace.trace" //上下文key
 
-// FromContext returns the trace bound to the context, if any.
+// FromContext returns the trace bound to the context, if any. 把trace_key 和trace_value 传递给上下文.
 func FromContext(ctx context.Context) (t Trace, ok bool) {
 	t, ok = ctx.Value(_ctxkey).(Trace)
 	return

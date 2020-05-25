@@ -8,17 +8,17 @@ import (
 )
 
 // A Group is a collection of goroutines working on subtasks that are part of
-// the same overall task.
+// the same overall(总体) task.
 //
 // A zero Group is valid and does not cancel on error.
 type Group struct {
-	err     error
-	wg      sync.WaitGroup
-	errOnce sync.Once
+	err     error  //保存错误
+	wg      sync.WaitGroup  //
+	errOnce sync.Once  //只被执行一次
 
 	workerOnce sync.Once
-	ch         chan func(ctx context.Context) error
-	chs        []func(ctx context.Context) error
+	ch         chan func(ctx context.Context) error //ch 用来保存函数
+	chs        []func(ctx context.Context) error    //函数切片,当ch满了时候,f放到chs里面,否则放在ch里面
 
 	ctx    context.Context
 	cancel func()
@@ -72,11 +72,11 @@ func (g *Group) GOMAXPROCS(n int) {
 		panic("errgroup: GOMAXPROCS must great than 0")
 	}
 	g.workerOnce.Do(func() {
-		g.ch = make(chan func(context.Context) error, n)
+		g.ch = make(chan func(context.Context) error, n) //这里才创建channel的内存.
 		for i := 0; i < n; i++ {
 			go func() {
 				for f := range g.ch {
-					g.do(f)
+					g.do(f) //调用f
 				}
 			}()
 		}

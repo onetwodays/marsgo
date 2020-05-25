@@ -50,7 +50,7 @@ var incomingKey = map[string]struct{}{
 	Caller: struct{}{},
 }
 
-// IsOutgoingKey represent this key should propagate by rpc.
+// IsOutgoingKey represent this key should propagate(传播) by rpc.
 func IsOutgoingKey(key string) bool {
 	_, ok := outgoingKey[key]
 	return ok

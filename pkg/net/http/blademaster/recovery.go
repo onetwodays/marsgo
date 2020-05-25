@@ -6,7 +6,7 @@ import (
 	"os"
 	"runtime"
 
-	"github.com/bilibili/kratos/pkg/log"
+	"marsgo/pkg/log"
 )
 
 // Recovery returns a middleware that recovers from any panics and writes a 500 if there was one.

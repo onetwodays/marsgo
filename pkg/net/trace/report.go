@@ -32,12 +32,12 @@ func newReport(network, address string, timeout time.Duration, protocolVersion i
 	report := &connReport{
 		network: network,
 		address: address,
-		dataCh:  make(chan []byte, _dataChSize),
-		done:    make(chan struct{}),
+		dataCh:  make(chan []byte, _dataChSize), //4096个字节数组
+		done:    make(chan struct{}), //同步chan
 		timeout: timeout,
 		version: protocolVersion,
 	}
-	go report.daemon()
+	go report.daemon() //启动一个协程发数据
 	return report
 }
 
@@ -48,7 +48,7 @@ type connReport struct {
 
 	network, address string
 
-	dataCh chan []byte
+	dataCh chan []byte //很多字节数组
 
 	conn net.Conn
 
@@ -59,9 +59,9 @@ type connReport struct {
 
 func (c *connReport) daemon() {
 	for b := range c.dataCh {
-		c.send(b)
+		c.send(b)  //每次发送一个字节数组
 	}
-	c.done <- struct{}{}
+	c.done <- struct{}{} //发送完了,给一个通知.
 }
 
 func (c *connReport) WriteSpan(sp *Span) error {
@@ -97,11 +97,11 @@ func (c *connReport) Close() error {
 	t := time.NewTimer(time.Second)
 	close(c.dataCh)
 	select {
-	case <-t.C:
-		c.closeConn()
+	case <-t.C: //有数据来了
+		c.closeConn() //定时器关闭.
 		return fmt.Errorf("close report timeout force close")
 	case <-c.done:
-		return c.closeConn()
+		return c.closeConn() //数据发完就关闭
 	}
 }
 
@@ -113,7 +113,7 @@ func (c *connReport) send(data []byte) {
 			return
 		}
 	}
-	c.conn.SetWriteDeadline(time.Now().Add(100 * time.Microsecond))
+	c.conn.SetWriteDeadline(time.Now().Add(100 * time.Microsecond)) //100ms发完
 	if _, err := c.conn.Write(data); err != nil {
 		c.Errorf("write to conn error: %s, close connect", err)
 		c.conn.Close()

@@ -8,6 +8,7 @@ import (
 	"time"
 )
 
+//List 是Pool的一种实现
 var _ Pool = &List{}
 
 // List .

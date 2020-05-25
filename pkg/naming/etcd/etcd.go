@@ -12,11 +12,15 @@ import (
 	"sync/atomic"
 	"time"
 
-	"github.com/bilibili/kratos/pkg/log"
-	"github.com/bilibili/kratos/pkg/naming"
 	"go.etcd.io/etcd/clientv3"
-	"go.etcd.io/etcd/mvcc/mvccpb"
+
+	"github.com/coreos/etcd/mvcc/mvccpb" //"go.etcd.io/etcd/mvcc/mvccpb"
+
 	"google.golang.org/grpc"
+
+	"marsgo/pkg/log"
+	"marsgo/pkg/naming"
+
 )
 
 var (
@@ -75,11 +79,11 @@ type EtcdBuilder struct {
 
 	mutex    sync.RWMutex
 	apps     map[string]*appInfo
-	registry map[string]struct{}
+	registry map[string]struct{} //保存已经注册过的app
 }
 type appInfo struct {
 	resolver map[*Resolve]struct{}
-	ins      atomic.Value
+	ins      atomic.Value //保存从edcd拿回来的值.
 	e        *EtcdBuilder
 	once     sync.Once
 }
@@ -94,13 +98,14 @@ type Resolve struct {
 
 // New is new a etcdbuilder
 func New(c *clientv3.Config) (e *EtcdBuilder, err error) {
+	//如果配置为空,就用默认值填充
 	if c == nil {
 		if endpoints == "" {
 			panic(fmt.Errorf("invalid etcd config endpoints:%+v", endpoints))
 		}
 		c = &clientv3.Config{
 			Endpoints:   strings.Split(endpoints, ","),
-			DialTimeout: time.Second * time.Duration(defaultDialTimeout),
+			DialTimeout: time.Second * time.Duration(defaultDialTimeout), //30s,一旦client创建成功，不用再关心后续底层连接的状态了，client内部会重连。
 			DialOptions: []grpc.DialOption{grpc.WithBlock()},
 		}
 	}
@@ -119,7 +124,7 @@ func New(c *clientv3.Config) (e *EtcdBuilder, err error) {
 	return
 }
 
-// Build disovery resovler builder.
+// Build disovery resovler builder.Build开始watch,也就是说主动watch一个key的value的变化.相当于服务发现
 func (e *EtcdBuilder) Build(appid string, opts ...naming.BuildOpt) naming.Resolver {
 	r := &Resolve{
 		id:    appid,
@@ -131,7 +136,7 @@ func (e *EtcdBuilder) Build(appid string, opts ...naming.BuildOpt) naming.Resolv
 	app, ok := e.apps[appid]
 	if !ok {
 		app = &appInfo{
-			resolver: make(map[*Resolve]struct{}),
+			resolver: make(map[*Resolve]struct{}), //这里生成一个
 			e:        e,
 		}
 		e.apps[appid] = app
@@ -147,7 +152,7 @@ func (e *EtcdBuilder) Build(appid string, opts ...naming.BuildOpt) naming.Resolv
 
 	app.once.Do(func() {
 		go app.watch(appid)
-		log.Info("etcd: AddWatch(%s) already watch(%v)", appid, ok)
+		log.Info("etcd: AddWatch(%s) already watch(%v)", appid, ok) //报告appid是不是第一次watch,幂等
 	})
 	return r
 }
@@ -158,7 +163,7 @@ func (e *EtcdBuilder) Scheme() string {
 
 }
 
-// Register is register instance
+// Register is register instance,,服务注册.每隔一段时间注册一次
 func (e *EtcdBuilder) Register(ctx context.Context, ins *naming.Instance) (cancelFunc context.CancelFunc, err error) {
 	e.mutex.Lock()
 	if _, ok := e.registry[ins.AppID]; ok {
@@ -167,6 +172,7 @@ func (e *EtcdBuilder) Register(ctx context.Context, ins *naming.Instance) (cance
 		e.registry[ins.AppID] = struct{}{}
 	}
 	e.mutex.Unlock()
+
 	if err != nil {
 		return
 	}
@@ -179,6 +185,7 @@ func (e *EtcdBuilder) Register(ctx context.Context, ins *naming.Instance) (cance
 		return
 	}
 	ch := make(chan struct{}, 1)
+	//通知定时器停止注册.
 	cancelFunc = context.CancelFunc(func() {
 		cancel()
 		<-ch
@@ -186,7 +193,7 @@ func (e *EtcdBuilder) Register(ctx context.Context, ins *naming.Instance) (cance
 
 	go func() {
 
-		ticker := time.NewTicker(time.Duration(registerTTL/3) * time.Second)
+		ticker := time.NewTicker(time.Duration(registerTTL/3) * time.Second) //30s
 		defer ticker.Stop()
 		for {
 			select {
@@ -242,12 +249,13 @@ func (e *EtcdBuilder) Close() error {
 	return nil
 }
 func (a *appInfo) watch(appID string) {
-	_ = a.fetchstore(appID)
+	_ = a.fetchstore(appID) //先get一下
 	prefix := fmt.Sprintf("/%s/%s/", etcdPrefix, appID)
-	rch := a.e.cli.Watch(a.e.ctx, prefix, clientv3.WithPrefix())
+	rch := a.e.cli.Watch(a.e.ctx, prefix, clientv3.WithPrefix()) //会阻塞在这里,返回一个通道,通道保存的是 WatchResponse
 	for wresp := range rch {
 		for _, ev := range wresp.Events {
 			if ev.Type == mvccpb.PUT || ev.Type == mvccpb.DELETE {
+				log.Info("key:(%s)发生事件:%s ",appID,ev.Type.String())
 				_ = a.fetchstore(appID)
 			}
 		}
@@ -271,11 +279,11 @@ func (a *appInfo) fetchstore(appID string) (err error) {
 }
 func (a *appInfo) store(ins *naming.InstancesInfo) {
 
-	a.ins.Store(ins)
+	a.ins.Store(ins) //设置a.ins的值=ins
 	a.e.mutex.RLock()
 	for rs := range a.resolver {
 		select {
-		case rs.event <- struct{}{}:
+		case rs.event <- struct{}{}://store完成后发一个事件告知一下,然后可以调用Fetch拿数据
 		default:
 		}
 	}
@@ -298,7 +306,7 @@ func (a *appInfo) paserIns(resp *clientv3.GetResponse) (ins *naming.InstancesInf
 	return ins, nil
 }
 
-// Watch watch instance.
+// Watch watch instance. 报告有watch事件来了,一种通知方式
 func (r *Resolve) Watch() <-chan struct{} {
 	return r.event
 }

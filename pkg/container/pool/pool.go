@@ -6,7 +6,7 @@ import (
 	"io"
 	"time"
 
-	xtime "github.com/bilibili/kratos/pkg/time"
+	xtime "marsgo/pkg/time"
 )
 
 var (
@@ -23,7 +23,7 @@ var (
 type Config struct {
 	// Active number of items allocated by the pool at a given time.
 	// When zero, there is no limit on the number of items in the pool.
-	Active int
+	Active int // 活动的个数
 	// Idle number of idle items in the pool.
 	Idle int
 	// Close items after remaining item for this duration. If the value
@@ -47,7 +47,7 @@ func (i *item) expired(timeout time.Duration) bool {
 	if timeout <= 0 {
 		return false
 	}
-	return i.createdAt.Add(timeout).Before(nowFunc())
+	return i.createdAt.Add(timeout).Before(nowFunc()) /*返回当前时间*/
 }
 
 func (i *item) close() error {

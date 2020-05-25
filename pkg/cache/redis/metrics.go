@@ -1,7 +1,7 @@
 package redis
 
 import (
-	"github.com/bilibili/kratos/pkg/stat/metric"
+	"marsgo/pkg/stat/metric"
 )
 
 const namespace = "redis_client"

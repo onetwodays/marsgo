@@ -70,7 +70,7 @@ type propagator interface {
 
 type httpPropagator struct{}
 
-type httpCarrier http.Header
+type httpCarrier http.Header //map[string][]string
 
 func (h httpCarrier) Set(key, val string) {
 	http.Header(h).Set(key, val)

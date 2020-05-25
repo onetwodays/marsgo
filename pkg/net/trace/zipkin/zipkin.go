@@ -1,16 +1,18 @@
 package zipkin
 
+
 import (
 	"fmt"
-	protogen "github.com/bilibili/kratos/pkg/net/trace/proto"
+	protogen "marsgo/pkg/net/trace/proto"
 	"time"
 
-	"github.com/bilibili/kratos/pkg/net/trace"
+	"marsgo/pkg/net/trace"
+
 	"github.com/openzipkin/zipkin-go/model"
 	"github.com/openzipkin/zipkin-go/reporter"
 	"github.com/openzipkin/zipkin-go/reporter/http"
 )
-
+//只是实现了report了.
 type report struct {
 	rpt reporter.Reporter
 }

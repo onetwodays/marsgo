@@ -18,7 +18,7 @@ func NewTracer(serviceName string, report reporter, disableSample bool) Tracer {
 	sampler := newSampler(_probability)
 
 	// default internal tags
-	tags := extendTag()
+	tags := extendTag() //默认的tag :比如region zone hostname ip
 	stdlog := log.New(os.Stderr, "trace", log.LstdFlags)
 	return &dapper{
 		serviceName:   serviceName,
@@ -27,7 +27,7 @@ func NewTracer(serviceName string, report reporter, disableSample bool) Tracer {
 			HTTPFormat: httpPropagator{},
 			GRPCFormat: grpcPropagator{},
 		},
-		reporter: report,
+		reporter: report, //report 有了.
 		sampler:  sampler,
 		tags:     tags,
 		pool:     &sync.Pool{New: func() interface{} { return new(Span) }},
@@ -38,7 +38,7 @@ func NewTracer(serviceName string, report reporter, disableSample bool) Tracer {
 type dapper struct {
 	serviceName   string
 	disableSample bool
-	tags          []Tag
+	tags          []Tag //key-value 的切片
 	reporter      reporter
 	propagators   map[interface{}]propagator
 	pool          *sync.Pool
@@ -46,11 +46,12 @@ type dapper struct {
 	sampler       sampler
 }
 
+//opts 是传进来的函数.
 func (d *dapper) New(operationName string, opts ...Option) Trace {
-	opt := defaultOption
+	opt := defaultOption   //对默认的选项作什么呢?
 	for _, fn := range opts {
-		fn(&opt)
-	}
+		fn(&opt) //依次对默认选项做些动作
+	}//只是把defaultOption设置成true
 	traceID := genID()
 	var sampled bool
 	var probability float32

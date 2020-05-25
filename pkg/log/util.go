@@ -7,10 +7,10 @@ import (
 	"strconv"
 	"time"
 
-	"github.com/bilibili/kratos/pkg/conf/env"
-	"github.com/bilibili/kratos/pkg/log/internal/core"
-	"github.com/bilibili/kratos/pkg/net/metadata"
-	"github.com/bilibili/kratos/pkg/net/trace"
+	"marsgo/pkg/conf/env"
+	"marsgo/pkg/log/internal/core"
+	"marsgo/pkg/net/metadata"
+	"marsgo/pkg/net/trace"
 )
 
 func addExtraField(ctx context.Context, fields map[string]interface{}) {
@@ -46,7 +46,7 @@ func funcName(skip int) (name string) {
 	return "unknown:0"
 }
 
-// toMap convert D slice to map[string]interface{} for legacy file and stdout.
+// toMap convert D slice to map[string]interface{} for legacy(遗产) file and stdout.
 func toMap(args ...D) map[string]interface{} {
 	d := make(map[string]interface{}, 10+len(args))
 	for _, arg := range args {

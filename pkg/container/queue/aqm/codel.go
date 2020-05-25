@@ -6,13 +6,13 @@ import (
 	"sync"
 	"time"
 
-	"github.com/bilibili/kratos/pkg/ecode"
+	"marsgo/pkg/ecode"
 )
 
 // Config codel config.
 type Config struct {
 	Target   int64 // target queue delay (default 20 ms).
-	Internal int64 // sliding minimum time window width (default 500 ms)
+	Internal int64 // sliding minimum time window width (default 500 ms) // 滑动最小时间窗口宽度
 }
 
 // Stat is the Statistics of codel.

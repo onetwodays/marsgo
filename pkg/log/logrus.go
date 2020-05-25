@@ -14,7 +14,8 @@ func init() {
 
 func redirectLogrus() {
 	// FIXME: because of different stack depth call runtime.Caller will get error function name.
-	logrus.AddHook(redirectHook{})
+	logrus.AddHook(redirectHook{}) //添加一个hook
+
 	if os.Getenv("LOGRUS_STDOUT") == "" {
 		logrus.SetOutput(ioutil.Discard)
 	}
@@ -33,7 +34,7 @@ func (redirectHook) Fire(entry *logrus.Entry) error {
 	switch entry.Level {
 	case logrus.FatalLevel, logrus.PanicLevel:
 		logrusLv = entry.Level.String()
-		fallthrough
+		fallthrough // Go里面switch默认相当于每个case最后带有break，匹配成功后不会自动向下执行其他case，而是跳出整个switch, 但是可以使用fallthrough强制执行后面的case代码，fallthrough不会判断下一条case的expr结果是否为true
 	case logrus.ErrorLevel:
 		lv = _errorLevel
 	case logrus.WarnLevel:

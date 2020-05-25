@@ -1,0 +1,12 @@
+ git clone https://gitlab.com/mailman/mailman-bundler.git
+Cloning into 'mailman-bundler'...
+fatal: unable to access 'https://gitlab.com/mailman/mailman-bundler.git/': Problem with the SSL CA cert (path? access rights?)
+
+
+You may be missing ca-certificates package on your system (which was probably newly installed).
+
+To fix (on Ubuntu or Debian systems):
+
+# apt-get install ca-certificates
+
+在ubuntu下 安装ca 一般自动安装openssl

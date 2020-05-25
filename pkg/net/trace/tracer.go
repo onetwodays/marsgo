@@ -14,19 +14,21 @@ func SetGlobalTracer(tracer Tracer) {
 	_tracer = tracer
 }
 
-// Tracer is a simple, thin interface for Trace creation and propagation.
+// Tracer is a simple, thin interface for Trace creation and propagation.(传播)
 type Tracer interface {
 	// New trace instance with given title.
 	New(operationName string, opts ...Option) Trace
 	// Inject takes the Trace instance and injects it for
 	// propagation within `carrier`. The actual type of `carrier` depends on
 	// the value of `format`.
-	Inject(t Trace, format interface{}, carrier interface{}) error
+	Inject(t Trace, format interface{}, carrier interface{}) error //注入
 	// Extract returns a Trace instance given `format` and `carrier`.
 	// return `ErrTraceNotFound` if trace not found.
-	Extract(format interface{}, carrier interface{}) (Trace, error)
+	Extract(format interface{}, carrier interface{}) (Trace, error) //提取
 }
 
+
+// 这是全局函数
 // New trace instance with given operationName.
 func New(operationName string, opts ...Option) Trace {
 	return _tracer.New(operationName, opts...)
@@ -53,15 +55,15 @@ func Close() error {
 	return nil
 }
 
-// Trace trace common interface.
+// Trace trace common interface.是一个接口类型.
 type Trace interface {
 	// return current trace id.
 	TraceID() string
 	// Fork fork a trace with client trace.
-	Fork(serviceName, operationName string) Trace
+	Fork(serviceName, operationName string) Trace //返回给自己一个类型
 
 	// Follow
-	Follow(serviceName, operationName string) Trace
+	Follow(serviceName, operationName string) Trace //返回给自己一个类型
 
 	// Finish when trace finish call it.
 	Finish(err *error)
@@ -78,7 +80,7 @@ type Trace interface {
 	// other tag value types is undefined at the OpenTracing level. If a
 	// tracing system does not know how to handle a particular value type, it
 	// may ignore the tag, but shall not panic.
-	// NOTE current only support legacy tag: TagAnnotation TagAddress TagComment
+	// NOTE current only support legacy tag: TagAnnotation(注解) TagAddress TagComment
 	// other will be ignore
 	SetTag(tags ...Tag) Trace
 

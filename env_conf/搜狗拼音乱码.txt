@@ -1,0 +1,4 @@
+cd ~/.config
+sudo rm -rf SogouPY* sogou*
+fcitx -r 
+#不用重启系统

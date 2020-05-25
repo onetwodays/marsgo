@@ -3,18 +3,24 @@ package criticality
 // Criticality is
 type Criticality string
 
-// criticality
+// criticality:关键性?
 var (
-	// EmptyCriticality is used to mark any invalid criticality, and the empty criticality will be parsed as the default criticality later.
+	// EmptyCriticality is used to mark any invalid criticality,
+	//and the empty criticality will be parsed as the default criticality later.
 	EmptyCriticality = Criticality("")
-	// CriticalPlus is reserved for the most critical requests, those that will result in serious user-visible impact if they fail.
+	// CriticalPlus is reserved for the most critical requests,
+	//those that will result in serious user-visible impact if they fail.
 	CriticalPlus = Criticality("CRITICAL_PLUS")
-	// Critical is the default value for requests sent from production jobs. These requests will result in user-visible impact, but the impact may be less severe than those of CRITICAL_PLUS. Services are expected to provision enough capacity for all expected CRITICAL and CRITICAL_PLUS traffic.
+	// Critical is the default value for requests sent from production jobs.
+	//These requests will result in user-visible impact, but the impact may be less severe than those of CRITICAL_PLUS.
+	//Services are expected to provision enough capacity for all expected CRITICAL and CRITICAL_PLUS traffic.
+	//从生产作业发送的请求的默认值。
+	//这些请求将导致用户可见的影响，但影响可能不如CRITICAL_PLUS严重。 服务应为所有预期的CRITICAL和CRITICAL_PLUS流量提供足够的容量。
 	Critical = Criticality("CRITICAL")
 	// SheddablePlus is traffic for which partial unavailability is expected. This is the default for batch jobs, which can retry requests minutes or even hours later.
-	SheddablePlus = Criticality("SHEDDABLE_PLUS")
+	SheddablePlus = Criticality("SHEDDABLE_PLUS") //SheddablePlus是预期部分不可用的流量,这是批处理作业的默认设置，可以在几分钟甚至几小时后重试请求。
 	// Sheddable is traffic for which frequent partial unavailability and occasional full unavailability is expected.
-	Sheddable = Criticality("SHEDDABLE")
+	Sheddable = Criticality("SHEDDABLE") //可预期流量是指预计经常出现部分不可用和偶尔完全不可用的流量
 
 	// higher is more critical
 	_criticalityEnum = map[Criticality]int{

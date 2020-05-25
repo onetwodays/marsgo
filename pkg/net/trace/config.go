@@ -8,11 +8,13 @@ import (
 
 	"github.com/pkg/errors"
 
-	"github.com/bilibili/kratos/pkg/conf/dsn"
-	"github.com/bilibili/kratos/pkg/conf/env"
-	xtime "github.com/bilibili/kratos/pkg/time"
+	"marsgo/pkg/conf/dsn"
+	"marsgo/pkg/conf/env"
+	xtime "marsgo/pkg/time"
 )
 
+
+//需要提供TRACE环境变量或者trace参数
 var _traceDSN = "unixgram:///var/run/dapper-collect/dapper-collect.sock"
 
 func init() {
@@ -35,7 +37,7 @@ type Config struct {
 	DisableSample bool `dsn:"query.disable_sample"`
 	// ProtocolVersion
 	ProtocolVersion int32 `dsn:"query.protocol_version,1"`
-	// Probability probability sampling
+	// Probability probability sampling //可能性
 	Probability float32 `dsn:"-"`
 }
 

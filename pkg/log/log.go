@@ -8,8 +8,8 @@ import (
 	"os"
 	"strconv"
 
-	"github.com/bilibili/kratos/pkg/conf/env"
-	"github.com/bilibili/kratos/pkg/stat/metric"
+	"marsgo/pkg/conf/env"
+	"marsgo/pkg/stat/metric"
 )
 
 // Config log config.
@@ -40,7 +40,7 @@ type Config struct {
 	//   "dao*" = 2
 	// sets the V level to 2 in all Go files whose names begin "dao".
 	Module map[string]int32
-	// Filter tell log handler which field are sensitive message, use * instead.
+	// Filter tell log handler which field are sensitive(敏感) message, use * instead.
 	Filter []string
 }
 
@@ -185,7 +185,7 @@ func Errorv(ctx context.Context, args ...D) {
 
 func logw(args []interface{}) []D {
 	if len(args)%2 != 0 {
-		Warn("log: the variadic must be plural, the last one will ignored")
+		Warn("log: the variadic must be plural, the last one will ignored") // 可变参数必须为复数
 	}
 	ds := make([]D, 0, len(args)/2)
 	for i := 0; i < len(args)-1; i = i + 2 {

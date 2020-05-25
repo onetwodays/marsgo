@@ -6,35 +6,37 @@ import (
 	"sync/atomic"
 	"time"
 
-	"github.com/bilibili/kratos/pkg/container/group"
-	"github.com/bilibili/kratos/pkg/ecode"
-	"github.com/bilibili/kratos/pkg/log"
-	limit "github.com/bilibili/kratos/pkg/ratelimit"
-	"github.com/bilibili/kratos/pkg/stat/metric"
-
-	cpustat "github.com/bilibili/kratos/pkg/stat/sys/cpu"
+	"marsgo/pkg/container/group"
+	"marsgo/pkg/ecode"
+	"marsgo/pkg/log"
+	limit "marsgo/pkg/ratelimit"
+	"marsgo/pkg/stat/metric"
+	cpustat "marsgo/pkg/stat/sys/cpu"
 )
 
+
+
 var (
-	cpu         int64
+	cpu         int64 //250ms 更新一次
 	decay       = 0.95
 	initTime    = time.Now()
 	defaultConf = &Config{
-		Window:       time.Second * 10,
-		WinBucket:    100,
-		CPUThreshold: 800,
+		Window:       time.Second * 10,//窗口时间是10s
+		WinBucket:    100,//10s里有10个桶
+		CPUThreshold: 800, //cpu阀是800
 	}
 )
 
 type cpuGetter func() int64
 
+//定时器每隔250ms 去采cpu的使用率
 func init() {
 	go cpuproc()
 }
 
 // cpu = cpuᵗ⁻¹ * decay + cpuᵗ * (1 - decay)
 func cpuproc() {
-	ticker := time.NewTicker(time.Millisecond * 250)
+	ticker := time.NewTicker(time.Millisecond * 250)//每隔250豪秒做一件事情
 	defer func() {
 		ticker.Stop()
 		if err := recover(); err != nil {
@@ -44,8 +46,8 @@ func cpuproc() {
 	}()
 
 	// EMA algorithm: https://blog.csdn.net/m0_38106113/article/details/81542863
-	for range ticker.C {
-		stat := &cpustat.Stat{}
+	for range ticker.C { //阻塞在这里.
+		stat := &cpustat.Stat{} //用来保存数据的.
 		cpustat.ReadStat(stat)
 		prevCpu := atomic.LoadInt64(&cpu)
 		curCpu := int64(float64(prevCpu)*decay + float64(stat.Usage)*(1.0-decay))
@@ -56,7 +58,7 @@ func cpuproc() {
 // Stats contains the metrics's snapshot of bbr.
 type Stat struct {
 	Cpu         int64
-	InFlight    int64
+	InFlight    int64  //飞行
 	MaxInFlight int64
 	MinRt       int64
 	MaxPass     int64
@@ -65,8 +67,22 @@ type Stat struct {
 // BBR implements bbr-like limiter.
 // It is inspired by sentinel.
 // https://github.com/alibaba/Sentinel/wiki/%E7%B3%BB%E7%BB%9F%E8%87%AA%E9%80%82%E5%BA%94%E9%99%90%E6%B5%81
+/*
+Sentinel 系统自适应限流从整体维度对应用入口流量进行控制，
+结合应用的 Load、CPU 使用率、总体平均 RT、入口 QPS 和并发线程数等几个维度的监控指标，
+通过自适应的流控策略，让系统的入口流量和系统的负载达到一个平衡，让系统尽可能跑在最大吞吐量的同时保证系统整体的稳定性。
+
+判断是否丢弃当前请求的算法如下：
+
+`cpu > 800 AND (Now - PrevDrop) < 1s AND (MaxPass * MinRt * windows / 1000) < InFlight`
+
+MaxPass 表示最近 5s 内，单个采样窗口中最大的请求数。
+MinRt 表示最近 5s 内，单个采样窗口中最小的响应时间。
+windows 表示一秒内采样窗口的数量，默认配置中是 5s 50 个采样，那么 windows 的值为 10。
+
+*/
 type BBR struct {
-	cpu             cpuGetter
+	cpu             cpuGetter //是个函数.
 	passStat        metric.RollingCounter
 	rtStat          metric.RollingCounter
 	inFlight        int64
@@ -81,11 +97,11 @@ type BBR struct {
 // Config contains configs of bbr limiter.
 type Config struct {
 	Enabled      bool
-	Window       time.Duration
-	WinBucket    int
+	Window       time.Duration  //窗口时长
+	WinBucket    int            //一个窗口几个桶
 	Rule         string
 	Debug        bool
-	CPUThreshold int64
+	CPUThreshold int64         //cpu阀
 }
 
 func (l *BBR) maxPASS() int64 {
@@ -186,7 +202,7 @@ func (l *BBR) Stat() Stat {
 // Allow checks all inbound traffic.
 // Once overload is detected, it raises ecode.LimitExceed error.
 func (l *BBR) Allow(ctx context.Context, opts ...limit.AllowOption) (func(info limit.DoneInfo), error) {
-	allowOpts := limit.DefaultAllowOpts()
+	allowOpts := limit.DefaultAllowOpts() //空结构体
 	for _, opt := range opts {
 		opt.Apply(&allowOpts)
 	}
@@ -241,6 +257,7 @@ func NewGroup(conf *Config) *Group {
 	if conf == nil {
 		conf = defaultConf
 	}
+	//使用的池化创建对象
 	group := group.NewGroup(func() interface{} {
 		return newLimiter(conf)
 	})
