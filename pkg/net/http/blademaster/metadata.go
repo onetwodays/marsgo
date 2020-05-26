@@ -27,6 +27,7 @@ const (
 	_httpHeaderMetadata = "x-bm-metadata-"
 )
 
+
 var _parser = map[string]func(string) interface{}{
 	"mirror": func(mirrorStr string) interface{} {
 		if mirrorStr == "" {

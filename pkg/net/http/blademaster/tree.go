@@ -125,7 +125,7 @@ func (n *node) incrementChildPrio(pos int) int {
 func (n *node) addRoute(path string, handlers []HandlerFunc) {
 	fullPath := path
 	n.priority++
-	numParams := countParams(path)
+	numParams := countParams(path) //统计path中的* 与: 个数
 
 	// non-empty tree
 	if len(n.path) > 0 || len(n.children) > 0 {

@@ -29,8 +29,8 @@ type RouterGroup struct {
 	Handlers   []HandlerFunc
 	basePath   string
 	engine     *Engine
-	root       bool
-	baseConfig *MethodConfig
+	root       bool  //是否是root
+	baseConfig *MethodConfig //当前只有超时时间
 }
 
 var _ IRouter = &RouterGroup{}

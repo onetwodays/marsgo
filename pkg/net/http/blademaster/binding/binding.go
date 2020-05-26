@@ -4,7 +4,7 @@ import (
 	"net/http"
 	"strings"
 
-	"gopkg.in/go-playground/validator.v9"
+	"gopkg.in/go-playground/validator.v9" //这个包有什么作用呢?Package validator implements value validations for structs and individual fields based on tags.
 )
 
 // MIME
@@ -40,7 +40,7 @@ type StructValidator interface {
 }
 
 // Validator default validator.
-var Validator StructValidator = &defaultValidator{}
+var Validator StructValidator = &defaultValidator{} //是全局变量
 
 // Binding
 var (
@@ -78,7 +78,7 @@ func validate(obj interface{}) error {
 
 func stripContentTypeParam(contentType string) string {
 	i := strings.Index(contentType, ";")
-	if i != -1 {
+	if i != -1 { //能找到;
 		contentType = contentType[:i]
 	}
 	return contentType

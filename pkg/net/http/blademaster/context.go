@@ -39,9 +39,9 @@ type Context struct {
 	handlers []HandlerFunc // type HandleFunc func(*Context)
 
 	// Keys is a key/value pair exclusively for the context of each request.
-	Keys map[string]interface{}
+	Keys map[string]interface{} //元数据管理
 
-	Error error
+	Error error //代表接口里面的错误码
 
 	method string
 	engine *Engine
@@ -139,8 +139,9 @@ func (c *Context) Render(code int, r render.Render) {
 		return
 	}
 
-	params := c.Request.Form
-	cb := template.JSEscapeString(params.Get("callback"))
+	//为何有这个callback???
+	params := c.Request.Form //
+	cb := template.JSEscapeString(params.Get("callback")) //看一下有没有callback这个form data
 	jsonp := cb != ""
 	if jsonp {
 		c.Writer.Write([]byte(cb))
@@ -164,7 +165,7 @@ func (c *Context) Render(code int, r render.Render) {
 func (c *Context) JSON(data interface{}, err error) {
 	code := http.StatusOK
 	c.Error = err
-	bcode := ecode.Cause(err)
+	bcode := ecode.Cause(err) //状态码吗?
 	// TODO app allow 5xx?
 	/*
 		if bcode.Code() == -500 {

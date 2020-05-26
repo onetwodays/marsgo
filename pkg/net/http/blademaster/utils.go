@@ -5,6 +5,7 @@ import (
 	"path"
 )
 
+//返回字符串最后一个字节
 func lastChar(str string) uint8 {
 	if str == "" {
 		panic("The length of the string can't be 0")
@@ -12,6 +13,7 @@ func lastChar(str string) uint8 {
 	return str[len(str)-1]
 }
 
+//返回一个以absolutePath+relativePath/结尾的路径
 func joinPaths(absolutePath, relativePath string) string {
 	if relativePath == "" {
 		return absolutePath
@@ -25,6 +27,7 @@ func joinPaths(absolutePath, relativePath string) string {
 	return finalPath
 }
 
+//返回:port的字符串,主要是端口号
 func resolveAddress(addr []string) string {
 	switch len(addr) {
 	case 0:
@@ -46,7 +49,7 @@ func resolveAddress(addr []string) string {
 //
 // The following rules are applied iteratively until no further processing can
 // be done:
-//	1. Replace multiple slashes(斜线) with a single slash.
+//	1. Replace multiple slashes(斜线) with a single slash.把多个//替换成一个/
 //	2. Eliminate(消除) each . path name element (the current directory).
 //	3. Eliminate each inner .. path name element (the parent directory)
 //	   along with the non-.. element that precedes(优先) it.
@@ -147,13 +150,14 @@ func cleanPath(p string) string {
 
 // internal helper to lazily create a buffer if necessary.
 func bufApp(buf *[]byte, s string, w int, c byte) {
-	if *buf == nil {
+	if *buf == nil { //buf为空就分配空间
 		if s[w] == c {
 			return
 		}
 
-		*buf = make([]byte, len(s))
+		*buf = make([]byte, len(s)) //是make
 		copy(*buf, s[:w])
 	}
+
 	(*buf)[w] = c
 }

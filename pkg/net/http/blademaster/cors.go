@@ -11,11 +11,11 @@ import (
 	"github.com/pkg/errors"
 )
 
-// CORSConfig represents all available options for the middleware.
+// CORSConfig represents all available options for the middleware. 中间件的配置选项
 type CORSConfig struct {
 	AllowAllOrigins bool
 
-	// AllowedOrigins is a list of origins a cross-domain request can be executed from.
+	// AllowedOrigins is a list of origins a cross-domain request can be executed from.跨域白名单
 	// If the special "*" value is present in the list, all origins will be allowed.
 	// Default value is []
 	AllowOrigins []string
@@ -33,7 +33,7 @@ type CORSConfig struct {
 	// cross-domain requests.
 	AllowHeaders []string
 
-	// AllowCredentials indicates whether the request can include user credentials like
+	// AllowCredentials(证书) indicates whether the request can include user credentials like
 	// cookies, HTTP authentication or client side SSL certificates.
 	AllowCredentials bool
 

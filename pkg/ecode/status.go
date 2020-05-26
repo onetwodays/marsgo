@@ -10,6 +10,7 @@ import (
 	"github.com/golang/protobuf/ptypes"
 )
 
+// Status 实现了Codes接口
 // Error new status with code and message
 func Error(code Code, message string) *Status {
 	return &Status{s: &types.Status{Code: int32(code.Code()), Message: message}}

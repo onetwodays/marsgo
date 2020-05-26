@@ -10,7 +10,7 @@ import (
 
 // tagOptions is the string following a comma in a struct field's "json"
 // tag, or the empty string. It does not include the leading comma.
-type tagOptions string
+type tagOptions string //`json:"data,omitempty"`
 
 // parseTag splits a struct field's json tag into its name and
 // comma-separated options.
