@@ -9,7 +9,7 @@ import (
 )
 
 
-//中间件
+//中间件.根据Host和url来判断是否跨域
 
 func matchHostSuffix(suffix string) func(*url.URL) bool {
 	return func(uri *url.URL) bool {
@@ -43,7 +43,7 @@ func CSRF(allowHosts []string, allowPattern []string) HandlerFunc {
 	}
 
 	return func(c *Context) {
-		referer := c.Request.Header.Get("Referer")
+		referer := c.Request.Header.Get("Referer") //当浏览器向web服务器发送请求的时候，一般会带上Referer，告诉服务器该网页是从哪个页面链接过来的，服务器因此可以获得一些信息用于处理。
 		if referer == "" {
 			log.V(5).Info("The request's Referer or Origin header is empty.")
 			c.AbortWithStatus(403)

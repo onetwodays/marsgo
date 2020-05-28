@@ -59,6 +59,7 @@ func (s *Span) Logs() []*protogen.Log {
 	return s.logs
 }
 
+//客户端trace
 func (s *Span) Fork(serviceName, operationName string) Trace {
 	if s.childs > _maxChilds {
 		// if child span more than max childs set return noopspan
@@ -69,6 +70,7 @@ func (s *Span) Fork(serviceName, operationName string) Trace {
 	return s.dapper.newSpanWithContext(operationName, s.context).SetTag(TagString(TagSpanKind, "client"))
 }
 
+//producer 类型的trace
 func (s *Span) Follow(serviceName, operationName string) Trace {
 	return s.Fork(serviceName, operationName).SetTag(TagString(TagSpanKind, "producer"))
 }

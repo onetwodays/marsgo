@@ -17,7 +17,7 @@ func Trace() HandlerFunc {
 	return func(c *Context) {
 		// handle http request
 		// get derived trace from http request header
-		t, err := trace.Extract(trace.HTTPFormat, c.Request.Header)
+		t, err := trace.Extract(trace.HTTPFormat, c.Request.Header) //调用的是全局函数
 		if err != nil {
 			var opts []trace.Option
 			if ok, _ := strconv.ParseBool(trace.KratosTraceDebug); ok {

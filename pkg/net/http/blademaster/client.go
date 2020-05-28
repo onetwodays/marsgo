@@ -75,7 +75,7 @@ func NewClient(c *ClientConfig) *Client {
 
 	originTransport := &xhttp.Transport{
 		DialContext:     client.dialer.DialContext,
-		TLSClientConfig: &tls.Config{InsecureSkipVerify: true},
+		TLSClientConfig: &tls.Config{InsecureSkipVerify: true}, // client 假装验证一下服务端证书
 	}
 
 	// wraps RoundTripper for tracer

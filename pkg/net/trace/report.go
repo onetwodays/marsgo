@@ -48,7 +48,7 @@ type connReport struct {
 
 	network, address string
 
-	dataCh chan []byte //很多字节数组
+	dataCh chan []byte //字节数组的通道
 
 	conn net.Conn
 

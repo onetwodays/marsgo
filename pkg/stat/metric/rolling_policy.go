@@ -36,6 +36,7 @@ func NewRollingPolicy(window *Window, opts RollingPolicyOpts) *RollingPolicy {
 	}
 }
 
+//几个桶
 func (r *RollingPolicy) timespan() int {
 	v := int(time.Since(r.lastAppendTime) / r.bucketDuration)
 	if v > -1 { // maybe time backwards

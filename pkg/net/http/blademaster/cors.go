@@ -11,6 +11,7 @@ import (
 	"github.com/pkg/errors"
 )
 
+//根据http请求头里的origin判断是否跨域
 // CORSConfig represents all available options for the middleware. 中间件的配置选项
 type CORSConfig struct {
 	AllowAllOrigins bool

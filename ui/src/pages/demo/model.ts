@@ -1,5 +1,6 @@
 import {Effect, Reducer,Subscription,request} from 'umi'
 
+
 export interface DemoTable{
     id:number;
     name:string;
@@ -17,13 +18,13 @@ export interface DemoModelType{
     namespace:"demo";
     state:DemoModelStateType;
     reducers:{
-        save:Reducer<DemoModelStateType>,
+        save:Reducer<DemoModelStateType>;
     };
     effects:{
-        fetch:Effect,
+        fetch:Effect;
     };
     subscriptions:{
-        setup:Subscription,
+        setup:Subscription;
     };
 }
 
@@ -31,7 +32,7 @@ const DemoModel: DemoModelType= {
     namespace:'demo',
     state:{
         rows:[],
-        filterKey:""
+        filterKey:"",
     },
     reducers:{
         save(state,action){return { ...state,...action.payload}}
@@ -61,3 +62,5 @@ const DemoModel: DemoModelType= {
         }
     },
 };
+
+export default DemoModel;

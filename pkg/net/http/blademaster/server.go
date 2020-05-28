@@ -74,8 +74,8 @@ func (f HandlerFunc) ServeHTTP(c *Context) {
 
 // ServerConfig is the bm server config model
 type ServerConfig struct {
-	Network      string         `dsn:"network"`
-	Addr         string         `dsn:"address"`
+	Network      string         `dsn:"network"` //比如"tcp", "tcp4", "tcp6", "unix" or "unixpacket"
+	Addr         string         `dsn:"address"` //0.0.0.:8080
 	Timeout      xtime.Duration `dsn:"query.timeout"`
 	ReadTimeout  xtime.Duration `dsn:"query.readTimeout"`
 	WriteTimeout xtime.Duration `dsn:"query.writeTimeout"`
@@ -241,6 +241,7 @@ func (engine *Engine) addRoute(method, path string, handlers ...HandlerFunc) {
 	root.addRoute(path, handlers)
 }
 
+//url里面的path,找到对应的处理链,赋值给c
 func (engine *Engine) prepareHandler(c *Context) {
 	httpMethod := c.Request.Method
 	rPath := c.Request.URL.Path
@@ -283,6 +284,7 @@ func (engine *Engine) prepareHandler(c *Context) {
 	return
 }
 
+//依次调用handler处理path的请求
 func (engine *Engine) handleContext(c *Context) {
 	var cancel func()
 	req := c.Request
@@ -311,7 +313,7 @@ func (engine *Engine) handleContext(c *Context) {
 		metadata.RemotePort:  remotePort(req),
 		metadata.Criticality: string(criticality.Critical),
 	}
-	parseMetadataTo(req, md)
+	parseMetadataTo(req, md) //从请求头里面获取自己感兴趣head
 	ctx := metadata.NewContext(context.Background(), md)
 	if tm > 0 {
 		c.Context, cancel = context.WithTimeout(ctx, tm)

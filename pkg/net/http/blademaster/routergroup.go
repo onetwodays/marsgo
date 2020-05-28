@@ -26,7 +26,7 @@ type IRoutes interface {
 // RouterGroup is used internally to configure router, a RouterGroup is associated with a prefix
 // and an array of handlers (middleware).
 type RouterGroup struct {
-	Handlers   []HandlerFunc
+	Handlers   []HandlerFunc //保存中间件的
 	basePath   string
 	engine     *Engine
 	root       bool  //是否是root
@@ -74,10 +74,10 @@ func (group *RouterGroup) BasePath() string {
 func (group *RouterGroup) handle(httpMethod, relativePath string, handlers ...HandlerFunc) IRoutes {
 	absolutePath := group.calculateAbsolutePath(relativePath)
 	injections := group.injections(relativePath)
-	handlers = group.combineHandlers(injections, handlers)
+	handlers = group.combineHandlers(injections, handlers) //组自己的+匹配正则表达式+入参
 	group.engine.addRoute(httpMethod, absolutePath, handlers...)
 	if group.baseConfig != nil {
-		group.engine.SetMethodConfig(absolutePath, group.baseConfig)
+		group.engine.SetMethodConfig(absolutePath, group.baseConfig)//给每个url设置一个超时时间
 	}
 	return group.returnObj()
 }
@@ -89,7 +89,7 @@ func (group *RouterGroup) handle(httpMethod, relativePath string, handlers ...Ha
 // For HEAD, GET, POST, PUT, and DELETE requests the respective shortcut
 // functions can be used.
 //
-// This function is intended for bulk loading and to allow the usage of less
+// This function is intended for bulk loading(批量载入) and to allow the usage of less
 // frequently used, non-standardized or custom methods (e.g. for internal
 // communication with a proxy).
 func (group *RouterGroup) Handle(httpMethod, relativePath string, handlers ...HandlerFunc) IRoutes {
@@ -165,7 +165,7 @@ func (group *RouterGroup) returnObj() IRoutes {
 
 // injections is
 func (group *RouterGroup) injections(relativePath string) []HandlerFunc {
-	absPath := group.calculateAbsolutePath(relativePath)
+	absPath := group.calculateAbsolutePath(relativePath) //算出一个绝对的url
 	for _, injection := range group.engine.injections {
 		if !injection.pattern.MatchString(absPath) {
 			continue

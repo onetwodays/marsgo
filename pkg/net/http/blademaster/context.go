@@ -172,7 +172,7 @@ func (c *Context) JSON(data interface{}, err error) {
 			code = http.StatusServiceUnavailable
 		}
 	*/
-	writeStatusCode(c.Writer, bcode.Code())
+	writeStatusCode(c.Writer, bcode.Code()) //写自己的头
 	c.Render(code, render.JSON{
 		Code:    bcode.Code(),
 		Message: bcode.Message(),

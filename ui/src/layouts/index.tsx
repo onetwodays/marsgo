@@ -1,5 +1,9 @@
 import React, { Component } from 'react';
-import { Layout, Menu} from 'antd';
+import { Layout,
+         Menu,
+         Switch, 
+         Divider 
+        } from 'antd';
 import {
   MenuUnfoldOutlined,
   MenuFoldOutlined,
@@ -35,21 +39,42 @@ const menuData = [
 //}
 
 class BasicLayout extends Component {
+  state ={
+    collapsed:false,
+    mode:  'inline',
+    theme: 'dark',
+  };
+
+  onCollapse = collapsed =>{
+    this.setState({collapsed})
+  };
+
+  onChangeMode= value=>{
+    this.setState({
+      mode:value?'vertical':'inline',
+    });
+  };
+
+  onChangeTheme= value=>{
+    this.setState({theme:value?'dark':'light',});
+  };
   
 
   render() {
     const {
+      location:{pathname},
       children,
     } = this.props;
 
-    const location = this.props.location;
-    const pathname = location.pathname; //note:pathname是个数组
+    //const location = this.props.location;
+    //const pathname = location.pathname; //note:pathname是个数组
 
     return (
       <Layout>
-        <Sider width={256} style={{ minHeight: '100vh'}}>
+        <Sider width={256} style={{ minHeight: '100vh'}} collapsible collapsed={this.state.collapsed} onCollapse={this.onCollapse}>
           <div style={{ height: '32px', background: 'rgba(255,255,255,.2)', margin: '16px' }} />
-          <Menu theme="dark" mode="inline" defaultSelectedKeys={[pathname]}>
+          
+          <Menu theme={this.state.theme} mode={this.state.mode} defaultSelectedKeys={[pathname]}>
 
             <Menu.Item icon={<UserOutlined />} key={`/${menuData[0].route}`}>
             <Link to={menuData[0].route}>{menuData[0].name}</Link>

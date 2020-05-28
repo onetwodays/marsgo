@@ -17,7 +17,7 @@ func Recovery() HandlerFunc {
 			if err := recover(); err != nil {
 				const size = 64 << 10
 				buf := make([]byte, size)
-				buf = buf[:runtime.Stack(buf, false)]
+				buf = buf[:runtime.Stack(buf, false)] //把当前携程的调用堆栈打印到buf里面
 				if c.Request != nil {
 					rawReq, _ = httputil.DumpRequest(c.Request, false)
 				}

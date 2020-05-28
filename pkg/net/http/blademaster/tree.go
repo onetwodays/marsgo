@@ -62,6 +62,7 @@ func min(a, b int) int {
 	return b
 }
 
+//统计path里面出现的:与* 的个数
 func countParams(path string) uint8 {
 	var n uint
 	for i := 0; i < len(path); i++ {
@@ -87,10 +88,10 @@ const (
 
 type node struct {
 	path      string
-	indices   string
+	indices   string //位图表示法
 	children  []*node
 	handlers  []HandlerFunc
-	priority  uint32
+	priority  uint32 //优先级什么鬼?
 	nType     nodeType
 	maxParams uint8
 	wildChild bool
@@ -506,8 +507,8 @@ walk: // Outer loop for walking the tree
 	}
 }
 
-// findCaseInsensitivePath makes a case-insensitive lookup of the given path and tries to find a handler.
-// It can optionally also fix trailing slashes.
+// findCaseInsensitivePath makes a case-insensitive(不区分大小写) lookup of the given path and tries to find a handler.
+// It can optionally also fix trailing slashes.(斜杠)
 // It returns the case-corrected path and a bool indicating whether the lookup
 // was successful.
 func (n *node) findCaseInsensitivePath(path string, fixTrailingSlash bool) (ciPath []byte, found bool) {

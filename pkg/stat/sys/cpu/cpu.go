@@ -9,6 +9,8 @@ import (
 const (
 	interval time.Duration = time.Millisecond * 500 // 500ms
 )
+//定时器每隔interval采集一下cpu的使用率,采回来之后放到全局变usage里面
+//ReadStat(stat *Stat) 把全局变量的值放到入参里面
 
 var (
 	stats CPU    //一个接口变量,相当于一个指针 ,在init里面初始化,然后在一个携程里调用其函数,赋值给usage

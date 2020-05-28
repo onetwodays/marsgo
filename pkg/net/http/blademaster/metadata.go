@@ -28,6 +28,7 @@ const (
 )
 
 
+//这个是全局变量.类型是map,key是字符串 value是一个函数,函数类型是func(string) interface{}
 var _parser = map[string]func(string) interface{}{
 	"mirror": func(mirrorStr string) interface{} {
 		if mirrorStr == "" {
@@ -51,6 +52,7 @@ var _parser = map[string]func(string) interface{}{
 	},
 }
 
+//从请求头里面获取自己感兴趣的head,http服务端调用
 func parseMetadataTo(req *http.Request, to metadata.MD) {
 	for rawKey := range req.Header {
 		key := strings.ReplaceAll(strings.TrimPrefix(strings.ToLower(rawKey), _httpHeaderMetadata), "-", "_")
@@ -65,6 +67,7 @@ func parseMetadataTo(req *http.Request, to metadata.MD) {
 	return
 }
 
+//http客户端使用
 func setMetadata(req *http.Request, key string, value interface{}) {
 	strV, ok := value.(string)
 	if !ok {
@@ -74,7 +77,7 @@ func setMetadata(req *http.Request, key string, value interface{}) {
 	req.Header.Set(header, strV)
 }
 
-// setCaller set caller into http request.
+// http client setCaller set caller into http request.
 func setCaller(req *http.Request) {
 	req.Header.Set(_httpHeaderUser, env.AppID)
 }

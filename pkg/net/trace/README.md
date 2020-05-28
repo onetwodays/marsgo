@@ -42,7 +42,12 @@
 >Annotation属于某个Span，需把新生成的Annotation添加到当前上下文里Span的annotations数组里
 
 ## Span
-   表示一次完整RPC调用，是由一组Annotation和BinaryAnnotation组成。是追踪服务调用的基本结构，多span形成树形结构组合成一次Trace追踪记录。Span是有父子关系的，比如：Client A、Client A -> B、B ->C、C -> D、分别会产生4个Span。Client A接收到请求会时生成一个Span A、Client A -> B发请求时会再生成一个Span A-B，并且Span A是 Span A-B的父节点
+   表示一次完整RPC调用，是由一组Annotation和BinaryAnnotation组成。
+   是追踪服务调用的基本结构，
+   多span形成树形结构组合成一次Trace追踪记录。Span是有父子关系的，
+   比如：Client A、Client A -> B、B ->C、C -> D、分别会产生4个Span。
+   Client A接收到请求会时生成一个Span A、Client A -> B发请求时会再生成一个Span A-B，
+   并且Span A是 Span A-B的父节点
    
    什么时候生成
    
