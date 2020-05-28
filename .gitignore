@@ -5,6 +5,7 @@
 *.bak
 *.swp
 *.test
+*.wal
 /depends/etcd/d*
 /depends/etcd/goreman
 /ui/dist
