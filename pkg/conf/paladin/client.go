@@ -6,11 +6,11 @@ import (
 
 const (
 	// EventAdd config add event.
-	EventAdd EventType = iota
+	EventAdd EventType = iota //0
 	// EventUpdate config update event.
-	EventUpdate
+	EventUpdate  //1
 	// EventRemove config remove event.
-	EventRemove
+	EventRemove  //2
 )
 
 // EventType is config event.

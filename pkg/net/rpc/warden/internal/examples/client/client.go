@@ -5,9 +5,9 @@ import (
 	"flag"
 	"fmt"
 
-	"github.com/bilibili/kratos/pkg/log"
-	"github.com/bilibili/kratos/pkg/net/rpc/warden"
-	pb "github.com/bilibili/kratos/pkg/net/rpc/warden/internal/proto/testproto"
+	"marsgo/pkg/log"
+	"marsgo/pkg/net/rpc/warden"
+	pb "marsgo/pkg/net/rpc/warden/internal/proto/testproto"
 )
 
 // usage: ./client -grpc.target=test.service=127.0.0.1:9000

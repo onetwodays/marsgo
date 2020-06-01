@@ -8,11 +8,15 @@ import (
 	"sync/atomic"
 	"time"
 
-	"github.com/bilibili/kratos/pkg/conf/env"
-	"github.com/bilibili/kratos/pkg/log"
-	nmd "github.com/bilibili/kratos/pkg/net/metadata"
-	wmeta "github.com/bilibili/kratos/pkg/net/rpc/warden/internal/metadata"
-	"github.com/bilibili/kratos/pkg/stat/metric"
+
+	"marsgo/pkg/conf/env"
+	"marsgo/pkg/log"
+
+	nmd "marsgo/pkg/net/metadata"
+	wmeta "marsgo/pkg/net/rpc/warden/internal/metadata"
+
+	"marsgo/pkg/stat/metric"
+
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/balancer"
 	"google.golang.org/grpc/balancer/base"
@@ -53,8 +57,8 @@ type subConn struct {
 	addr resolver.Address
 	meta wmeta.MD
 
-	err     metric.RollingCounter
-	latency metric.RollingGauge
+	err     metric.RollingCounter //错误
+	latency metric.RollingGauge   //延迟
 	si      serverInfo
 	// effective weight
 	ewt int64

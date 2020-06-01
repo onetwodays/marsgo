@@ -18,7 +18,7 @@ import (
 	"context"
 
 	"marsgo/pkg/container/pool"
-	xtime "github.com/bilibili/kratos/pkg/time"
+	xtime "marsgo/pkg/time"
 )
 
 // Error represents an error returned in a command reply.

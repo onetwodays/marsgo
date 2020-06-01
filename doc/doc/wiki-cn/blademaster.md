@@ -21,12 +21,12 @@
 
 # blademaster架构
 
-![bm-arch](../img/bm-arch-2-2.png)
+![bm-arch](/doc/img/bm-arch-2-2.png)
 
 `blademaster`由几个非常精简的内部模块组成。其中`Router`用于根据请求的路径分发请求，`Context`包含了一个完整的请求信息，`Handler`则负责处理传入的`Context`，`Handlers`为一个列表，一个串一个地执行。  
 所有的`middlerware`均以`Handler`的形式存在，这样可以保证`blademaster`自身足够精简且扩展性足够强。
 
-![bm-arch](../img/bm-arch-2-3.png)
+![bm-arch](/doc/img/bm-arch-2-3.png)
 
 `blademaster`处理请求的模式非常简单，大部分的逻辑都被封装在了各种`Handler`中。一般而言，业务逻辑作为最后一个`Handler`。
 

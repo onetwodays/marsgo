@@ -39,7 +39,7 @@ type sampler interface {
 // 下面定义了一个类型和实现了sampler接口.
 type probabilitySampling struct {
 	probability float32
-	slot        [slotLength]int64 //2048个槽?什么意思呢?是个数组啊
+	slot        [slotLength]int64 //2048个槽?什么意思呢?是个数组啊,保存的是个时间
 }
 
 func (p *probabilitySampling) IsSampled(traceID uint64, operationName string) (bool, float32) {
@@ -55,7 +55,7 @@ func (p *probabilitySampling) IsSampled(traceID uint64, operationName string) (b
 		atomic.SwapInt64(&p.slot[idx], now)
 		return true, 1
 	}
-	return rand.Float32() < float32(p.probability), float32(p.probability)
+	return rand.Float32() < float32(p.probability), float32(p.probability) //是否sample?
 }
 
 func (p *probabilitySampling) Close() error { return nil }

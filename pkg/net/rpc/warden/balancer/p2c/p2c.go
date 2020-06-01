@@ -9,11 +9,11 @@ import (
 	"sync/atomic"
 	"time"
 
-	"github.com/bilibili/kratos/pkg/conf/env"
+	"marsgo/pkg/conf/env"
 
-	"github.com/bilibili/kratos/pkg/log"
-	nmd "github.com/bilibili/kratos/pkg/net/metadata"
-	wmd "github.com/bilibili/kratos/pkg/net/rpc/warden/internal/metadata"
+	"marsgo/pkg/log"
+	nmd "marsgo/pkg/net/metadata"
+	wmd "marsgo/pkg/net/rpc/warden/internal/metadata"
 
 	"google.golang.org/grpc/balancer"
 	"google.golang.org/grpc/balancer/base"
@@ -23,16 +23,17 @@ import (
 )
 
 const (
-	// The mean lifetime of `cost`, it reaches its half-life after Tau*ln(2).
+	// The mean lifetime of `cost`, it reaches its half-life after Tau*ln(2).“成本”的平均寿命，在Tau * ln（2）之后达到其半衰期。
 	tau = int64(time.Millisecond * 600)
-	// if statistic not collected,we add a big penalty to endpoint
+	// if statistic not collected,we add a big penalty(惩罚) to endpoint
 	penalty = uint64(1000 * time.Millisecond * 250)
 
-	forceGap = int64(time.Second * 3)
+	forceGap = int64(time.Second * 3) //力差
 )
 
 var _ base.PickerBuilder = &p2cPickerBuilder{}
 var _ balancer.Picker = &p2cPicker{}
+//var _ balancer.V2Picker = &p2cPicker{}
 
 // Name is the name of pick of two random choices balancer.
 const Name = "p2c"
@@ -50,9 +51,9 @@ type subConn struct {
 	// metadata
 	conn balancer.SubConn
 	addr resolver.Address
-	meta wmd.MD
+	meta wmd.MD  //一个结构体
 
-	//client statistic data
+	//client statistic(统计) data
 	lag      uint64
 	success  uint64
 	inflight int64
@@ -76,7 +77,7 @@ func (sc *subConn) health() uint64 {
 }
 
 func (sc *subConn) load() uint64 {
-	lag := uint64(math.Sqrt(float64(atomic.LoadUint64(&sc.lag))) + 1)
+	lag := uint64(math.Sqrt(float64(atomic.LoadUint64(&sc.lag))) + 1) //开平方根
 	load := atomic.LoadUint64(&sc.svrCPU) * lag * uint64(atomic.LoadInt64(&sc.inflight))
 	if load == 0 {
 		// penalty是初始化没有数据时的惩罚值，默认为1e9 * 250
@@ -146,7 +147,7 @@ func (*p2cPickerBuilder) Build(readySCs map[resolver.Address]balancer.SubConn) b
 
 type p2cPicker struct {
 	// subConns is the snapshot of the weighted-roundrobin balancer when this picker was
-	// created. The slice is immutable. Each Get() will do a round robin
+	// created. The slice is immutable. Each Get() will do a round robin(轮寻)
 	// selection from it and return the selected SubConn.
 	subConns []*subConn
 	colors   map[string]*p2cPicker

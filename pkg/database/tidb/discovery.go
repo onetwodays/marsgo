@@ -6,10 +6,10 @@ import (
 	"strings"
 	"time"
 
-	"github.com/bilibili/kratos/pkg/conf/env"
-	"github.com/bilibili/kratos/pkg/log"
-	"github.com/bilibili/kratos/pkg/naming"
-	"github.com/bilibili/kratos/pkg/naming/discovery"
+	"marsgo/pkg/conf/env"
+	"marsgo/pkg/log"
+	"marsgo/pkg/naming"
+	"marsgo/pkg/naming/discovery"
 )
 
 var _schema = "tidb://"

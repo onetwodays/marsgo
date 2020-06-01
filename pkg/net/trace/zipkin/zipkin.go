@@ -69,7 +69,7 @@ func (r *report) WriteSpan(raw *trace.Span) (err error) {
 	}
 	//log save to zipkin annotation
 	span.Annotations = r.converLogsToAnnotations(raw.Logs())
-	r.rpt.Send(span)
+	r.rpt.Send(span) //发走了.
 	return
 }
 

@@ -72,7 +72,7 @@ func (c *Context) Protobuf(data proto.Message, err error)
 
 # Handler
 
-![handler](../img/bm-handlers.png)
+![handler](/doc/img/bm-handlers.png)
 
 初次接触`blademaster`的用户可能会对其`Handler`的流程处理产生不小的疑惑，实际上`bm`对`Handler`对处理非常简单：
 

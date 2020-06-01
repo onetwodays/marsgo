@@ -65,7 +65,7 @@ func (c *connReport) daemon() {
 }
 
 func (c *connReport) WriteSpan(sp *Span) error {
-	data, err := marshalSpan(sp, c.version)
+	data, err := marshalSpan(sp, c.version) //probuf格式发出
 	if err != nil {
 		return err
 	}

@@ -17,9 +17,9 @@ func Trace() HandlerFunc {
 	return func(c *Context) {
 		// handle http request
 		// get derived trace from http request header
-		t, err := trace.Extract(trace.HTTPFormat, c.Request.Header) //调用的是全局函数
+		t, err := trace.Extract(trace.HTTPFormat, c.Request.Header) //调用的是全局函数,失败的话
 		if err != nil {
-			var opts []trace.Option
+			var opts []trace.Option //函数切片
 			if ok, _ := strconv.ParseBool(trace.KratosTraceDebug); ok {
 				opts = append(opts, trace.EnableDebug())
 			}
@@ -34,12 +34,16 @@ func Trace() HandlerFunc {
 		t.SetTag(trace.String("caller", metadata.String(c.Context, metadata.Caller)))
 		// export trace id to user.
 		c.Writer.Header().Set(trace.KratosTraceID, t.TraceID())
-		c.Context = trace.NewContext(c.Context, t)
+		c.Context = trace.NewContext(c.Context, t) //把trace放到c.Context里面
 		c.Next()
 		t.Finish(&c.Error)
 	}
 }
 
+
+
+//下面应该是http client 调用的追踪
+//定义一个结构体
 type closeTracker struct {
 	io.ReadCloser
 	tr trace.Trace

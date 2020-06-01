@@ -60,3 +60,4 @@ func (redirectHook) Fire(entry *logrus.Entry) error {
 	}
 	return nil
 }
+//对logrus的兼容

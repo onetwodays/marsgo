@@ -10,16 +10,16 @@ import (
 	"sync"
 	"time"
 
-	"github.com/bilibili/kratos/pkg/conf/dsn"
-	"github.com/bilibili/kratos/pkg/log"
-	nmd "github.com/bilibili/kratos/pkg/net/metadata"
-	"github.com/bilibili/kratos/pkg/net/rpc/warden/ratelimiter"
-	"github.com/bilibili/kratos/pkg/net/trace"
-	xtime "github.com/bilibili/kratos/pkg/time"
+	"marsgo/pkg/conf/dsn"
+	"marsgo/pkg/log"
+	nmd "marsgo/pkg/net/metadata"
+	"marsgo/pkg/net/rpc/warden/ratelimiter"
+	"marsgo/pkg/net/trace"
+	xtime "marsgo/pkg/time"
 
 	//this package is for json format response
-	_ "github.com/bilibili/kratos/pkg/net/rpc/warden/internal/encoding/json"
-	"github.com/bilibili/kratos/pkg/net/rpc/warden/internal/status"
+	_ "marsgo/pkg/net/rpc/warden/internal/encoding/json"
+	"marsgo/pkg/net/rpc/warden/internal/status"
 
 	"github.com/pkg/errors"
 	"google.golang.org/grpc"
@@ -158,7 +158,7 @@ func parseDSN(rawdsn string) *ServerConfig {
 	if err != nil {
 		panic(errors.WithMessage(err, fmt.Sprintf("warden: invalid dsn: %s", rawdsn)))
 	}
-	if _, err = d.Bind(conf); err != nil {
+	if _, err = d.Bind(conf); err != nil { //先把url(string)解析成DSN结构体,然后再把结构体赋值给ServerConfig
 		panic(errors.WithMessage(err, fmt.Sprintf("warden: invalid dsn: %s", rawdsn)))
 	}
 	return conf

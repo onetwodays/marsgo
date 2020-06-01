@@ -28,8 +28,8 @@ func marshalSpan(sp *Span, version int32) ([]byte, error) {
 }
 
 func marshalSpanV1(sp *Span) ([]byte, error) {
-	protoSpan := new(protogen.Span)
-	protoSpan.Version = protoVersion1
+	protoSpan := new(protogen.Span) //创建一个结构体
+	protoSpan.Version = protoVersion1 //1
 	protoSpan.ServiceName = sp.dapper.serviceName
 	protoSpan.OperationName = sp.operationName
 	protoSpan.TraceId = sp.context.TraceID

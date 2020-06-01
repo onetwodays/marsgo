@@ -2,7 +2,7 @@
 
 * [介绍](README.md)
   * [快速开始](quickstart.md)
-  * [案例](https://github.com/bilibili/kratos-demo)
+  * [案例](https://github.com/go-kratos/kratos-demo)
 * [http blademaster](blademaster.md)
   * [bm quickstart](blademaster-quickstart.md) 
   * [bm module](blademaster-mod.md) 
@@ -17,7 +17,7 @@
 * [config](config.md)
   * [paladin](config-paladin.md)
 * [ecode](ecode.md)
-* [trace](dapper.md)
+* [trace](trace.md)
 * [log](logger.md)
   * [log-agent](log-agent.md)
 * [database](database.md)

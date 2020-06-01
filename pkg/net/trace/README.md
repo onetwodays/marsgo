@@ -70,4 +70,6 @@
       整个Trace Tree通过Trace Id、Span ID、parent Span ID串起来的。
       
 
-
+## 设计
+1.先全局生成一个tracer,其中tracer里面有reporter,负责把span 发走
+2.生成一个span,收集信息,然后调用span.Finish(),把span通过reporter发走

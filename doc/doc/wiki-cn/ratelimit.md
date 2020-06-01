@@ -25,7 +25,7 @@ kratos 借鉴了 Sentinel 项目的自适应限流系统，通过综合分析服
 
 在自适应限流保护中，采集到的指标的时效性非常强，系统只需要采集最近一小段时间内的 qps、rt 即可，对于较老的数据，会自动丢弃。为了实现这个效果，kratos 使用了滑动窗口来保存采样数据。
 
-![ratelimit-rolling-window](../img/ratelimit-rolling-window.png)
+![ratelimit-rolling-window](/doc/img/ratelimit-rolling-window.png)
 
 如上图，展示了一个具有两个桶（bucket）的滑动窗口（rolling window）。整个滑动窗口用来保存最近 1s 的采样数据，每个小的桶用来保存 500ms 的采样数据。
 当时间流动之后，过期的桶会自动被新桶的数据覆盖掉，在图中，在 1000-1500ms 时，bucket 1 的数据因为过期而被丢弃，之后 bucket 3 的数据填到了窗口的头部。
@@ -45,7 +45,7 @@ windows 表示一秒内采样窗口的数量，默认配置中是 5s 50 个采�
 
 场景1，请求以每秒增加1个的速度不停上升，压测效果如下：
 
-![ratelimit-benchmark-up-1](../img/ratelimit-benchmark-up-1.png)
+![ratelimit-benchmark-up-1](/doc/img/ratelimit-benchmark-up-1.png)
 
 左测是没有限流的压测效果，右侧是带限流的压测效果。
 可以看到，没有限流的场景里，系统在 700qps 时开始抖动，在 1k qps 时被拖垮，几乎没有新的请求能被放行，然而在使用限流之后，系统请求能够稳定在 600 qps 左右，rt 没有暴增，服务也没有被打垮，可见，限流有效的保护了服务。

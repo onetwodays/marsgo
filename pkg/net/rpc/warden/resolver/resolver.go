@@ -7,10 +7,10 @@ import (
 	"strings"
 	"sync"
 
-	"github.com/bilibili/kratos/pkg/conf/env"
-	"github.com/bilibili/kratos/pkg/log"
-	"github.com/bilibili/kratos/pkg/naming"
-	wmeta "github.com/bilibili/kratos/pkg/net/rpc/warden/internal/metadata"
+	"marsgo/pkg/conf/env"
+	"marsgo/pkg/log"
+	"marsgo/pkg/naming"
+	wmeta "marsgo/pkg/net/rpc/warden/internal/metadata"
 
 	"github.com/pkg/errors"
 	"google.golang.org/grpc/resolver"
@@ -29,7 +29,7 @@ var (
 
 // Register register resolver builder if nil.
 func Register(b naming.Builder) {
-	mu.Lock()
+	mu.Lock() //全局变量
 	defer mu.Unlock()
 	if resolver.Get(b.Scheme()) == nil {
 		resolver.Register(&Builder{b})

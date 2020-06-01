@@ -26,7 +26,7 @@ var _fileNames = map[int]string{
 // FileHandler .
 type FileHandler struct {
 	render Render
-	fws    [_totalIdx]*filewriter.FileWriter
+	fws    [_totalIdx]*filewriter.FileWriter //注意_totalIdx=3
 }
 
 // NewFile crete a file logger.

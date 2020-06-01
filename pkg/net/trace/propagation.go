@@ -68,6 +68,7 @@ type propagator interface {
 	Extract(carrier interface{}) (Carrier, error)
 }
 
+//http注解
 type httpPropagator struct{}
 
 type httpCarrier http.Header //map[string][]string
@@ -175,3 +176,4 @@ func (grpcPropagator) Extract(carrier interface{}) (Carrier, error) {
 	}
 	return grpcCarrier(md), nil
 }
+//相当于给map[string][]string 套了2个马甲.

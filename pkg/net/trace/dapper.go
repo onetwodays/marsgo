@@ -61,7 +61,7 @@ func (d *dapper) New(operationName string, opts ...Option) Trace {
 	} else {
 		sampled, probability = d.sampler.IsSampled(traceID, operationName)
 	}
-	pctx := spanContext{TraceID: traceID}
+	pctx := spanContext{TraceID: traceID} //只是spanContext不是span;
 	if sampled {
 		pctx.Flags = flagSampled
 		pctx.Probability = probability
@@ -104,6 +104,7 @@ func (d *dapper) newSpanWithContext(operationName string, pctx spanContext) Trac
 	return sp
 }
 
+//把trace里面的信息全部注入到http header里面
 func (d *dapper) Inject(t Trace, format interface{}, carrier interface{}) error {
 	// if carrier implement Carrier use direct, ignore format
 	carr, ok := carrier.(Carrier)
@@ -125,7 +126,7 @@ func (d *dapper) Inject(t Trace, format interface{}, carrier interface{}) error 
 	}
 	return nil
 }
-
+//从http head 里面获取kratos-trace-id的值,生成一个spanContext
 func (d *dapper) Extract(format interface{}, carrier interface{}) (Trace, error) {
 	sp, err := d.extract(format, carrier)
 	if err != nil {
@@ -177,7 +178,7 @@ func (d *dapper) putSpan(sp *Span) {
 	if len(sp.logs) > 32 {
 		sp.logs = nil
 	}
-	d.pool.Put(sp)
+	d.pool.Put(sp)  //放回池子里
 }
 
 func (d *dapper) getSpan() *Span {

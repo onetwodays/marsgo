@@ -56,7 +56,7 @@ type Render interface {
 }
 
 var (
-	h Handler
+	h Handler //全局变量.
 	c *Config
 )
 
@@ -66,7 +66,7 @@ func init() {
 		Family: env.AppID,
 		Host:   host,
 	}
-	h = newHandlers([]string{}, NewStdout())
+	h = newHandlers([]string{}, NewStdout()) //默认输出到控制台
 
 	addFlag(flag.CommandLine)
 }

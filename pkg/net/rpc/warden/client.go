@@ -32,7 +32,7 @@ import (
 	gstatus "google.golang.org/grpc/status"
 )
 
-var _grpcTarget flagvar.StringVars
+var _grpcTarget flagvar.StringVars  //字符串切片
 
 var (
 	_once           sync.Once
@@ -46,6 +46,7 @@ var (
 	_defaultClient *Client
 )
 
+//获取caller和color,
 func baseMetadata() metadata.MD {
 	gmd := metadata.MD{nmd.Caller: []string{env.AppID}}
 	if env.Color != "" {

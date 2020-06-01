@@ -9,7 +9,7 @@ import (
 	"github.com/tsuna/gohbase"
 	"github.com/tsuna/gohbase/hrpc"
 
-	"github.com/bilibili/kratos/pkg/log"
+	"marsgo/pkg/log"
 )
 
 // HookFunc hook function call before every method and hook return function will call after finish.

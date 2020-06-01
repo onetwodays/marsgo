@@ -22,7 +22,7 @@ type FileWriter struct {
 	dir    string
 	fname  string
 	ch     chan *bytes.Buffer
-	stdlog *log.Logger
+	stdlog *log.Logger //标准库的Logger组件
 	pool   *sync.Pool
 
 	lastRotateFormat string

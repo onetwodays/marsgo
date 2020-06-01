@@ -28,7 +28,7 @@ type Tracer interface {
 }
 
 
-// 这是全局函数
+// 这是全局函数,url 作为operationName
 // New trace instance with given operationName.
 func New(operationName string, opts ...Option) Trace {
 	return _tracer.New(operationName, opts...)

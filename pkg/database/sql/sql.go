@@ -7,10 +7,10 @@ import (
 	"sync/atomic"
 	"time"
 
-	"github.com/bilibili/kratos/pkg/ecode"
-	"github.com/bilibili/kratos/pkg/log"
-	"github.com/bilibili/kratos/pkg/net/netutil/breaker"
-	"github.com/bilibili/kratos/pkg/net/trace"
+	"marsgo/pkg/ecode"
+	"marsgo/pkg/log"
+	"marsgo/pkg/net/netutil/breaker"
+	"marsgo/pkg/net/trace"
 
 	"github.com/go-sql-driver/mysql"
 	"github.com/pkg/errors"
@@ -36,27 +36,27 @@ var (
 
 // DB database.
 type DB struct {
-	write  *conn
-	read   []*conn
-	idx    int64
-	master *DB
+	write  *conn     //一个写连接池
+	read   []*conn   //很多读连接池
+	idx    int64 //一个正数
+	master *DB   //DB包含指向自己的指针
 }
 
 // conn database connection
 type conn struct {
-	*sql.DB
-	breaker breaker.Breaker
-	conf    *Config
-	addr    string
+	*sql.DB //数据库连接池
+	breaker breaker.Breaker //连接级别的断路器
+	conf    *Config //连接的配置
+	addr    string  //连接地址
 }
 
 // Tx transaction.
 type Tx struct {
 	db     *conn
 	tx     *sql.Tx
-	t      trace.Trace
+	t      trace.Trace //事物级别的链路追踪
 	c      context.Context
-	cancel func()
+	cancel func() //超时取消
 }
 
 // Row row.
@@ -64,17 +64,17 @@ type Row struct {
 	err error
 	*sql.Row
 	db     *conn
-	query  string
-	args   []interface{}
-	t      trace.Trace
-	cancel func()
+	query  string //查询sql
+	args   []interface{} //参数
+	t      trace.Trace //行级别的链路追踪
+	cancel func() //超时取消
 }
 
 // Scan copies the columns from the matched row into the values pointed at by dest.
 func (r *Row) Scan(dest ...interface{}) (err error) {
 	defer slowLog(fmt.Sprintf("Scan query(%s) args(%+v)", r.query, r.args), time.Now())
 	if r.t != nil {
-		defer r.t.Finish(&err)
+		defer r.t.Finish(&err) //调用链跟踪
 	}
 	if r.err != nil {
 		err = r.err
@@ -84,11 +84,11 @@ func (r *Row) Scan(dest ...interface{}) (err error) {
 	if err != nil {
 		return
 	}
-	err = r.Row.Scan(dest...)
+	err = r.Row.Scan(dest...) // 查询到的值读取
 	if r.cancel != nil {
 		r.cancel()
 	}
-	r.db.onBreaker(&err)
+	r.db.onBreaker(&err)  //统计成功失败的次数
 	if err != ErrNoRows {
 		err = errors.Wrapf(err, "query %s args %+v", r.query, r.args)
 	}
@@ -103,8 +103,8 @@ type Rows struct {
 
 // Close closes the Rows, preventing further enumeration. If Next is called
 // and returns false and there are no further result sets,
-// the Rows are closed automatically and it will suffice to check the
-// result of Err. Close is idempotent and does not affect the result of Err.
+// the Rows are closed automatically and it will suffice(满足) to check the
+// result of Err. Close is idempotent(幂等) and does not affect the result of Err.
 func (rs *Rows) Close() (err error) {
 	err = errors.WithStack(rs.Rows.Close())
 	if rs.cancel != nil {
@@ -118,7 +118,7 @@ type Stmt struct {
 	db    *conn
 	tx    bool
 	query string
-	stmt  atomic.Value
+	stmt  atomic.Value //sql.Stmt
 	t     trace.Trace
 }
 
@@ -134,7 +134,7 @@ func Open(c *Config) (*DB, error) {
 	addr := parseDSNAddr(c.DSN)
 	brkGroup := breaker.NewGroup(c.Breaker)
 	brk := brkGroup.Get(addr)
-	w := &conn{DB: d, breaker: brk, conf: c, addr: addr}
+	w := &conn{DB: d, breaker: brk, conf: c, addr: addr} //代表写连接池
 	rs := make([]*conn, 0, len(c.ReadDSN))
 	for _, rd := range c.ReadDSN {
 		d, err := connect(c, rd)
@@ -193,6 +193,7 @@ func (db *DB) Prepared(query string) (stmt *Stmt) {
 
 // Query executes a query that returns rows, typically a SELECT. The args are
 // for any placeholder parameters in the query.
+// 读连接池不可用时,选择写连接池
 func (db *DB) Query(c context.Context, query string, args ...interface{}) (rows *Rows, err error) {
 	idx := db.readIndex()
 	for i := range db.read {
@@ -220,7 +221,7 @@ func (db *DB) readIndex() int {
 	if len(db.read) == 0 {
 		return 0
 	}
-	v := atomic.AddInt64(&db.idx, 1)
+	v := atomic.AddInt64(&db.idx, 1) //+1 然后返回新值
 	return int(v) % len(db.read)
 }
 
@@ -260,6 +261,8 @@ func (db *DB) Master() *DB {
 	return db.master
 }
 
+/////////////////////////////////////////////////////////////////////////
+
 func (db *conn) onBreaker(err *error) {
 	if err != nil && *err != nil && *err != sql.ErrNoRows && *err != sql.ErrTxDone {
 		db.breaker.MarkFailed()
@@ -271,7 +274,7 @@ func (db *conn) onBreaker(err *error) {
 func (db *conn) begin(c context.Context) (tx *Tx, err error) {
 	now := time.Now()
 	defer slowLog("Begin", now)
-	t, ok := trace.FromContext(c)
+	t, ok := trace.FromContext(c) //拿到一个trace
 	if ok {
 		t = t.Fork(_family, "begin")
 		t.SetTag(trace.String(trace.TagAddress, db.addr), trace.String(trace.TagComment, ""))

@@ -85,7 +85,7 @@ func (hs Handlers) Log(ctx context.Context, lv Level, d ...D) {
 		if _, ok := hs.filters[d[i].Key]; ok {
 			d[i].Value = "***"  //如果key是要过滤的,就用***代替
 		}
-		if d[i].Key == _source { //如果field里面有source字段
+		if d[i].Key == _source { //如果field里面有source字段,file+line
 			hasSource = true
 		}
 	}

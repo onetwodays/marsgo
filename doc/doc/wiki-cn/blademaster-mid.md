@@ -76,7 +76,7 @@ engine.Use(YourMiddleware())
 
 # 局部中间件
 
-先来看一段鉴权伪代码示例([auth示例代码位置](https://github.com/bilibili/kratos/tree/master/example/blademaster/middleware/auth))：
+先来看一段鉴权伪代码示例([auth示例代码位置](https://github.com/go-kratos/kratos/tree/master/example/blademaster/middleware/auth))：
 
 ```go
 func Example() {
@@ -158,7 +158,7 @@ e.POST("/api", cors, myHandler)
 
 ## 自适应限流
 
-更多关于自适应限流的信息可参考：[kratos 自适应限流](../wiki-cn/ratelimit.md)。如要使用如下：
+更多关于自适应限流的信息可参考：[kratos 自适应限流](/doc/wiki-cn/ratelimit.md)。如要使用如下：
 
 ```go
 e := bm.DefaultServer(nil)

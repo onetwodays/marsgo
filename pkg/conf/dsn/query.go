@@ -44,6 +44,7 @@ func (e *BindTypeError) Error() string {
 
 type assignFunc func(v reflect.Value, to tagOpt) error
 
+//把val的值赋值给assiginFunc的入参v
 func stringsAssignFunc(val string) assignFunc {
 	return func(v reflect.Value, to tagOpt) error {
 		if v.Kind() != reflect.String || !v.CanSet() {
@@ -60,6 +61,7 @@ func stringsAssignFunc(val string) assignFunc {
 
 // bindQuery parses url.Values and stores the result in the value pointed to by v.
 // if v is nil or not a pointer, bindQuery returns an InvalidDecodeError
+//v 不能是空指针,必须是一个指针
 func bindQuery(query url.Values, v interface{}, assignFuncs map[string]assignFunc) (url.Values, error) {
 	if assignFuncs == nil {
 		assignFuncs = make(map[string]assignFunc)
