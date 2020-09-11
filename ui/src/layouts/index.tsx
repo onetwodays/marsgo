@@ -1,9 +1,14 @@
 import React, { Component } from 'react';
+//导入antd布局相关的组件
 import { Layout,
          Menu,
          Switch, 
          Divider 
         } from 'antd';
+
+
+//导入antd-design-icons的图标
+
 import {
   MenuUnfoldOutlined,
   MenuFoldOutlined,
@@ -13,6 +18,7 @@ import {
   DesktopOutlined,
 } from '@ant-design/icons';
 
+//导入umi的Link组件
 import {Link} from 'umi'
 
 // Header, Footer, Sider, Content组件在Layout组件模块下
@@ -21,12 +27,11 @@ const SubMenu = Menu.SubMenu;
 
 
 const menuData = [
-  { route:'/hello',              name:'欢迎'},        //0
-
-  { route:'/dashboard/base',    name:'基本信息'},      //1
-  { route:'/dashboard/monitor',  name:'监控'},        //2
-  { route:'/dashboard/workplace',name:'工作台'},      //3
-  { route:'/demo',               name:'示例'},      //4
+  { route:'/hello',                   name:'欢迎'},            //0
+  { route:'/dashboard/base',          name:'基本信息'},        //1
+  { route:'/dashboard/monitor',       name:'监控'},           //2
+  { route:'/dashboard/workplace',     name:'工作台'},         //3
+  { route:'/demo',                    name:'示例'},          //4
 
 ]
 
@@ -39,11 +44,16 @@ const menuData = [
 //}
 
 class BasicLayout extends Component {
-  state ={
-    collapsed:false,
-    mode:  'inline',
-    theme: 'dark',
-  };
+  constructor(props){
+    super(props);
+    this.state ={
+      collapsed:false,
+      mode:  'inline',
+      theme: 'dark',
+    };
+  }
+  
+  
 
   onCollapse = collapsed =>{
     this.setState({collapsed})
@@ -68,14 +78,7 @@ class BasicLayout extends Component {
 
     //const location = this.props.location;
     //const pathname = location.pathname; //note:pathname是个数组
-    //https://www.yifile.com/file/VoShJSDPwQrWiREW7G2/1.html
-    //https://www.yifile.com/file/VIf2JHqVl1nWiRAZ72i6.html
-    //http://www.99disk.com/file/QVNaMzU0Njg1.html
-    //https://www.yifile.com/file/UNSgcHrCwl7WiRES7Wm7.html
-    //http://www.99disk.com/file/QVNaMzQzODQ2.html
-    //http://www.99disk.com/file/QVNaMzE4MDk1.html
-    //https://cl.fr26.xyz/htm_data/2005/7/3927636.html
-    //http://www.99disk.com/file/QVNaMzMxMjYz.html
+
 
     return (
       <Layout>
@@ -85,7 +88,7 @@ class BasicLayout extends Component {
           <Menu theme={this.state.theme} mode={this.state.mode} defaultSelectedKeys={[pathname]}>
 
             <Menu.Item icon={<UserOutlined />} key={`/${menuData[0].route}`}>
-            <Link to={menuData[0].route}>{menuData[0].name}</Link>
+            <Link to={menuData[0].route}>{menuData[0].name}</Link> 
             </Menu.Item>
 
 
@@ -103,7 +106,7 @@ class BasicLayout extends Component {
           </Menu>
         </Sider>
         <Layout>
-          <Header style={{ background: '#fff', textAlign: 'center', padding: 24 }}>hello world!</Header>
+          <Header  style={{ background: '#fff', textAlign: 'center', padding: 24 }}>hello world!</Header>
           <Content style={{ margin: '24px 16px 0' }}>
             <div style={{ padding: 24, background: '#fff', minHeight: 360 }}>
               {children}
