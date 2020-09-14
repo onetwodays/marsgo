@@ -89,7 +89,7 @@ type User struct{
     Age int
 }
 
-func main()  {
+func main2()  {
 
     u:= User{"张三",20}
     t:=reflect.TypeOf(u)
@@ -124,6 +124,11 @@ func main()  {
     vq:=reflect.ValueOf(&x)
     vq.Elem().SetInt(100)
     fmt.Println(x)
+
+}
+
+func main()  {
+    fmt.Println(1%2)
 
 }
 

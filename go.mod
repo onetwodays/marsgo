@@ -22,7 +22,7 @@ require (
 	github.com/gobwas/glob v0.2.3 // indirect
 	github.com/gocolly/colly v1.2.0
 	github.com/gogo/protobuf v1.3.1
-	github.com/golang/protobuf v1.3.4
+	github.com/golang/protobuf v1.4.2
 	github.com/google/wire v0.4.0
 	github.com/json-iterator/go v1.1.9
 	github.com/kennygrant/sanitize v1.2.4 // indirect
@@ -42,10 +42,12 @@ require (
 	github.com/tidwall/gjson v1.5.0
 	github.com/tsuna/gohbase v0.0.0-20190823190353-a66bcc9075db
 	go.etcd.io/etcd v3.3.20+incompatible
-	golang.org/x/net v0.0.0-20200226121028-0de0cce0169b
-	golang.org/x/sys v0.0.0-20200202164722-d101bd2416d5
-	google.golang.org/genproto v0.0.0-20191216205247-b31c10ee225f
-	google.golang.org/grpc v1.27.1
+	golang.org/x/net v0.0.0-20200707034311-ab3426394381
+	golang.org/x/sys v0.0.0-20200802091954-4b90ce9b60b3
+	golang.org/x/text v0.3.3 // indirect
+	google.golang.org/genproto v0.0.0-20200731012542-8145dea6a485
+	google.golang.org/grpc v1.31.0
+	google.golang.org/protobuf v1.25.0 // indirect
 	gopkg.in/go-playground/validator.v9 v9.31.0
 	gopkg.in/yaml.v2 v2.2.8
 
