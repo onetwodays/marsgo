@@ -11,9 +11,9 @@ import (
 
 // deploy env.
 const (
-	DeployEnvDev  = "dev"
-	DeployEnvFat  = "fat"
-	DeployEnvUat  = "uat"
+	DeployEnvDev  = "dev" //开发环境
+	DeployEnvFat  = "fat" //测试环境，相当于alpha环境(功能测试)
+	DeployEnvUat  = "uat" //集成环境，相当于beta环境（回归测试）
 	DeployEnvPre  = "pre"
 	DeployEnvProd = "prod"
 )
@@ -39,7 +39,7 @@ var (
 	// AppID is global unique application id, register by service tree.
 	// such as main.arch.disocvery.
 	AppID string
-	// Color is the identification of different experimental group in one caster cluster.
+	// Color is the identification of different experimental() group in one caster cluster.
 	Color string
 	// DiscoveryNodes is seed nodes.
 	DiscoveryNodes string
@@ -59,12 +59,12 @@ func init() {
 
 func addFlag(fs *flag.FlagSet) {
 	// env
-	fs.StringVar(&Region, "region", defaultString("REGION", _region), "avaliable region. or use REGION env variable, value: sh etc.")
-	fs.StringVar(&Zone, "zone", defaultString("ZONE", _zone), "avaliable zone. or use ZONE env variable, value: sh001/sh002 etc.")
-	fs.StringVar(&AppID, "appid", os.Getenv("APP_ID"), "appid is global unique application id, register by service tree. or use APP_ID env variable.")
-	fs.StringVar(&DeployEnv, "deploy.env", defaultString("DEPLOY_ENV", _deployEnv), "deploy env. or use DEPLOY_ENV env variable, value: dev/fat1/uat/pre/prod etc.")
-	fs.StringVar(&Color, "deploy.color", os.Getenv("DEPLOY_COLOR"), "deploy.color is the identification of different experimental group.")
-	fs.StringVar(&DiscoveryNodes, "discovery.nodes", os.Getenv("DISCOVERY_NODES"), "discovery.nodes is seed nodes. value: 127.0.0.1:7171,127.0.0.2:7171 etc.")
+	fs.StringVar(&Region,         "region",          defaultString("REGION", _region),        "avaliable region. or use REGION env variable, value: sh etc.")
+	fs.StringVar(&Zone,           "zone",            defaultString("ZONE", _zone),            "avaliable zone. or use ZONE env variable, value: sh001/sh002 etc.")
+	fs.StringVar(&AppID,          "appid",           os.Getenv("APP_ID"),                     "appid is global unique application id, register by service tree. or use APP_ID env variable.")
+	fs.StringVar(&DeployEnv,     "deploy.env",       defaultString("DEPLOY_ENV", _deployEnv), "deploy env. or use DEPLOY_ENV env variable, value: dev/fat1/uat/pre/prod etc.")
+	fs.StringVar(&Color,          "deploy.color",    os.Getenv("DEPLOY_COLOR"),               "deploy.color is the identification of different experimental group.")
+	fs.StringVar(&DiscoveryNodes, "discovery.nodes", os.Getenv("DISCOVERY_NODES"),            "discovery.nodes is seed nodes. value: 127.0.0.1:7171,127.0.0.2:7171 etc.")
 }
 
 func defaultString(env, value string) string {

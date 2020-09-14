@@ -26,27 +26,31 @@ var patternMap = map[string]func(map[string]interface{}) string{
 }
 
 // newPatternRender new pattern render
+// "[%D %T] [%L] [%S] %M"
+// "%L %d-%T %f %M"
 func newPatternRender(format string) Render {
 	p := &pattern{
 		bufPool: sync.Pool{New: func() interface{} { return &bytes.Buffer{} }},
 	}
-	b := make([]byte, 0, len(format))
+	b := make([]byte, 0, len(format)) //字节切片,移除format里面的%
 	for i := 0; i < len(format); i++ {
 		if format[i] != '%' {
 			b = append(b, format[i])
 			continue
 		}
+		//最后一个元素
 		if i+1 >= len(format) {
 			b = append(b, format[i])
 			continue
 		}
+		//如果是%
 		f, ok := patternMap[string(format[i+1])]
-		if !ok {
+		if !ok { //找不到时
 			b = append(b, format[i])
 			continue
 		}
 		if len(b) != 0 {
-			p.funcs = append(p.funcs, textFactory(string(b)))
+			p.funcs = append(p.funcs, textFactory(string(b))) //textFactory()产生默认的处理方法,生成一个字符串
 			b = b[:0]
 		}
 		p.funcs = append(p.funcs, f)
@@ -98,6 +102,7 @@ func textFactory(text string) func(map[string]interface{}) string {
 		return text
 	}
 }
+
 func keyFactory(key string) func(map[string]interface{}) string {
 	return func(d map[string]interface{}) string {
 		if v, ok := d[key]; ok {
@@ -110,6 +115,7 @@ func keyFactory(key string) func(map[string]interface{}) string {
 	}
 }
 
+//source代表文件+function+line
 func longSource(d map[string]interface{}) string {
 	if fn, ok := d[_source].(string); ok {
 		return fn

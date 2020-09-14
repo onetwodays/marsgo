@@ -15,8 +15,8 @@ package api
 import (
 	"context"
 
-	bm "github.com/bilibili/kratos/pkg/net/http/blademaster"
-	"github.com/bilibili/kratos/pkg/net/http/blademaster/binding"
+	bm "marsgo/pkg/net/http/blademaster"
+	"marsgo/pkg/net/http/blademaster/binding"
 )
 import google_protobuf1 "github.com/golang/protobuf/ptypes/empty"
 
@@ -67,7 +67,7 @@ func demoSayHelloURL(c *bm.Context) {
 	c.JSON(resp, err)
 }
 
-// RegisterDemoBMServer Register the blademaster route
+// RegisterDemoBMServer  Register the blademaster route
 func RegisterDemoBMServer(e *bm.Engine, server DemoBMServer) {
 	DemoSvc = server
 	e.GET("/demo.service.v1.Demo/Ping", demoPing)

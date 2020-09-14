@@ -6,13 +6,20 @@ import (
 	"time"
 )
 
+
+//%L log level e.g. INFO WARN ERROR
+//%d data format at "01/02"
+//%T time format at "15:04:05.999" on stdout handler, "15:04:05 MST" on file handler
+//%f function name and line number e.g. model.Get:121
+//%M log message and additional fields: key=value this is log message
+
 const defaultPattern = "%L %d-%T %f %M"
 
 var _defaultStdout = NewStdout()
 
 // StdoutHandler stdout log handler
 type StdoutHandler struct {
-	render Render
+	render Render //委托给Render做
 }
 
 // NewStdout create a stdout log handler

@@ -10,7 +10,7 @@ import (
 	"sync"
 	"time"
 
-	"github.com/philchia/agollo"
+	"github.com/philchia/agollo/v3" //new add
 
 	"marsgo/pkg/conf/paladin"
 )
@@ -22,7 +22,7 @@ var (
 
 type apolloWatcher struct {
 	keys []string // in apollo, they're called namespaces
-	C    chan paladin.Event // 1个队列,里面放5个事件通知
+	C    chan paladin.Event // 1个队列,里面放5个事件通知,谁个消费这个队列呢?
 }
 
 func newApolloWatcher(keys []string) *apolloWatcher {
@@ -41,6 +41,7 @@ func (aw *apolloWatcher) HasKey(key string) bool {
 	return false
 }
 
+//
 func (aw *apolloWatcher) Handle(event paladin.Event) {
 	select {
 	case aw.C <- event:
@@ -149,7 +150,7 @@ func (ad *apolloDriver) new(conf *Config) (paladin.Client, error) {
 		Cluster:        conf.Cluster,
 		NameSpaceNames: conf.Namespaces, // these namespaces will be subscribed at init
 		CacheDir:       conf.CacheDir,
-		IP:             conf.MetaAddr,
+		MetaAddr:       conf.MetaAddr,
 	})
 	err := client.Start()
 	if err != nil {
@@ -209,6 +210,7 @@ func (a *apollo) reloadValue(key string) (err error) {
 	raws[key] = value
 	a.values.Store(raws)
 	a.wmu.RLock()
+	//why ???
 	n := 0
 	for w := range a.watchers {
 		if w.HasKey(key) {

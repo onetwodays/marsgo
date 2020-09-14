@@ -27,7 +27,7 @@ func joinPaths(absolutePath, relativePath string) string {
 	return finalPath
 }
 
-//返回:port的字符串,主要是端口号
+//返回:port的字符串,主要是端口号,入参为空时,从环境变量里获取
 func resolveAddress(addr []string) string {
 	switch len(addr) {
 	case 0:

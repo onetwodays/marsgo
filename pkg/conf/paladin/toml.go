@@ -1,11 +1,12 @@
 package paladin
 
+
 import (
 	"bytes"
 	"reflect"
 	"strconv"
 
-	"github.com/BurntSushi/toml" // Note that a case insensitive match will be tried if an exact match can't be found.
+	"github.com/BurntSushi/toml" // 请注意，如果找不到完全匹配的字符，将尝试不区分大小写的匹配
 	"github.com/pkg/errors"
 )
 

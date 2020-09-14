@@ -1,25 +1,29 @@
 package metric
 
 // Bucket contains multiple float64 points.
+// [[1], [3], [5]]
 type Bucket struct {
-	Points []float64
-	Count  int64
+	Points []float64 //切片,
+	Count  int64     //Points的长度
 	next   *Bucket
 }
 
 // Append appends the given value to the bucket.
+// 往桶里尾部放入一个元素
 func (b *Bucket) Append(val float64) {
 	b.Points = append(b.Points, val)
 	b.Count++
 }
 
 // Add adds the given value to the point.
+// 往index的值加上一个值,Count+1?
 func (b *Bucket) Add(offset int, val float64) {
 	b.Points[offset] += val
 	b.Count++
 }
 
 // Reset empties the bucket.
+// 清空一个桶
 func (b *Bucket) Reset() {
 	b.Points = b.Points[:0]
 	b.Count = 0
@@ -31,6 +35,7 @@ func (b *Bucket) Next() *Bucket {
 }
 
 // Window contains multiple buckets.
+// [[1], [3], [5]]
 type Window struct {
 	window []Bucket
 	size   int
@@ -42,6 +47,7 @@ type WindowOpts struct {
 }
 
 // NewWindow creates a new Window based on WindowOpts.
+// 首尾相连的动态数组
 func NewWindow(opts WindowOpts) *Window {
 	buckets := make([]Bucket, opts.Size)
 	for offset := range buckets {
@@ -56,6 +62,7 @@ func NewWindow(opts WindowOpts) *Window {
 }
 
 // ResetWindow empties all buckets within the window.
+// 重置所有的桶
 func (w *Window) ResetWindow() {
 	for offset := range w.window {
 		w.ResetBucket(offset)
@@ -85,7 +92,7 @@ func (w *Window) Add(offset int, val float64) {
 		w.window[offset].Append(val)
 		return
 	}
-	w.window[offset].Add(0, val)
+	w.window[offset].Add(0, val) //永远都是首部
 }
 
 // Bucket returns the bucket where index equals the given offset.
@@ -99,6 +106,7 @@ func (w *Window) Size() int {
 }
 
 // Iterator returns the bucket iterator.
+// 从哪里开始索引?
 func (w *Window) Iterator(offset int, count int) Iterator {
 	return Iterator{
 		count: count,

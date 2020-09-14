@@ -64,7 +64,7 @@ type Config struct {
 	K float64  //触发熔断的错误率（K = 1 - 1/错误率）
 
 	Window  xtime.Duration //统计桶窗口时间
-	Bucket  int  //统计桶大小
+	Bucket  int  //统计桶数目
 	Request int64 //触发熔断的最少请求数量（请求少于该值时不会触发熔断）
 }
 ```

@@ -68,14 +68,7 @@ class BasicLayout extends Component {
 
     //const location = this.props.location;
     //const pathname = location.pathname; //note:pathname是个数组
-    //https://www.yifile.com/file/VoShJSDPwQrWiREW7G2/1.html
-    //https://www.yifile.com/file/VIf2JHqVl1nWiRAZ72i6.html
-    //http://www.99disk.com/file/QVNaMzU0Njg1.html
-    //https://www.yifile.com/file/UNSgcHrCwl7WiRES7Wm7.html
-    //http://www.99disk.com/file/QVNaMzQzODQ2.html
-    //http://www.99disk.com/file/QVNaMzE4MDk1.html
-    //https://cl.fr26.xyz/htm_data/2005/7/3927636.html
-    //http://www.99disk.com/file/QVNaMzMxMjYz.html
+ 
 
     return (
       <Layout>

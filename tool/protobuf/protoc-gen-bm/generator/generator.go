@@ -6,12 +6,13 @@ import (
 	"sort"
 	"strings"
 
-	"github.com/go-kratos/kratos/tool/protobuf/pkg/generator"
-	"github.com/go-kratos/kratos/tool/protobuf/pkg/naming"
-	"github.com/go-kratos/kratos/tool/protobuf/pkg/tag"
-	"github.com/go-kratos/kratos/tool/protobuf/pkg/typemap"
-	"github.com/go-kratos/kratos/tool/protobuf/pkg/utils"
+	"marsgo/tool/protobuf/pkg/generator"
+	"marsgo/tool/protobuf/pkg/naming"
+	"marsgo/tool/protobuf/pkg/tag"
+	"marsgo/tool/protobuf/pkg/typemap"
+	"marsgo/tool/protobuf/pkg/utils"
 	"github.com/golang/protobuf/proto"
+
 	"github.com/golang/protobuf/protoc-gen-go/descriptor"
 	plugin "github.com/golang/protobuf/protoc-gen-go/plugin"
 )
@@ -115,8 +116,8 @@ func (t *bm) generateImports(file *descriptor.FileDescriptorProto) {
 	//t.P(`	`,t.pkgs["context"], ` "context"`)
 	t.P(`	"context"`)
 	t.P()
-	t.P(`	bm "github.com/go-kratos/kratos/pkg/net/http/blademaster"`)
-	t.P(`	"github.com/go-kratos/kratos/pkg/net/http/blademaster/binding"`)
+	t.P(`	bm "marsgo/pkg/net/http/blademaster"`)
+	t.P(`	"marsgo/pkg/net/http/blademaster/binding"`)
 
 	t.P(`)`)
 	// It's legal to import a message and use it as an input or output for a

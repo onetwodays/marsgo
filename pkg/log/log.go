@@ -14,8 +14,8 @@ import (
 
 // Config log config.
 type Config struct {
-	Family string
-	Host   string
+	Family string //appid 在init里面初始化=env.appid
+	Host   string //在init里面初始化=os.Hostname()
 
 	// stdout
 	Stdout bool
@@ -56,10 +56,11 @@ type Render interface {
 }
 
 var (
-	h Handler //全局变量.
-	c *Config
+	h Handler //全局变量.是个接口类型
+	c *Config //全局变量
 )
 
+//初始化全局变量
 func init() {
 	host, _ := os.Hostname()
 	c = &Config{
@@ -71,15 +72,17 @@ func init() {
 	addFlag(flag.CommandLine)
 }
 
+//默认的全局变量
 var (
-	_v        int
-	_stdout   bool
+	_v        int //日志等级
+	_stdout   bool //是否输出到控制台
 	_dir      string
 	_agentDSN string
-	_filter   logFilter
-	_module   = verboseModule{}
-	_noagent  bool
+	_filter   logFilter //[]string
+	_module   = verboseModule{} //每个模块的日志等级
+	_noagent  bool //是否输出到代理
 )
+
 
 // addFlag init log from dsn.
 func addFlag(fs *flag.FlagSet) {
@@ -91,18 +94,18 @@ func addFlag(fs *flag.FlagSet) {
 	if tm := os.Getenv("LOG_MODULE"); len(tm) > 0 {
 		_module.Set(tm)
 	}
-	if tf := os.Getenv("LOG_FILTER"); len(tf) > 0 {
+	if tf := os.Getenv("/"); len(tf) > 0 {
 		_filter.Set(tf)
 	}
 	_noagent, _ = strconv.ParseBool(os.Getenv("LOG_NO_AGENT"))
 	// get val from flag
-	fs.IntVar(&_v, "log.v", _v, "log verbose level, or use LOG_V env variable.")
-	fs.BoolVar(&_stdout, "log.stdout", _stdout, "log enable stdout or not, or use LOG_STDOUT env variable.")
-	fs.StringVar(&_dir, "log.dir", _dir, "log file `path, or use LOG_DIR env variable.")
-	fs.StringVar(&_agentDSN, "log.agent", _agentDSN, "log agent dsn, or use LOG_AGENT env variable.")
-	fs.Var(&_module, "log.module", "log verbose for specified module, or use LOG_MODULE env variable, format: file=1,file2=2.")
-	fs.Var(&_filter, "log.filter", "log field for sensitive message, or use LOG_FILTER env variable, format: field1,field2.")
-	fs.BoolVar(&_noagent, "log.noagent", _noagent, "force disable log agent print log to stderr,  or use LOG_NO_AGENT")
+	fs.IntVar(&_v,          "log.v",      _v,        "log verbose level, or use LOG_V env variable.")
+	fs.BoolVar(&_stdout,    "log.stdout", _stdout,   "log enable stdout or not, or use LOG_STDOUT env variable.")
+	fs.StringVar(&_dir,     "log.dir",    _dir,      "log file `path, or use LOG_DIR env variable.")
+    fs.StringVar(&_agentDSN,"log.agent",  _agentDSN, "log agent dsn, or use LOG_AGENT env variable.")
+	fs.Var(&_module,        "log.module",            "log verbose for specified module, or use LOG_MODULE env variable, format: file=1,file2=2.")
+	fs.Var(&_filter,        "log.filter",            "log field for sensitive message, or use LOG_FILTER env variable, format: field1,field2.")
+	fs.BoolVar(&_noagent,   "log.noagent", _noagent, "force disable log agent print log to stderr,  or use LOG_NO_AGENT")
 }
 
 // Init create logger with context.
@@ -185,11 +188,11 @@ func Errorv(ctx context.Context, args ...D) {
 
 func logw(args []interface{}) []D {
 	if len(args)%2 != 0 {
-		Warn("log: the variadic must be plural, the last one will ignored") // 可变参数必须为复数
+		Warn("log: the variadic must be plural, the last one will ignored") // 可变参数必须为偶数
 	}
 	ds := make([]D, 0, len(args)/2)
 	for i := 0; i < len(args)-1; i = i + 2 {
-		if key, ok := args[i].(string); ok {
+		if key, ok := args[i].(string); ok {  //key必须是字符串
 			ds = append(ds, KV(key, args[i+1]))
 		} else {
 			Warn("log: key must be string, get %T, ignored", args[i])

@@ -39,21 +39,8 @@ func (ps Params) ByName(name string) (va string) {
 	return
 }
 
-type methodTree struct {
-	method string
-	root   *node
-}
 
-type methodTrees []methodTree
 
-func (trees methodTrees) get(method string) *node {
-	for _, tree := range trees {
-		if tree.method == method {
-			return tree.root
-		}
-	}
-	return nil
-}
 
 func min(a, b int) int {
 	if a <= b {
@@ -62,7 +49,7 @@ func min(a, b int) int {
 	return b
 }
 
-//统计path里面出现的:与* 的个数
+//统计path里面出现的:与* 的个数,url是否有参数
 func countParams(path string) uint8 {
 	var n uint
 	for i := 0; i < len(path); i++ {
@@ -77,24 +64,42 @@ func countParams(path string) uint8 {
 	return uint8(n)
 }
 
-type nodeType uint8
+//压缩检索树的实现
+
+type methodTree struct {
+	method string
+	root   *node
+}
+
+type methodTrees []methodTree //树的切片
+
+func (trees methodTrees) get(method string) *node {
+	for _, tree := range trees {
+		if tree.method == method {
+			return tree.root
+		}
+	}
+	return nil
+}
+
+type nodeType uint8 //节点类型
 
 const (
-	static nodeType = iota // default
-	root
-	param
-	catchAll
+	static nodeType = iota // default 非根节点的普通字符串节点
+	root  // 根节点
+	param //参数节点如:id
+	catchAll //通配符节点,如*angway
 )
 
 type node struct {
-	path      string
-	indices   string //位图表示法
-	children  []*node
-	handlers  []HandlerFunc
-	priority  uint32 //优先级什么鬼?
-	nType     nodeType
-	maxParams uint8
-	wildChild bool
+	path      string //当前节点对应的路径中的字符串
+	indices   string //子节点索引,子节点为非参数节点(wildChild=false)的首字母组成的字符串
+	children  []*node //子节点
+	handlers  []HandlerFunc//对应的handler切片
+	priority  uint32 //优先级什么鬼?优先级，查找的时候会用到,表示当前节点加上所有子节点的数目
+	nType     nodeType //节点类型
+	maxParams uint8 //最大的参数
+	wildChild bool //当前节点是否是参数节点
 }
 
 // increments priority of the given child and reorders if necessary.

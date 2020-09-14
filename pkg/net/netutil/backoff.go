@@ -4,13 +4,13 @@ import (
 	"math/rand"
 	"time"
 )
-
+// 这个文件好像当前没有用到
 // DefaultBackoffConfig uses values specified for backoff(远离) in common.
 var DefaultBackoffConfig = BackoffConfig{
 	MaxDelay:  120 * time.Second,
 	BaseDelay: 1.0 * time.Second,
 	Factor:    1.6,
-	Jitter:    0.2,
+	Jitter:    0.2, // 抖动
 }
 
 // Backoff defines the methodology for backing off after a call failure.
@@ -22,12 +22,12 @@ type Backoff interface {
 
 // BackoffConfig defines the parameters for the default backoff strategy.
 type BackoffConfig struct {
-	// MaxDelay is the upper bound of backoff delay.
+	// MaxDelay is the upper bound of backoff(退让) delay.
 	MaxDelay time.Duration
 
 	// baseDelay is the amount of time to wait before retrying after the first
 	// failure.
-	BaseDelay time.Duration
+	BaseDelay time.Duration //重试等待时间
 
 	// factor is applied to the backoff after each retry.
 	Factor float64
@@ -49,7 +49,7 @@ func (bc *BackoffConfig) Fix() {
 */
 
 // Backoff returns the amount of time to wait before the next retry given
-// the number of consecutive failures.
+// the number of consecutive(连续的) failures.在失败了retries之后，下次等待重试的时间
 func (bc *BackoffConfig) Backoff(retries int) time.Duration {
 	if retries == 0 {
 		return bc.BaseDelay

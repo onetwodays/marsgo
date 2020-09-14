@@ -12,6 +12,7 @@ type Render interface {
 	WriteContentType(w http.ResponseWriter)
 }
 
+//不是全局变量
 var (
 	_ Render = JSON{}
 	_ Render = MapJSON{}

@@ -21,7 +21,7 @@ type List struct {
 	New func(ctx context.Context) (io.Closer, error)
 
 	// mu protects fields defined below.
-	mu     sync.Mutex
+	mu     sync.Mutex  //是对conf的保护
 	cond   chan struct{}
 	closed bool
 	active int
@@ -43,7 +43,7 @@ func NewList(c *Config) *List {
 	}
 	// new pool
 	p := &List{conf: c}
-	p.cond = make(chan struct{})
+	p.cond = make(chan struct{}) //用来同步
 	p.startCleanerLocked(time.Duration(c.IdleTimeout))
 	return p
 }

@@ -6,7 +6,7 @@ import (
 
 	pb "marsgo/cmd/mars_server/api"
 	"marsgo/cmd/mars_server/internal/dao"
-	"github.com/bilibili/kratos/pkg/conf/paladin"
+	"marsgo/pkg/conf/paladin"
 
 	"github.com/golang/protobuf/ptypes/empty"
 )
@@ -23,7 +23,7 @@ func New(d dao.Dao) (s *Service, err error) {
 		ac:  &paladin.TOML{},
 		dao: d,
 	}
-	err = paladin.Watch("application.toml", s.ac)
+	err = paladin.Watch("application.toml", s.ac) //看监控谁个
 	return
 }
 

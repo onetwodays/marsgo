@@ -9,7 +9,6 @@ import (
 
 var jsonContentType = []string{"application/json; charset=utf-8"}
 
-// JSON common json struct.
 type JSON struct {
 	Code    int         `json:"code"`
 	Message string      `json:"message"`

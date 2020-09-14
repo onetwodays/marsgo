@@ -3,8 +3,8 @@ package grpc
 import (
 	pb "marsgo/cmd/mars_server/api"
 
-	"github.com/bilibili/kratos/pkg/conf/paladin"
-	"github.com/bilibili/kratos/pkg/net/rpc/warden"
+	"marsgo/pkg/conf/paladin"
+	"marsgo/pkg/net/rpc/warden"
 )
 
 // New new a grpc server.

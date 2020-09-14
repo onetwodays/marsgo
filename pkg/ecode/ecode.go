@@ -14,10 +14,14 @@ var (
 )
 
 // Register register ecode message map.
+// 覆盖保存
 func Register(cm map[int]string) {
 	_messages.Store(cm)
 }
 
+
+// A Code is an int error code spec.
+type Code int
 // New new a ecode.Codes by int value.
 // NOTE: ecode must unique in global, the New will check repeat and then panic.
 func New(e int) Code {
@@ -48,8 +52,6 @@ type Codes interface {
 	Details() []interface{}
 }
 
-// A Code is an int error code spec.
-type Code int
 
 func (e Code) Error() string {
 	return strconv.FormatInt(int64(e), 10)
@@ -68,7 +70,7 @@ func (e Code) Message() string {
 	return e.Error()
 }
 
-// Details return details.
+// Details return details.grpc保留
 func (e Code) Details() []interface{} { return nil }
 
 // Int parse code int to error.

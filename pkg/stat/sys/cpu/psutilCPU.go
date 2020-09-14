@@ -4,6 +4,7 @@ import (
 	"time"
 
 	"github.com/shirou/gopsutil/cpu"
+
 )
 
 type psutilCPU struct {

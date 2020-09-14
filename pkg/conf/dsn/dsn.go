@@ -59,6 +59,7 @@ type DSN struct {
 //	// Field bind value from query
 //	Field string `dsn:"query.name"`
 //  type url.Values=Values map[string][]string
+// url.Values = map[string][]string
 func (d *DSN) Bind(v interface{}) (url.Values, error) {
 	assignFuncs := make(map[string]assignFunc)
 	if d.User != nil {
@@ -80,6 +81,7 @@ func (d *DSN) Bind(v interface{}) (url.Values, error) {
 
 func addressesAssignFunc(addresses []string) assignFunc {
 	return func(v reflect.Value, to tagOpt) error {
+		//处理 v是string类型
 		if v.Kind() == reflect.String {
 			if addresses[0] == "" && to.Default != "" {
 				v.SetString(to.Default)
@@ -88,9 +90,11 @@ func addressesAssignFunc(addresses []string) assignFunc {
 			}
 			return nil
 		}
+		//处理v是字符串切片
 		if !(v.Kind() == reflect.Slice && v.Type().Elem().Kind() == reflect.String) {
 			return &BindTypeError{Value: strings.Join(addresses, ","), Type: v.Type()}
 		}
+		//分配空间
 		vals := reflect.MakeSlice(v.Type(), len(addresses), len(addresses))
 		for i, address := range addresses {
 			vals.Index(i).SetString(address)
@@ -113,6 +117,7 @@ func (d *DSN) Addresses() []string {
 }
 
 // Parse parses rawdsn into a URL structure.
+//[scheme:][//[userinfo@]host][/]path[?query][#fragment]
 func Parse(rawdsn string) (*DSN, error) {
 	u, err := url.Parse(rawdsn)
 	return &DSN{URL: u}, err

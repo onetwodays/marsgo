@@ -6,9 +6,9 @@ import (
 
 	"marsgo/cmd/mars_server/internal/service"
 
-	"github.com/bilibili/kratos/pkg/log"
-	bm "github.com/bilibili/kratos/pkg/net/http/blademaster"
-	"github.com/bilibili/kratos/pkg/net/rpc/warden"
+	"marsgo/pkg/log"
+	bm "marsgo/pkg/net/http/blademaster"
+	"marsgo/pkg/net/rpc/warden"
 )
 
 //go:generate kratos tool wire

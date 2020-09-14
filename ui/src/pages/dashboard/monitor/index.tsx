@@ -9,7 +9,7 @@ export default () => {
 
   useEffect(()=>{
     const timer = setInterval(()=>{setNowTime(moment().format('YYYY年MM月DD日 ddd HH:mm:ss'))},1000);
-    document.title = `曹雪${nowTime}`;
+    document.title = `雪${nowTime}`;
     return()=>{clearInterval(timer);}
   },[nowTime]);
   return (

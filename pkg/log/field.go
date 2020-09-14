@@ -6,9 +6,17 @@ import (
 
 	"marsgo/pkg/log/internal/core"
 )
+/*
+// core.Field is for encoder
+type Field struct {
+	Key       string
+	Value     interface{}
+	Type      FieldType
+	StringVal string
+	Int64Val  int64
+}
+ */
 
-// D represents a map of entry level data used for structured logging.
-// type D map[string]interface{}
 type D = core.Field
 
 // KVString construct Field with string value.

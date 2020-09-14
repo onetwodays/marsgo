@@ -5,12 +5,12 @@ import (
 	"time"
 
 	"marsgo/cmd/mars_server/internal/model"
-	"github.com/bilibili/kratos/pkg/cache/memcache"
-	"github.com/bilibili/kratos/pkg/cache/redis"
-	"github.com/bilibili/kratos/pkg/conf/paladin"
-	"github.com/bilibili/kratos/pkg/database/sql"
-	"github.com/bilibili/kratos/pkg/sync/pipeline/fanout"
-	xtime "github.com/bilibili/kratos/pkg/time"
+	"marsgo/pkg/cache/memcache"
+	"marsgo/pkg/cache/redis"
+	"marsgo/pkg/conf/paladin"
+	"marsgo/pkg/database/sql"
+	"marsgo/pkg/sync/pipeline/fanout"
+	xtime "marsgo/pkg/time"
 )
 
 //go:generate kratos tool genbts

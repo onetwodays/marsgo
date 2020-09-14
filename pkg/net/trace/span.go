@@ -85,7 +85,7 @@ func (s *Span) Finish(perr *error) {
 			s.SetLog(Log(LogStack, fmt.Sprintf("%+v", err.StackTrace())))
 		}
 	}
-	s.dapper.report(s)
+	s.dapper.report(s) //发送给tracer服务端
 }
 
 func (s *Span) SetTag(tags ...Tag) Trace {

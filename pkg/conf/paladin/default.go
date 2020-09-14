@@ -9,7 +9,7 @@ import (
 var (
 	// DefaultClient default client.
 	DefaultClient Client  // 定义了一个接口
-	confPath      string  //配置文件路径或者所在的目录
+	confPath      string  //配置文件路径或者所在的目录 来自命令行参数
 )
 
 func init() {
@@ -22,8 +22,8 @@ func init() {
 // args[0]: driver name, string type
 func Init(args ...interface{}) (err error) {
 	if confPath != "" {
-		DefaultClient, err = NewFile(confPath) // 是配置文件
-	} else {
+		DefaultClient, err = NewFile(confPath) // 从本地文件系统读取配置
+	} else { // 远程配置服务器读取配置
 		var (
 			driver Driver
 		)
@@ -31,8 +31,8 @@ func Init(args ...interface{}) (err error) {
 		if len(args) == 0 {
 			panic(argsLackErr.Error())
 		}
-		argsInvalidErr := errors.New("invalid remote config center args")
-		driverName, ok := args[0].(string)
+		argsInvalidErr := errors.New("invalid remote config center args") //远程配置中心
+		driverName, ok := args[0].(string) //
 		if !ok {
 			panic(argsInvalidErr.Error())
 		}
@@ -57,7 +57,7 @@ func Watch(key string, s Setter) error {
 	if err != nil {
 		return err
 	}
-	if err := s.Set(str); err != nil {
+	if err := s.Set(str); err != nil { //第一次读取配置
 		return err
 	}
 	go func() {

@@ -15,7 +15,7 @@ func (jsonBinding) Name() string {
 
 //req 是src obj是dst,返回值
 func (jsonBinding) Bind(req *http.Request, obj interface{}) error {
-	decoder := json.NewDecoder(req.Body)
+	decoder := json.NewDecoder(req.Body) //在这里处理req.Body
 	if err := decoder.Decode(obj); err != nil {
 		return errors.WithStack(err)
 	}

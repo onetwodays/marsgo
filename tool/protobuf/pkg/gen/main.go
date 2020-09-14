@@ -47,7 +47,7 @@ func readGenRequest() *plugin.CodeGeneratorRequest {
 		Error(err, "reading input")
 	}
 
-	req := new(plugin.CodeGeneratorRequest)
+	req := new(plugin.CodeGeneratorRequest) //
 	if err = proto.Unmarshal(data, req); err != nil {
 		Error(err, "parsing input proto")
 	}

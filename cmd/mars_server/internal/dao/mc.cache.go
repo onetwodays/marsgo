@@ -19,8 +19,8 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/bilibili/kratos/pkg/cache/memcache"
-	"github.com/bilibili/kratos/pkg/log"
+	"marsgo/pkg/cache/memcache"
+	"marsgo/pkg/log"
 	"marsgo/cmd/mars_server/internal/model"
 )
 

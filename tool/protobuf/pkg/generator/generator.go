@@ -11,19 +11,25 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/go-kratos/kratos/tool/protobuf/pkg/gen"
-	"github.com/go-kratos/kratos/tool/protobuf/pkg/naming"
-	"github.com/go-kratos/kratos/tool/protobuf/pkg/typemap"
-	"github.com/go-kratos/kratos/tool/protobuf/pkg/utils"
+	"marsgo/tool/protobuf/pkg/gen"
+
+	"marsgo/tool/protobuf/pkg/naming"
+
+	"marsgo/tool/protobuf/pkg/typemap"
+
+	"marsgo/tool/protobuf/pkg/utils"
+
 	"github.com/golang/protobuf/protoc-gen-go/descriptor"
+
 	plugin "github.com/golang/protobuf/protoc-gen-go/plugin"
+
 	"github.com/pkg/errors"
 )
 
 const Version = "v0.1"
 
-var GoModuleImportPath = "github.com/go-kratos/kratos"
-var GoModuleDirName = "github.com/go-kratos/kratos"
+var GoModuleImportPath = "marsgo"
+var GoModuleDirName = "marsgo"
 
 type Base struct {
 	Reg *typemap.Registry
@@ -223,6 +229,8 @@ func (t *Base) P(args ...string) {
 	}
 	t.Output.WriteByte('\n')
 }
+
+
 
 func (t *Base) FormattedOutput() string {
 	// Reformat generated code.

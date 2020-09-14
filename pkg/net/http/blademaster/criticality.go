@@ -14,7 +14,7 @@ func Criticality(pathCriticality criticalityPkg.Criticality) HandlerFunc {
 	}
 	return func(ctx *Context) {
 		md, ok := metadata.FromContext(ctx)
-		if ok {
+		if ok { //只是判断一下是否有元数据
 			md[metadata.Criticality] = string(pathCriticality)
 		}
 	}
