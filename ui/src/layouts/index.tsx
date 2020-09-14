@@ -21,8 +21,8 @@ import {
 //导入umi的Link组件
 import {Link} from 'umi'
 
-// Header, Footer, Sider, Content组件在Layout组件模块下
-const { Header, Footer, Sider, Content } = Layout;
+// Header, Footer, Sider, Content组件在Layout组件模块下 对象的解析赋值
+const { Header, Footer, Sider, Content } = Layout; 
 const SubMenu = Menu.SubMenu;
 
 
@@ -32,8 +32,23 @@ const menuData = [
   { route:'/dashboard/monitor',       name:'监控'},           //2
   { route:'/dashboard/workplace',     name:'工作台'},         //3
   { route:'/demo',                    name:'示例'},          //4
+  { route:'/test',                    name:'test'},          //4
 
 ]
+
+//定义多个菜单数组
+const subMenuHero = [
+  { route:'/hero/hero',                        name:'英雄'},            //0
+  { route:'/hero/item',                         name:'局内道具'},            //0
+  { route:'/hero/summoner',                     name:'召唤师技能'},            //0
+
+]
+
+
+
+
+
+
 
 //umi 会自动使用BasicLayout包裹页面，并传入如下 props
 //{
@@ -55,24 +70,27 @@ class BasicLayout extends Component {
   
   
 
+  //菜单是不是可收缩的
   onCollapse = collapsed =>{
     this.setState({collapsed})
   };
 
+  //菜单是水平还是垂直
   onChangeMode= value=>{
     this.setState({
       mode:value?'vertical':'inline',
     });
   };
 
+  //改变菜单的主题
   onChangeTheme= value=>{
     this.setState({theme:value?'dark':'light',});
   };
   
-
+  // location:{pathname} 解析赋值，location是模式，pathname才是要赋值的变量
   render() {
     const {
-      location:{pathname},
+      location:{pathname}, 
       children,
     } = this.props;
 
@@ -86,6 +104,16 @@ class BasicLayout extends Component {
           <div style={{ height: '32px', background: 'rgba(255,255,255,.2)', margin: '16px' }} />
           
           <Menu theme={this.state.theme} mode={this.state.mode} defaultSelectedKeys={[pathname]}>
+
+
+            <SubMenu key="subHero" title={<span><DesktopOutlined/><span>王者荣耀资料库</span></span>}>
+              {subMenuHero.map(menu=>(
+                <Menu.Item key={`/${menu.route}`}>
+                  <Link to={menu.route}>{menu.name}</Link>
+                </Menu.Item>
+                
+              ))}
+            </SubMenu>
 
             <Menu.Item icon={<UserOutlined />} key={`/${menuData[0].route}`}>
             <Link to={menuData[0].route}>{menuData[0].name}</Link> 
@@ -101,6 +129,10 @@ class BasicLayout extends Component {
 
             <Menu.Item icon={<MenuFoldOutlined />} key={`/${menuData[4].route}`}>
                 <Link to={menuData[4].route}>{menuData[4].name}</Link>
+            </Menu.Item>
+
+            <Menu.Item  key={`/${menuData[5].route}`}>
+                <Link to={menuData[5].route}>{menuData[5].name}</Link>
             </Menu.Item>
 
           </Menu>
