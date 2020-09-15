@@ -24,6 +24,7 @@ var (
 )
 
 func protocAction(ctx *cli.Context) (err error) {
+	//当前系统是否已经安装了protoc编译器
 	if err = checkProtoc(); err != nil {
 		return err
 	}
@@ -93,7 +94,7 @@ func checkProtoc() error {
 				return err
 			}
 		default:
-			return errors.New("您还没安装protobuf，请进行手动安装：https://github.com/protocolbuffers/protobuf/releases")
+			return errors.New("您还没安装protobuf的编译器protoc，请进行手动安装：https://github.com/protocolbuffers/protobuf/releases")
 		}
 	}
 	return nil

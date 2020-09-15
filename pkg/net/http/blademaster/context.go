@@ -43,12 +43,12 @@ type Context struct {
 
 	Error error //代表接口里面的错误码
 
-	method string
+	method string //添加路由时,有一个中间件,由中间件填充其值 比如GET POST等
 	engine *Engine
 
-	RoutePath string
+	RoutePath string //添加路由时,有一个中间件,由中间件填充其值 =请求对应的url
 
-	Params Params //pair的切片
+	Params Params //pair的切片.
 }
 
 /************************************/
@@ -129,6 +129,7 @@ func (c *Context) Status(code int) {
 }
 
 // Render http response with http code by a render instance.
+// 是个状态码
 func (c *Context) Render(code int, r render.Render) {
 	r.WriteContentType(c.Writer)
 	if code > 0 {
@@ -292,7 +293,7 @@ func (c *Context) Bind(obj interface{}) error {
 // It will abort the request with HTTP 400 if any error ocurrs.
 // See the binding package.
 func (c *Context) mustBindWith(obj interface{}, b binding.Binding) (err error) {
-	if err = b.Bind(c.Request, obj); err != nil {
+	if err = b.Bind(c.Request, obj); err != nil { //有错误发生啊,
 		c.Error = ecode.RequestErr
 		c.Render(http.StatusOK, render.JSON{
 			Code:    ecode.RequestErr.Code(),

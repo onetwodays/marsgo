@@ -20,7 +20,7 @@ type Group struct {
 	ch         chan func(ctx context.Context) error //ch 用来保存函数
 	chs        []func(ctx context.Context) error    //函数切片,当ch满了时候,f放到chs里面,否则放在ch里面
 
-	ctx    context.Context
+	ctx    context.Context //作为结构体里面的一个成员，这里要注意了
 	cancel func()
 }
 

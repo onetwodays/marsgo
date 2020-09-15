@@ -12,14 +12,14 @@ type IRouter interface {
 
 // IRoutes http router interface.
 type IRoutes interface {
-	UseFunc(...HandlerFunc) IRoutes
-	Use(...Handler) IRoutes
+	UseFunc(...HandlerFunc)  IRoutes
+	Use(...Handler)          IRoutes
 
 	Handle(string, string, ...HandlerFunc) IRoutes
 	HEAD(string, ...HandlerFunc) IRoutes
-	GET(string, ...HandlerFunc) IRoutes
+	GET(string, ...HandlerFunc)  IRoutes
 	POST(string, ...HandlerFunc) IRoutes
-	PUT(string, ...HandlerFunc) IRoutes
+	PUT(string, ...HandlerFunc)  IRoutes
 	DELETE(string, ...HandlerFunc) IRoutes
 }
 
@@ -72,7 +72,7 @@ func (group *RouterGroup) BasePath() string {
 }
 
 func (group *RouterGroup) handle(httpMethod, relativePath string, handlers ...HandlerFunc) IRoutes {
-	absolutePath := group.calculateAbsolutePath(relativePath)
+	absolutePath := group.calculateAbsolutePath(relativePath)  //basePath+relativePath
 	injections := group.injections(relativePath)
 	handlers = group.combineHandlers(injections, handlers) //组自己的+匹配正则表达式+入参
 	group.engine.addRoute(httpMethod, absolutePath, handlers...)

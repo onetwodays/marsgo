@@ -39,7 +39,7 @@ func (p *PointPolicy) Append(val float64) {
 	p.mu.Lock()
 	defer p.mu.Unlock()
 	offset := p.nextOffset()
-	p.window.ResetBucket(offset)
+	p.window.ResetBucket(offset) //先把要添加的桶内元素清空
 	p.window.Append(offset, val)
 	p.updateOffset(offset)
 }

@@ -6,9 +6,9 @@ import (
 	"runtime"
 	"sync"
 
-	"github.com/bilibili/kratos/pkg/log"
-	"github.com/bilibili/kratos/pkg/net/metadata"
-	"github.com/bilibili/kratos/pkg/net/trace"
+	"marsgo/pkg/log"
+	"marsgo/pkg/net/metadata"
+	"marsgo/pkg/net/trace"
 )
 
 var (

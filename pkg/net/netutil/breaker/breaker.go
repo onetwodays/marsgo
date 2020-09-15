@@ -37,7 +37,7 @@ func (conf *Config) fix() {
 // Breaker is a CircuitBreaker pattern.
 // FIXME on int32 atomic.LoadInt32(&b.on) == _switchOn
 type Breaker interface {
-	Allow() error
+	Allow() error //判断是否有错误,来表示是否发生熔断
 	MarkSuccess()
 	MarkFailed()
 }
@@ -68,9 +68,9 @@ const (
 )
 
 var (
-	_mu   sync.RWMutex
+	_mu   sync.RWMutex //保护全局变量_conf
 	_conf = &Config{
-		Window:  xtime.Duration(3 * time.Second),
+		Window:  xtime.Duration(3 * time.Second),//窗口时间是3s
 		Bucket:  10,
 		Request: 100,
 
@@ -91,7 +91,7 @@ func Init(conf *Config) {
 	_conf = conf
 	_mu.Unlock()
 }
-
+// 全局函数
 // Go runs your function while tracking the breaker state of default group.
 func Go(name string, run, fallback func() error) error {
 	breaker := _group.Get(name)

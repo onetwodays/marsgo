@@ -31,7 +31,7 @@ func extendTag() (tags []Tag) {
 }
 
 func genID() uint64 {
-	var b [8]byte
+	var b [8]byte  //8字节数组
 	// i think this code will not survive(生存) to 2106-02-07
 	binary.BigEndian.PutUint32(b[4:], uint32(time.Now().Unix())>>8)
 	b[4] = _hostHash
@@ -45,7 +45,7 @@ type stackTracer interface {
 
 type ctxKey string
 
-var _ctxkey ctxKey = "marsgo/pkg/net/trace.trace" //上下文key
+var _ctxkey ctxKey = "marsgo/pkg/net/trace.trace" //上下文key,默认值
 
 // FromContext returns the trace bound to the context, if any. 把trace_key 和trace_value 传递给上下文.
 func FromContext(ctx context.Context) (t Trace, ok bool) {

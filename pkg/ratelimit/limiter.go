@@ -20,7 +20,7 @@ type allowOptions struct{}
 
 // AllowOptions allow options.
 type AllowOption interface {
-	Apply(*allowOptions)
+	Apply(*allowOptions) //定义一个方法
 }
 
 // DoneInfo done info.

@@ -16,7 +16,7 @@ package dao
 import (
 	"context"
 
-	"github.com/bilibili/kratos/pkg/cache"
+	"marsgo/pkg/cache"
 	"marsgo/cmd/mars_server/internal/model"
 )
 

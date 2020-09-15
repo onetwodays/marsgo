@@ -61,7 +61,7 @@ func (c *connReport) daemon() {
 	for b := range c.dataCh {
 		c.send(b)  //每次发送一个字节数组
 	}
-	c.done <- struct{}{} //发送完了,给一个通知.
+	c.done <- struct{}{} //发送完了,关闭了,给一个通知.
 }
 
 func (c *connReport) WriteSpan(sp *Span) error {

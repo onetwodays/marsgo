@@ -7,11 +7,12 @@ import (
 	"regexp"
 	"strings"
 
-	"github.com/go-kratos/kratos/tool/protobuf/pkg/gen"
-	"github.com/go-kratos/kratos/tool/protobuf/pkg/generator"
-	"github.com/go-kratos/kratos/tool/protobuf/pkg/naming"
-	"github.com/go-kratos/kratos/tool/protobuf/pkg/tag"
-	"github.com/go-kratos/kratos/tool/protobuf/pkg/typemap"
+	"marsgo/tool/protobuf/pkg/gen"
+	"marsgo/tool/protobuf/pkg/generator"
+	"marsgo/tool/protobuf/pkg/naming"
+	"marsgo/tool/protobuf/pkg/tag"
+	"marsgo/tool/protobuf/pkg/typemap"
+
 	"github.com/golang/protobuf/protoc-gen-go/descriptor"
 	plugin "github.com/golang/protobuf/protoc-gen-go/plugin"
 )

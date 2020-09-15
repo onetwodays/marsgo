@@ -90,7 +90,7 @@ func parseTag(tag string) tagOpt {
 }
 
 type decodeState struct {
-	data        url.Values
+	data        url.Values //数据源
 	used        map[string]bool
 	assignFuncs map[string]assignFunc
 }
@@ -131,11 +131,11 @@ func (d *decodeState) root(v reflect.Value) error {
 	if v.Kind() != reflect.Struct {
 		return &BindTypeError{Value: d.data.Encode(), Type: v.Type()}
 	}
-	tv := v.Type()
+	tv := v.Type() //取出v的类型信息
 	for i := 0; i < tv.NumField(); i++ {
-		fv := v.Field(i)
-		field := tv.Field(i)
-		to := parseTag(field.Tag.Get(_tagID))
+		fv := v.Field(i)      //带有value+filed
+		field := tv.Field(i)   //带有filed
+		to := parseTag(field.Tag.Get(_tagID)) //`dsn:"name,defalut"`
 		if to.Name == "-" {
 			continue
 		}
@@ -408,6 +408,7 @@ func (d *decodeState) indirect(v reflect.Value) (encoding.TextUnmarshaler, refle
 		if v.IsNil() {
 			v.Set(reflect.New(v.Type().Elem()))
 		}
+		//类型包含的method 个数
 		if v.Type().NumMethod() > 0 {
 			if u, ok := v.Interface().(encoding.TextUnmarshaler); ok {
 				return u, reflect.Value{}

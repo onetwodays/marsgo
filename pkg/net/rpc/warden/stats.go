@@ -18,7 +18,7 @@ func (s *Server) stats() grpc.UnaryServerInterceptor {
 		cpu.ReadStat(&cpustat)
 		if cpustat.Usage != 0 {
 			trailer := gmd.Pairs([]string{nmd.CPUUsage, strconv.FormatInt(int64(cpustat.Usage), 10)}...)
-			grpc.SetTrailer(ctx, trailer)
+			grpc.SetTrailer(ctx, trailer) //返回追踪信息
 		}
 		return
 	}

@@ -4,13 +4,13 @@ import (
 	"context"
 
 	"marsgo/cmd/mars_server/internal/model"
-	"github.com/bilibili/kratos/pkg/conf/paladin"
-	"github.com/bilibili/kratos/pkg/database/sql"
+	"marsgo/pkg/conf/paladin"
+	"marsgo/pkg/database/sql"
 )
 
 func NewDB() (db *sql.DB, err error) {
 	var cfg struct {
-		Client *sql.Config
+		Client *sql.Config //指针分配空间怎么办？
 	}
 	if err = paladin.Get("db.toml").UnmarshalTOML(&cfg); err != nil {
 		return

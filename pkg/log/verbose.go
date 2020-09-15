@@ -7,7 +7,8 @@ import (
 	"runtime"
 	"strings"
 )
-
+// Verbose(详情) is a boolean type that implements Info, Infov (like Printf) etc.
+type Verbose bool
 // V reports whether verbosity at the call site is at least the requested level.
 // The returned value is a boolean of type Verbose, which implements Info, Infov etc.
 // These methods will write to the Info log if called.
@@ -23,6 +24,7 @@ import (
 // V is at least the value of Config.VLevel, or of Config.Module for the source file containing the
 // call, the V call will log.
 // v must be more than 0.
+//log.V(5).Info("The request's Referer or Origin header is empty.")
 func V(v int32) Verbose {
 	var (
 		file string
@@ -43,7 +45,7 @@ func V(v int32) Verbose {
 	}
 	for filter, lvl := range c.Module { //c.Module = map[string]int
 		var match bool
-		if match = filter == file; !match {
+		if match =  filter == file ; !match {
 			match, _ = filepath.Match(filter, file)
 		}
 		if match {
@@ -70,7 +72,7 @@ func (v Verbose) Infov(ctx context.Context, args ...D) { //多个D
 // Infow logs a message with some additional context. The variadic key-value pairs are treated as they are in With.
 func (v Verbose) Infow(ctx context.Context, args ...interface{}) {
 	if v {
-		h.Log(ctx, _infoLevel, logw(args)...)
+		h.Log(ctx, _infoLevel, logw(args)...) //logw是用来生成D的
 	}
 }
 

@@ -32,7 +32,7 @@ func oneAtTimeHash(s string) (hash uint32) {
 
 // sampler decides whether a new trace should be sampled or not.
 type sampler interface {
-	IsSampled(traceID uint64, operationName string) (bool, float32)
+	IsSampled(traceID uint64, operationName string) (bool, float32) //是否采集
 	Close() error
 }
 
@@ -48,11 +48,11 @@ func (p *probabilitySampling) IsSampled(traceID uint64, operationName string) (b
 			return false, 0
 		}
 	}
-	now := time.Now().Unix() //时间戳
-	idx := oneAtTimeHash(operationName) % slotLength
+	now := time.Now().Unix() //时间戳,秒级
+	idx := oneAtTimeHash(operationName) % slotLength //为什么要判断时间呢?
 	old := atomic.LoadInt64(&p.slot[idx])
 	if old != now {
-		atomic.SwapInt64(&p.slot[idx], now)
+		atomic.SwapInt64(&p.slot[idx], now) //幂等
 		return true, 1
 	}
 	return rand.Float32() < float32(p.probability), float32(p.probability) //是否sample?

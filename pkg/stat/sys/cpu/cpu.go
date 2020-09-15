@@ -55,8 +55,8 @@ type Stat struct {
 
 // Info cpu info.
 type Info struct {
-	Frequency uint64
-	Quota     float64
+	Frequency uint64 //频率
+	Quota     float64 //配额
 }
 
 // ReadStat read cpu stat. stat 保存结果值

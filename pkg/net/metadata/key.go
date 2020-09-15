@@ -1,6 +1,7 @@
 package metadata
 
 // metadata common key
+// key 放在map里面，value 是任意类型，可以快速查找出key存不存在.主要用来保证key是系统合法的key
 const (
 
 	// Network
@@ -47,7 +48,7 @@ var outgoingKey = map[string]struct{}{
 }
 
 var incomingKey = map[string]struct{}{
-	Caller: struct{}{},
+	Caller: struct{}{}, //任意类型
 }
 
 // IsOutgoingKey represent this key should propagate(传播) by rpc.

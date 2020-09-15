@@ -23,15 +23,15 @@ var _ Client = &file{} //验证一下file 是否实现了Client接口
 
 // file is file config client.
 type file struct {
-	values *Map                  // 一大块内存
+	values *Map                  // 一大块原子内存
 	rawVal map[string]*Value     // key -value的形式
 
 	watchChs map[string][]chan Event // 每个key对应多个事件队列.因为有好几类事件,一类事件可以有多个事件保存在队列里面
 	mx       sync.Mutex
 	wg       sync.WaitGroup
 
-	base string
-	done chan struct{}
+	base string  //配置文件所在的父目录
+	done chan struct{} //协程退出信号
 }
 
 func isHiddenFile(name string) bool {
@@ -108,7 +108,7 @@ func NewFile(base string) (Client, error) {
 	fc := &file{
 		values:   valMap, // 他俩保存的是同一个变量,文件名-文件内容字符串
 		rawVal:   rawVal, // (map[string]*Value
-		watchChs: make(map[string][]chan Event),
+		watchChs: make(map[string][]chan Event), //监控每个文件的变化事件,key是文件名
 
 		base: base,
 		done: make(chan struct{}, 1),
@@ -130,7 +130,7 @@ func (f *file) GetAll() *Map {
 	return f.values
 }
 
-// WatchEvent watch multi key.
+// WatchEvent watch multi key. 返回一个事件队列,key多是一个文件名
 func (f *file) WatchEvent(ctx context.Context, keys ...string) <-chan Event {
 	f.mx.Lock()
 	defer f.mx.Unlock()
@@ -190,10 +190,10 @@ func (f *file) reloadFile(name string) {
 	f.values.Store(f.rawVal)
 
 	f.mx.Lock()
-	chs := f.watchChs[key] //key是文件名.,找到这个文件名的对应的事件队列切片
+	chs := f.watchChs[key] //key是文件名.,找到这个文件名的对应的事件队列切片.
 	f.mx.Unlock()
 
-	for _, ch := range chs {
+	for _, ch := range chs { //key 对应多个通道,对于每个通道
 		select {
 		case ch <- Event{Event: EventUpdate, Value: val.raw}:
 		default:

@@ -14,10 +14,12 @@ import (
 	"time"
 
 	"marsgo/pkg/conf/dsn"
-	"marsgo/pkg/log"
 	"marsgo/pkg/net/criticality"
 	"marsgo/pkg/net/ip"
 	"marsgo/pkg/net/metadata"
+
+	"marsgo/pkg/log"
+
 	xtime "marsgo/pkg/time"
 
 	"github.com/pkg/errors"
@@ -72,7 +74,7 @@ func (f HandlerFunc) ServeHTTP(c *Context) {
 	f(c)
 }
 
-// ServerConfig is the bm server config model
+// ServerConfig is the bm server config model "tcp://0.0.0.0:8000/?timeout=1s"
 type ServerConfig struct {
 	Network      string         `dsn:"network"` //比如"tcp", "tcp4", "tcp6", "unix" or "unixpacket"
 	Addr         string         `dsn:"address"` //0.0.0.:8080
@@ -86,32 +88,7 @@ type MethodConfig struct {
 	Timeout xtime.Duration
 }
 
-// Start listen and serve bm engine by given DSN.
-func (engine *Engine) Start() error {
-	conf := engine.conf
-	l, err := net.Listen(conf.Network, conf.Addr)
-	if err != nil {
-		errors.Wrapf(err, "blademaster: listen tcp: %s", conf.Addr)
-		return err
-	}
 
-	log.Info("blademaster: start http listen addr: %s", conf.Addr)
-	server := &http.Server{
-		ReadTimeout:  time.Duration(conf.ReadTimeout),
-		WriteTimeout: time.Duration(conf.WriteTimeout),
-	}
-	go func() {
-		if err := engine.RunServer(server, l); err != nil {
-			if errors.Cause(err) == http.ErrServerClosed {
-				log.Info("blademaster: server closed")
-				return
-			}
-			panic(errors.Wrapf(err, "blademaster: engine.ListenServer(%+v, %+v)", server, l))
-		}
-	}()
-
-	return nil
-}
 
 // Engine is the framework's instance, it contains the muxer, middleware and configuration settings.
 // Create an instance of Engine, by using New() or Default()
@@ -125,7 +102,7 @@ type Engine struct {
 
 	trees     methodTrees
 	server    atomic.Value                      // store *http.Server
-	metastore map[string]map[string]interface{} // metastore is the path as key and the metadata of this path as value, it export via /metadata
+	metastore map[string]map[string]interface{} // 每个url对应的元数据,metastore is the path as key and the metadata of this path as value, it export via /metadata
 
 	pcLock        sync.RWMutex
 	methodConfigs map[string]*MethodConfig
@@ -158,6 +135,7 @@ type injection struct {
 	pattern  *regexp.Regexp
 	handlers []HandlerFunc
 }
+
 
 // NewServer returns a new blank Engine instance without any middleware attached.
 func NewServer(conf *ServerConfig) *Engine {
@@ -199,6 +177,39 @@ func NewServer(conf *ServerConfig) *Engine {
 	return engine
 }
 
+// DefaultServer returns an Engine instance with the Recovery and Logger middleware already attached.
+func DefaultServer(conf *ServerConfig) *Engine {
+	engine := NewServer(conf)
+	engine.Use(Recovery(), Trace(), Logger())
+	return engine
+}
+// Start listen and serve bm engine by given DSN.
+func (engine *Engine) Start() error {
+	conf := engine.conf
+	l, err := net.Listen(conf.Network, conf.Addr)
+	if err != nil {
+		errors.Wrapf(err, "blademaster: listen tcp: %s", conf.Addr)
+		return err
+	}
+
+	log.Info("blademaster: start http listen addr: %s", conf.Addr)
+	server := &http.Server{
+		ReadTimeout:  time.Duration(conf.ReadTimeout),
+		WriteTimeout: time.Duration(conf.WriteTimeout),
+	}
+	go func() {
+		if err := engine.RunServer(server, l); err != nil {
+			if errors.Cause(err) == http.ErrServerClosed {
+				log.Info("blademaster: server closed")
+				return
+			}
+			panic(errors.Wrapf(err, "blademaster: engine.ListenServer(%+v, %+v)", server, l))
+		}
+	}()
+
+	return nil
+}
+
 // SetMethodConfig is used to set config on specified path
 func (engine *Engine) SetMethodConfig(path string, mc *MethodConfig) {
 	engine.pcLock.Lock()
@@ -206,12 +217,7 @@ func (engine *Engine) SetMethodConfig(path string, mc *MethodConfig) {
 	engine.pcLock.Unlock()
 }
 
-// DefaultServer returns an Engine instance with the Recovery and Logger middleware already attached.
-func DefaultServer(conf *ServerConfig) *Engine {
-	engine := NewServer(conf)
-	engine.Use(Recovery(), Trace(), Logger())
-	return engine
-}
+
 
 func (engine *Engine) addRoute(method, path string, handlers ...HandlerFunc) {
 	if path[0] != '/' {
@@ -226,7 +232,7 @@ func (engine *Engine) addRoute(method, path string, handlers ...HandlerFunc) {
 	if _, ok := engine.metastore[path]; !ok {
 		engine.metastore[path] = make(map[string]interface{})
 	}
-	engine.metastore[path]["method"] = method
+	engine.metastore[path]["method"] = method //这个path对应的method是什么
 	root := engine.trees.get(method)
 	if root == nil {
 		root = new(node)
@@ -294,6 +300,7 @@ func (engine *Engine) handleContext(c *Context) {
 		req.ParseMultipartForm(defaultMaxMemory)
 	default:
 		req.ParseForm()
+
 	}
 	// get derived timeout from http request header,
 	// compare with the engine configured,
@@ -305,6 +312,7 @@ func (engine *Engine) handleContext(c *Context) {
 	if pc := engine.methodConfig(c.Request.URL.Path); pc != nil {
 		tm = time.Duration(pc.Timeout)
 	}
+	//从http head拿过期时间
 	if ctm := timeout(req); ctm > 0 && tm > ctm {
 		tm = ctm
 	}
@@ -320,7 +328,7 @@ func (engine *Engine) handleContext(c *Context) {
 	} else {
 		c.Context, cancel = context.WithCancel(ctx)
 	}
-	defer cancel()
+	defer cancel() //外面的
 	engine.prepareHandler(c)
 	c.Next()
 }
@@ -455,7 +463,7 @@ func (engine *Engine) RunUnix(file string) (err error) {
 // RunServer will serve and start listening HTTP requests by given server and listener.
 // Note: this method will block the calling goroutine indefinitely unless an error happens.
 func (engine *Engine) RunServer(server *http.Server, l net.Listener) (err error) {
-	server.Handler = engine
+	server.Handler = engine //这里是关键
 	engine.server.Store(server)
 	if err = server.Serve(l); err != nil {
 		err = errors.Wrapf(err, "listen server: %+v/%+v", server, l)
@@ -479,6 +487,7 @@ func (engine *Engine) Inject(pattern string, handlers ...HandlerFunc) {
 }
 
 // ServeHTTP conforms to the http.Handler interface.
+// 每个请求的入口
 func (engine *Engine) ServeHTTP(w http.ResponseWriter, req *http.Request) {
 	c := &Context{
 		Context:  nil,
@@ -493,7 +502,7 @@ func (engine *Engine) ServeHTTP(w http.ResponseWriter, req *http.Request) {
 	c.Request = req
 	c.Writer = w
 
-	engine.handleContext(c)
+	engine.handleContext(c) //调用中间件依次处理
 }
 
 // NoRoute adds handlers for NoRoute. It return a 404 code by default.

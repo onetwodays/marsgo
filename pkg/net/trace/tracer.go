@@ -6,7 +6,7 @@ import (
 
 var (
 	// global tracer
-	_tracer Tracer = nooptracer{}
+	_tracer Tracer = nooptracer{} //是全局变量
 )
 
 // SetGlobalTracer SetGlobalTracer
@@ -35,8 +35,9 @@ func New(operationName string, opts ...Option) Trace {
 }
 
 // Inject takes the Trace instance and injects it for
-// propagation within `carrier`. The actual type of `carrier` depends on
+// propagation（传播） within `carrier`. The actual type of `carrier` depends on
 // the value of `format`.
+// 把carrier按着format注入到t里面
 func Inject(t Trace, format interface{}, carrier interface{}) error {
 	return _tracer.Inject(t, format, carrier)
 }

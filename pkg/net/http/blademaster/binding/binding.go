@@ -21,7 +21,7 @@ const (
 // Binding http binding request interface.
 type Binding interface {
 	Name() string
-	Bind(*http.Request, interface{}) error
+	Bind(*http.Request, interface{}/*出参*/) error
 }
 
 // StructValidator http validator interface.

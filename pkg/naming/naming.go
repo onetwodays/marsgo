@@ -39,6 +39,7 @@ type Instance struct {
 }
 
 // Resolver resolve naming service
+// 服务发现
 type Resolver interface {
 	Fetch(context.Context) (*InstancesInfo, bool)
 	Watch() <-chan struct{}
@@ -46,12 +47,13 @@ type Resolver interface {
 }
 
 // Registry Register an instance and renew automatically.
+//服务注册
 type Registry interface {
 	Register(ctx context.Context, ins *Instance) (cancel context.CancelFunc, err error)
 	Close() error
 }
 
-// Builder resolver builder.
+// Builder resolver builder. 服务发现的builder
 type Builder interface {
 	Build(id string, options ...BuildOpt) Resolver
 	Scheme() string
@@ -59,9 +61,9 @@ type Builder interface {
 
 // InstancesInfo instance info.
 type InstancesInfo struct {
-	Instances map[string][]*Instance `json:"instances"`
+	Instances map[string][]*Instance `json:"instances"` //instance 可能是多版本的,key 是ZONE
 	LastTs    int64                  `json:"latest_timestamp"`
-	Scheduler *Scheduler             `json:"scheduler"`
+	Scheduler *Scheduler             `json:"scheduler"` //哪个机房的appid
 }
 
 // Scheduler scheduler.

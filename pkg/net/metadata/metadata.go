@@ -8,10 +8,12 @@ import (
 	"github.com/pkg/errors"
 )
 
+// 创建一个MD，MD可以放到content里面或者从里面取出来，key的类型是mdKey，contenxt可能还放有其他key，MD之维护元信息
+
 // MD is a mapping from metadata keys to values.
 type MD map[string]interface{}
 
-type mdKey struct{}
+type mdKey struct{}  //mdKey{} 作为WithContent（）的key，这个key是唯一的
 
 // Len returns the number of items in md.
 func (md MD) Len() int {

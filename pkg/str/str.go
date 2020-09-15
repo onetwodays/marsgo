@@ -23,7 +23,7 @@ func JoinInts(is []int64) string {
 	if len(is) == 1 {
 		return strconv.FormatInt(is[0], 10)
 	}
-	buf := bfPool.Get().(*bytes.Buffer)
+	buf := bfPool.Get().(*bytes.Buffer) //转成了指针
 	for _, i := range is {
 		buf.WriteString(strconv.FormatInt(i, 10))
 		buf.WriteByte(',')
@@ -33,7 +33,7 @@ func JoinInts(is []int64) string {
 	}
 	s := buf.String()
 	buf.Reset()
-	bfPool.Put(buf)
+	bfPool.Put(buf) //用完了放回去
 	return s
 }
 

@@ -17,12 +17,12 @@ import (
 
 
 var (
-	cpu         int64 //250ms 更新一次
-	decay       = 0.95
+	cpu         int64 //250ms 更新一次,定时器来更新
+	decay       = 0.95 //衰败
 	initTime    = time.Now()
 	defaultConf = &Config{
 		Window:       time.Second * 10,//窗口时间是10s
-		WinBucket:    100,//10s里有10个桶
+		WinBucket:    100,//1s里有10个桶
 		CPUThreshold: 800, //cpu阀是800
 	}
 )
@@ -83,15 +83,15 @@ windows 表示一秒内采样窗口的数量，默认配置中是 5s 50 个采�
 */
 type BBR struct {
 	cpu             cpuGetter //是个函数.
-	passStat        metric.RollingCounter
-	rtStat          metric.RollingCounter
-	inFlight        int64
-	winBucketPerSec int64
+	passStat        metric.RollingCounter//成功的采样
+	rtStat          metric.RollingCounter//往返时间采样
+	inFlight        int64 // maxFlight=math.Floor(float64(l.maxPASS()*l.minRT()*l.winBucketPerSec)/1000.0 + 0.5)
+	winBucketPerSec int64 //每个桶多少秒
 	conf            *Config
-	prevDrop        atomic.Value
-	prevDropHit     int32
-	rawMaxPASS      int64
-	rawMinRt        int64
+	prevDrop        atomic.Value // ?
+	prevDropHit     int32 // ?
+	rawMaxPASS      int64 //数值来自passStat
+	rawMinRt        int64 //数值来自rtStat
 }
 
 // Config contains configs of bbr limiter.
@@ -105,10 +105,13 @@ type Config struct {
 }
 
 func (l *BBR) maxPASS() int64 {
+
 	rawMaxPass := atomic.LoadInt64(&l.rawMaxPASS)
+	//桶时间还没到
 	if rawMaxPass > 0 && l.passStat.Timespan() < 1 {
 		return rawMaxPass
 	}
+
 	rawMaxPass = int64(l.passStat.Reduce(func(iterator metric.Iterator) float64 {
 		var result = 1.0
 		for i := 1; iterator.Next() && i < l.conf.WinBucket; i++ {
@@ -209,12 +212,12 @@ func (l *BBR) Allow(ctx context.Context, opts ...limit.AllowOption) (func(info l
 	if l.shouldDrop() {
 		return nil, ecode.LimitExceed
 	}
-	atomic.AddInt64(&l.inFlight, 1)
+	atomic.AddInt64(&l.inFlight, 1)//放行了,所有待处理的请求+1
 	stime := time.Since(initTime)
 	return func(do limit.DoneInfo) {
 		rt := int64((time.Since(initTime) - stime) / time.Millisecond)
 		l.rtStat.Add(rt)
-		atomic.AddInt64(&l.inFlight, -1)
+		atomic.AddInt64(&l.inFlight, -1)//处理成功了,待处理的请求-1
 		switch do.Op {
 		case limit.Success:
 			l.passStat.Add(1)
@@ -231,8 +234,8 @@ func newLimiter(conf *Config) limit.Limiter {
 	}
 	size := conf.WinBucket
 	bucketDuration := conf.Window / time.Duration(conf.WinBucket)
-	passStat := metric.NewRollingCounter(metric.RollingCounterOpts{Size: size, BucketDuration: bucketDuration})
-	rtStat := metric.NewRollingCounter(metric.RollingCounterOpts{Size: size, BucketDuration: bucketDuration})
+	passStat := metric.NewRollingCounter(metric.RollingCounterOpts{Size: size,  BucketDuration: bucketDuration})
+	rtStat   := metric.NewRollingCounter(metric.RollingCounterOpts{Size: size,  BucketDuration: bucketDuration})
 	cpu := func() int64 {
 		return atomic.LoadInt64(&cpu)
 	}
@@ -271,3 +274,5 @@ func (g *Group) Get(key string) limit.Limiter {
 	limiter := g.group.Get(key)
 	return limiter.(limit.Limiter)
 }
+
+//key-value key对谁限流  value一个限流

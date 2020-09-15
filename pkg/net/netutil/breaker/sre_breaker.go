@@ -7,16 +7,16 @@ import (
 	"sync/atomic"
 	"time"
 
-	"github.com/bilibili/kratos/pkg/ecode"
-	"github.com/bilibili/kratos/pkg/log"
-	"github.com/bilibili/kratos/pkg/stat/metric"
+	"marsgo/pkg/ecode"
+	"marsgo/pkg/log"
+	"marsgo/pkg/stat/metric"
 )
 
 // sreBreaker is a sre CircuitBreaker pattern. Circuit(电路图)
 // Circuit-Breaker的作用就好似可能失败操作的代理。
 //代理会监控最近发生的错误，然后依据这一信息来决定是否允许操作的继续执行，或者直接立刻返回异常信息
 type sreBreaker struct {
-	stat metric.RollingCounter
+	stat metric.RollingCounter //指标数据
 	r    *rand.Rand
 	// rand.New(...) returns a non thread safe object
 	randLock sync.Mutex
@@ -29,8 +29,8 @@ type sreBreaker struct {
 
 func newSRE(c *Config) Breaker {
 	counterOpts := metric.RollingCounterOpts{
-		Size:           c.Bucket,
-		BucketDuration: time.Duration(int64(c.Window) / int64(c.Bucket)),
+		Size:           c.Bucket,                                         //滑动窗口桶的数目
+		BucketDuration: time.Duration(int64(c.Window) / int64(c.Bucket)), //每个桶的时间
 	}
 	stat := metric.NewRollingCounter(counterOpts)
 	return &sreBreaker{
@@ -39,7 +39,7 @@ func newSRE(c *Config) Breaker {
 
 		request: c.Request,
 		k:       c.K,
-		state:   StateClosed,
+		state:   StateClosed, //状态,默认值
 	}
 }
 
@@ -47,7 +47,7 @@ func (b *sreBreaker) summary() (success int64, total int64) {
 	b.stat.Reduce(func(iterator metric.Iterator) float64 {
 		for iterator.Next() {
 			bucket := iterator.Bucket()
-			total += bucket.Count
+			total += bucket.Count //是个计数
 			for _, p := range bucket.Points {
 				success += int64(p)
 			}
@@ -64,12 +64,14 @@ func (b *sreBreaker) Allow() error {
 		log.Info("breaker: request: %d, succee: %d, fail: %d", total, success, total-success)
 	}
 	// check overflow requests = K * success
+	//关闭断路器,准许访问后端
 	if total < b.request || float64(total) < k {
 		if atomic.LoadInt32(&b.state) == StateOpen {
 			atomic.CompareAndSwapInt32(&b.state, StateOpen, StateClosed)
 		}
 		return nil
 	}
+	//打开断路器,不许访问后端
 	if atomic.LoadInt32(&b.state) == StateClosed {
 		atomic.CompareAndSwapInt32(&b.state, StateClosed, StateOpen)
 	}

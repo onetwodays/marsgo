@@ -90,7 +90,11 @@ class BasicLayout extends Component {
 
     //const location = this.props.location;
     //const pathname = location.pathname; //note:pathname是个数组
+<<<<<<< HEAD
+ 
+=======
 
+>>>>>>> 2f5b035c3562c57ec513a4bc68ac845304cfe21f
 
     return (
       <Layout>

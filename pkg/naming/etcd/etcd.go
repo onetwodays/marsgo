@@ -24,9 +24,10 @@ import (
 )
 
 var (
-	//etcdPrefix is a etcd globe key prefix
+
 	endpoints  string
-	etcdPrefix string
+	//etcdPrefix is a etcd globe key prefix
+	etcdPrefix string //key前缀
 
 	//Time units is second
 	registerTTL        = 90
@@ -35,7 +36,7 @@ var (
 
 var (
 	_once    sync.Once
-	_builder naming.Builder
+	_builder naming.Builder // 服务发现的builder
 	//ErrDuplication is a register duplication err
 	ErrDuplication = errors.New("etcd: instance duplicate registration")
 )
@@ -46,8 +47,8 @@ func init() {
 
 func addFlag(fs *flag.FlagSet) {
 	// env
-	fs.StringVar(&endpoints, "etcd.endpoints", os.Getenv("ETCD_ENDPOINTS"), "etcd.endpoints is etcd endpoints. value: 127.0.0.1:2379,127.0.0.2:2379 etc.")
-	fs.StringVar(&etcdPrefix, "etcd.prefix", defaultString("ETCD_PREFIX", "kratos_etcd"), "etcd globe key prefix or use ETCD_PREFIX env variable. value etcd_prefix etc.")
+	fs.StringVar(&endpoints,  "etcd.endpoints", os.Getenv("ETCD_ENDPOINTS"), "etcd.endpoints is etcd endpoints. value: 127.0.0.1:2379,127.0.0.2:2379 etc.")
+	fs.StringVar(&etcdPrefix, "etcd.prefix",    defaultString("ETCD_PREFIX", "kratos_etcd"), "etcd globe key prefix or use ETCD_PREFIX env variable. value etcd_prefix etc.")
 }
 
 func defaultString(env, value string) string {
@@ -58,7 +59,7 @@ func defaultString(env, value string) string {
 	return v
 }
 
-// Builder return default etcd resolver builder.
+// Builder return default etcd resolver builder.(服务发现）
 func Builder(c *clientv3.Config) naming.Builder {
 	_once.Do(func() {
 		_builder, _ = New(c)
@@ -73,16 +74,16 @@ func Build(c *clientv3.Config, id string) naming.Resolver {
 
 // EtcdBuilder is a etcd clientv3 EtcdBuilder
 type EtcdBuilder struct {
-	cli        *clientv3.Client
+	cli        *clientv3.Client //专门负责跟etcd server打交道
 	ctx        context.Context
 	cancelFunc context.CancelFunc
 
 	mutex    sync.RWMutex
-	apps     map[string]*appInfo
-	registry map[string]struct{} //保存已经注册过的app
+	apps     map[string]*appInfo //用来进行服务发现的
+	registry map[string]struct{} //保存已经注册过的app,实现服务的注册
 }
 type appInfo struct {
-	resolver map[*Resolve]struct{}
+	resolver map[*Resolve]struct{}   //每个appInfo里面都有一个map 的结构体，有什么用呢？
 	ins      atomic.Value //保存从edcd拿回来的值.
 	e        *EtcdBuilder
 	once     sync.Once
@@ -126,10 +127,11 @@ func New(c *clientv3.Config) (e *EtcdBuilder, err error) {
 
 // Build disovery resovler builder.Build开始watch,也就是说主动watch一个key的value的变化.相当于服务发现
 func (e *EtcdBuilder) Build(appid string, opts ...naming.BuildOpt) naming.Resolver {
+	//每次都新创建一个r
 	r := &Resolve{
 		id:    appid,
 		e:     e,
-		event: make(chan struct{}, 1),
+		event: make(chan struct{}, 1),//注意是1个
 		opt:   new(naming.BuildOptions),
 	}
 	e.mutex.Lock()
@@ -211,8 +213,8 @@ func (e *EtcdBuilder) Register(ctx context.Context, ins *naming.Instance) (cance
 
 //注册和续约公用一个操作
 func (e *EtcdBuilder) register(ctx context.Context, ins *naming.Instance) (err error) {
-	prefix := e.keyPrefix(ins)
-	val, _ := json.Marshal(ins)
+	prefix := e.keyPrefix(ins) //注册用的key
+	val, _ := json.Marshal(ins) //ins 是json格式
 
 	ttlResp, err := e.cli.Grant(context.TODO(), int64(registerTTL))
 	if err != nil {

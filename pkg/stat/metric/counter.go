@@ -37,6 +37,7 @@ func (c *counter) Value() int64 {
 	return atomic.LoadInt64(&c.val)
 }
 
+//------------------------下面才是重要的--------------------
 // CounterVecOpts is an alias of VectorOpts.
 type CounterVecOpts VectorOpts
 

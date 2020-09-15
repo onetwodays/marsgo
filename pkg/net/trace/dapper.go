@@ -10,7 +10,7 @@ import (
 const (
 	_maxLevel = 64
 	// hard code reset probability at 0.00025, 1/4000
-	_probability = 0.00025
+	_probability = 0.00025 //这个是什么意思呢?
 )
 
 // NewTracer new a tracer.
@@ -75,7 +75,7 @@ func (d *dapper) New(operationName string, opts ...Option) Trace {
 }
 
 func (d *dapper) newSpanWithContext(operationName string, pctx spanContext) Trace {
-	sp := d.getSpan()
+	sp := d.getSpan() //从池子里生成一个span
 	// is span is not sampled just return a span with this context, no need clear it
 	//if !pctx.isSampled() {
 	//	sp.context = pctx
@@ -168,7 +168,7 @@ func (d *dapper) report(sp *Span) {
 			d.stdlog.Printf("marshal trace span error: %s", err)
 		}
 	}
-	d.putSpan(sp)
+	d.putSpan(sp) //发完之后,放回池子里
 }
 
 func (d *dapper) putSpan(sp *Span) {

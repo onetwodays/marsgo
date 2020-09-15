@@ -39,9 +39,11 @@ type Config struct {
 }
 
 type item struct {
-	createdAt time.Time
+	createdAt time.Time //记录创建的时间
 	c         io.Closer
 }
+
+
 
 func (i *item) expired(timeout time.Duration) bool {
 	if timeout <= 0 {

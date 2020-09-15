@@ -44,7 +44,7 @@ func kindOfData(data interface{}) reflect.Kind {
 	value := reflect.ValueOf(data)
 	valueType := value.Kind()
 	if valueType == reflect.Ptr {
-		valueType = value.Elem().Kind()
+		valueType = value.Elem().Kind() //好严格
 	}
 	return valueType
 }

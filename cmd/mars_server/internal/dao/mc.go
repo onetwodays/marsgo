@@ -5,9 +5,9 @@ import (
 	"fmt"
 
 	"marsgo/cmd/mars_server/internal/model"
-	"github.com/bilibili/kratos/pkg/cache/memcache"
-	"github.com/bilibili/kratos/pkg/conf/paladin"
-	"github.com/bilibili/kratos/pkg/log"
+	"marsgo/pkg/cache/memcache"
+	"marsgo/pkg/conf/paladin"
+	"marsgo/pkg/log"
 )
 
 //go:generate kratos tool genmc

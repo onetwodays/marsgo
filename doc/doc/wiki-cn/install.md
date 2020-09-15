@@ -14,7 +14,7 @@ mv -r include/google /usr/local/include/
 go get -u github.com/golang/protobuf/proto
 ```
 
-3.安装goprotobuf插件
+3.安装goprotobuf插件(二进制)
 
 ```
 go get github.com/golang/protobuf/protoc-gen-go

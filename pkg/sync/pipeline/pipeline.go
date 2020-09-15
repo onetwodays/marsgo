@@ -7,16 +7,16 @@ import (
 	"sync"
 	"time"
 
-	"github.com/bilibili/kratos/pkg/net/metadata"
-	"github.com/bilibili/kratos/pkg/stat/metric"
-	xtime "github.com/bilibili/kratos/pkg/time"
+	"marsgo/pkg/net/metadata"
+	"marsgo/pkg/stat/metric"
+	xtime "marsgo/pkg/time"
 )
 
 // ErrFull channel full error
-var ErrFull = errors.New("channel full")
+var ErrFull = errors.New("channel full") //channel满了的错误
 
-const _metricNamespace = "sync"
-const _metricSubSystem = "pipeline"
+const _metricNamespace = "sync"   //命名空间
+const _metricSubSystem = "pipeline" //子系统
 
 var (
 	_metricCount = metric.NewCounterVec(&metric.CounterVecOpts{
@@ -42,8 +42,8 @@ type message struct {
 
 // Pipeline pipeline struct
 type Pipeline struct {
-	Do          func(c context.Context, index int, values map[string][]interface{})
-	Split       func(key string) int
+	Do          func(c context.Context, index int, values map[string][]interface{}) //Do函数没有返回值
+	Split       func(key string) int //类似一个hash函数，hash值是下表
 	chans       []chan *message
 	mirrorChans []chan *message
 	config      *Config
@@ -90,7 +90,7 @@ func NewPipeline(config *Config) (res *Pipeline) {
 	}
 	config.fix()
 	res = &Pipeline{
-		chans:       make([]chan *message, config.Worker),
+		chans:       make([]chan *message, config.Worker), //每个worker一个config.Buffer大小的*message的带缓存的通道
 		mirrorChans: make([]chan *message, config.Worker),
 		config:      config,
 		name:        config.Name,
@@ -138,6 +138,7 @@ func (p *Pipeline) Add(c context.Context, key string, value interface{}) (err er
 	return
 }
 
+//根据KEY找到分片，然后找到channel和生成一个新的消息
 func (p *Pipeline) add(c context.Context, key string, value interface{}) (ch chan *message, m *message) {
 	shard := p.Split(key) % p.config.Worker
 	if metadata.String(c, metadata.Mirror) != "" {
@@ -165,7 +166,7 @@ func (p *Pipeline) mergeproc(mirror bool, index int, ch <-chan *message) {
 	defer p.wait.Done()
 	var (
 		m         *message
-		vals      = make(map[string][]interface{}, p.config.MaxSize)
+		vals      = make(map[string][]interface{}, p.config.MaxSize) //一个map
 		closed    bool
 		count     int
 		inteval   = p.config.Interval

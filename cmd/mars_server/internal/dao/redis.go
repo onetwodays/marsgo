@@ -3,9 +3,9 @@ package dao
 import (
 	"context"
 
-	"github.com/bilibili/kratos/pkg/cache/redis"
-	"github.com/bilibili/kratos/pkg/conf/paladin"
-	"github.com/bilibili/kratos/pkg/log"
+	"marsgo/pkg/cache/redis"
+	"marsgo/pkg/conf/paladin"
+	"marsgo/pkg/log"
 )
 
 func NewRedis() (r *redis.Redis, err error) {

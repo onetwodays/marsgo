@@ -12,10 +12,10 @@ func KeyNamed(key string) string {
 
 // Map is config map, key(filename) -> value(file).
 type Map struct {
-	values atomic.Value  //一个结构体.
+	values atomic.Value  //atomic.Value一个结构体.里面有个interface类型的变量
 }
 
-// Store sets the value of the Value to values map.
+// Store sets the value of the Value to values map.//复制语义
 func (m *Map) Store(values map[string]*Value) {
 	dst := make(map[string]*Value, len(values))
 	for k, v := range values {
@@ -24,7 +24,7 @@ func (m *Map) Store(values map[string]*Value) {
 	m.values.Store(dst)
 }
 
-// Load returns the value set by the most recent Store.
+// Load returns the value set by the most recent Store.返回的是个副本
 func (m *Map) Load() map[string]*Value {
 	src := m.values.Load().(map[string]*Value)
 	dst := make(map[string]*Value, len(src))

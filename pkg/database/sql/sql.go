@@ -18,7 +18,7 @@ import (
 
 const (
 	_family          = "sql_client"
-	_slowLogDuration = time.Millisecond * 250
+	_slowLogDuration = time.Millisecond * 250 //慢查询 250ms
 )
 
 var (
@@ -38,8 +38,8 @@ var (
 type DB struct {
 	write  *conn     //一个写连接池
 	read   []*conn   //很多读连接池
-	idx    int64 //一个正数
-	master *DB   //DB包含指向自己的指针
+	idx    int64     //一个正数
+	master *DB       //DB包含指向自己的指针
 }
 
 // conn database connection

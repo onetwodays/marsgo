@@ -5,9 +5,9 @@ import (
 
 	pb "marsgo/cmd/mars_server/api"
 	"marsgo/cmd/mars_server/internal/model"
-	"github.com/bilibili/kratos/pkg/conf/paladin"
-	"github.com/bilibili/kratos/pkg/log"
-	bm "github.com/bilibili/kratos/pkg/net/http/blademaster"
+	"marsgo/pkg/conf/paladin"
+	"marsgo/pkg/log"
+	bm "marsgo/pkg/net/http/blademaster"
 )
 
 var svc pb.DemoServer
@@ -40,6 +40,11 @@ func initRouter(e *bm.Engine) {
 		g.GET("/start", howToStart)
 	}
 }
+
+//在这里加代码
+
+
+
 
 func ping(ctx *bm.Context) {
 	if _, err := svc.Ping(ctx, nil); err != nil {

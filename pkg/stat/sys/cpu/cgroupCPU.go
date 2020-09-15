@@ -8,7 +8,9 @@ import (
 	"strings"
 
 	"github.com/pkg/errors"
+
 	pscpu "github.com/shirou/gopsutil/cpu"
+
 )
 
 type cgroupCPU struct {
