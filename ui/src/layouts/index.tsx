@@ -39,6 +39,13 @@ const subHeroMenu = [
 ]
 
 
+//定义多个菜单数组
+const subEOSMenu = [
+  { route:'/eos/chain',                         name:'EOS chain'},            //0
+
+
+]
+
 
 
 
@@ -90,11 +97,6 @@ class BasicLayout extends Component {
 
     //const location = this.props.location;
     //const pathname = location.pathname; //note:pathname是个数组
-<<<<<<< HEAD
- 
-=======
-
->>>>>>> 2f5b035c3562c57ec513a4bc68ac845304cfe21f
 
     return (
       <Layout>
@@ -102,6 +104,15 @@ class BasicLayout extends Component {
           <div style={{ height: '32px', background: 'rgba(255,255,255,.2)', margin: '16px' }} />
           
           <Menu theme={this.state.theme} mode={this.state.mode} defaultSelectedKeys={[pathname]}>
+
+          <SubMenu key="subEOS" title={<span><DesktopOutlined/><span>EOS</span></span>}>
+              {subEOSMenu.map(menu=>(
+                <Menu.Item key={`/${menu.route}`}>
+                  <Link to={menu.route}>{menu.name}</Link>
+                </Menu.Item>
+                
+              ))}
+            </SubMenu>
 
 
             <SubMenu key="subHero" title={<span><DesktopOutlined/><span>王者荣耀资料库</span></span>}>
