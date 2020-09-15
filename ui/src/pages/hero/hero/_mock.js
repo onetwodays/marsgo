@@ -1,5 +1,7 @@
 import herolist from './herolist.json'
 
+//整个文件需要 export 导出一个 js 对象。对象的 key 是由<Http_verb> <Resource_uri>
+//构成的，值是 function，当一个 ajax 调用匹配了 key 后，与之对应的 function 就会被执行。函数中我们调用 res.json 就可以给浏览器返回结果
 export default {
     '/apimock/web201605/js/herolist.json': [
         {
@@ -29,6 +31,11 @@ export default {
         }
         const freeheros = getRandomArrayElements(herolist, number);
         res.send(freeheros);
+      },
+
+      'get /dev/random_joke': function (req, res) {
+        res.status(500);
+        res.json({});
       },
 
   };

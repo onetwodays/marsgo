@@ -75,19 +75,17 @@ const Hero:FC<PageProps>= (props) =>{//2
                 ))
               }
             </div>
-            
           </Col>
         </Row>
       </div>
       <Card className={styles.radioPanel}>
         <RadioGroup onChange={onChange} value={filterKey}>
           {heroType.map(data => (
-              <Radio value={data.key} key={`hero-rodio-${data.key}`}>
-                {data.value}
-              </Radio>
-            ))}
+            <Radio value={data.key} key={`hero-rodio-${data.key}`}>
+              {data.value}
+            </Radio>
+          ))}
         </RadioGroup>
-        
       </Card>
       <Row>
         {heros.filter(item => filterKey === 0 || item.hero_type === filterKey).reverse().map(item => (
@@ -99,10 +97,14 @@ const Hero:FC<PageProps>= (props) =>{//2
       </Row>
     </div>
   );
-
 }
+
+
 //connect是用来连接前端的ui界面和和前端model的一个嫁接桥梁 ，通过使用connect将model里面定义的state，和dispatch，和histoey方法等传递到前端供前端使用
-export default connect(({hero}:{hero:HeroModelState})=>({hero}))(Hero);//3
+//数据已经不再由组件自己管理
+export default connect(
+                      ({hero}:{hero:HeroModelState})=>({hero})
+                      )(Hero);//3
 
 
 

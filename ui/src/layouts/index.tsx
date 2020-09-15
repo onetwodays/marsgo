@@ -26,19 +26,13 @@ const { Header, Footer, Sider, Content } = Layout;
 const SubMenu = Menu.SubMenu;
 
 
-const menuData = [
-  { route:'/hello',                   name:'欢迎'},            //0
-  { route:'/dashboard/base',          name:'基本信息'},        //1
-  { route:'/dashboard/monitor',       name:'监控'},           //2
-  { route:'/dashboard/workplace',     name:'工作台'},         //3
-  { route:'/demo',                    name:'示例'},          //4
-  { route:'/test',                    name:'test'},          //4
 
-]
+
+const demoMenu={route:'/demo',                    name:'示例'}
 
 //定义多个菜单数组
-const subMenuHero = [
-  { route:'/hero/hero',                        name:'英雄'},            //0
+const subHeroMenu = [
+  { route:'/hero/hero',                         name:'英雄'},            //0
   { route:'/hero/item',                         name:'局内道具'},            //0
   { route:'/hero/summoner',                     name:'召唤师技能'},            //0
 
@@ -107,7 +101,7 @@ class BasicLayout extends Component {
 
 
             <SubMenu key="subHero" title={<span><DesktopOutlined/><span>王者荣耀资料库</span></span>}>
-              {subMenuHero.map(menu=>(
+              {subHeroMenu.map(menu=>(
                 <Menu.Item key={`/${menu.route}`}>
                   <Link to={menu.route}>{menu.name}</Link>
                 </Menu.Item>
@@ -115,26 +109,9 @@ class BasicLayout extends Component {
               ))}
             </SubMenu>
 
-            <Menu.Item icon={<UserOutlined />} key={`/${menuData[0].route}`}>
-            <Link to={menuData[0].route}>{menuData[0].name}</Link> 
+            <Menu.Item icon={<UserOutlined />} key={`/${demoMenu.route}`}>
+            <Link to={demoMenu.route}>{demoMenu.name}</Link> 
             </Menu.Item>
-
-
-
-            <SubMenu key="sub1" title={<span><DesktopOutlined/><span>仪表盘</span></span>} >
-              <Menu.Item key={`/${menuData[1].route}`}><Link to={menuData[1].route}>{menuData[1].name}</Link></Menu.Item>
-              <Menu.Item key={`/${menuData[2].route}`}><Link to={menuData[2].route}>{menuData[2].name}</Link></Menu.Item>
-              <Menu.Item key={`/${menuData[3].route}`}><Link to={menuData[3].route}>{menuData[3].name}</Link></Menu.Item>
-            </SubMenu>
-
-            <Menu.Item icon={<MenuFoldOutlined />} key={`/${menuData[4].route}`}>
-                <Link to={menuData[4].route}>{menuData[4].name}</Link>
-            </Menu.Item>
-
-            <Menu.Item  key={`/${menuData[5].route}`}>
-                <Link to={menuData[5].route}>{menuData[5].name}</Link>
-            </Menu.Item>
-
           </Menu>
         </Sider>
         <Layout>

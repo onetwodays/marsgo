@@ -1,24 +1,24 @@
 import {Effect, Reducer,Subscription,request} from 'umi'
 
 
-export interface DemoTable{
+export interface rowProps{
     id:number;
     name:string;
     desc:string;
     url:string;
 }
 
-export interface DemoModelStateType{
-    rows:DemoTable[];
+export interface DemoModelState{
+    rows:rowProps[];
     filterKey:string;
 }
 
 
 export interface DemoModelType{
     namespace:"demo";
-    state:DemoModelStateType;
+    state:DemoModelState;
     reducers:{
-        save:Reducer<DemoModelStateType>;
+        save:Reducer<DemoModelState>;
     };
     effects:{
         fetch:Effect;
