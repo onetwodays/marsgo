@@ -1,10 +1,12 @@
 import React, { Component } from 'react';
 //导入antd布局相关的组件
-import { Layout,
-         Menu,
-         Switch, 
-         Divider 
-        } from 'antd';
+import {
+  Layout,
+  Menu,
+  Switch,
+  Divider,
+  Button
+} from 'antd';
 
 
 //导入antd-design-icons的图标
@@ -19,29 +21,29 @@ import {
 } from '@ant-design/icons';
 
 //导入umi的Link组件
-import {Link} from 'umi'
+import { Link } from 'umi'
 
 // Header, Footer, Sider, Content组件在Layout组件模块下 对象的解析赋值
-const { Header, Footer, Sider, Content } = Layout; 
+const { Header, Footer, Sider, Content } = Layout;
 const SubMenu = Menu.SubMenu;
 
 
 
 
-const demoMenu={route:'/demo',                    name:'示例'}
+const demoMenu = { route: '/demo', name: '示例' }
 
 //定义多个菜单数组
 const subHeroMenu = [
-  { route:'/hero/hero',                         name:'英雄'},            //0
-  { route:'/hero/item',                         name:'局内道具'},            //0
-  { route:'/hero/summoner',                     name:'召唤师技能'},            //0
+  { route: '/hero/hero', name: '英雄' },            //0
+  { route: '/hero/item', name: '局内道具' },            //0
+  { route: '/hero/summoner', name: '召唤师技能' },            //0
 
 ]
 
 
 //定义多个菜单数组
 const subEOSMenu = [
-  { route:'/eos/chain',                         name:'EOS chain'},            //0
+  { route: '/eos/chain', name: 'EOS chain' },            //0
 
 
 ]
@@ -60,38 +62,38 @@ const subEOSMenu = [
 //}
 
 class BasicLayout extends Component {
-  constructor(props){
+  constructor(props) {
     super(props);
-    this.state ={
-      collapsed:false,
-      mode:  'inline',
+    this.state = {
+      collapsed: false,
+      mode: 'inline',
       theme: 'dark',
     };
   }
-  
-  
+
+
 
   //菜单是不是可收缩的
-  onCollapse = collapsed =>{
-    this.setState({collapsed})
+  onCollapse = collapsed => {
+    this.setState({ collapsed })
   };
 
   //菜单是水平还是垂直
-  onChangeMode= value=>{
+  onChangeMode = value => {
     this.setState({
-      mode:value?'vertical':'inline',
+      mode: value ? 'vertical' : 'inline',
     });
   };
 
   //改变菜单的主题
-  onChangeTheme= value=>{
-    this.setState({theme:value?'dark':'light',});
+  onChangeTheme = value => {
+    this.setState({ theme: value ? 'dark' : 'light', });
   };
-  
+
   // location:{pathname} 解析赋值，location是模式，pathname才是要赋值的变量
   render() {
     const {
-      location:{pathname}, 
+      location: { pathname },
       children,
     } = this.props;
 
@@ -100,37 +102,37 @@ class BasicLayout extends Component {
 
     return (
       <Layout>
-        <Sider width={256} style={{ minHeight: '100vh'}} collapsible collapsed={this.state.collapsed} onCollapse={this.onCollapse}>
+        <Sider width={256} style={{ minHeight: '100vh' }} collapsible collapsed={this.state.collapsed} onCollapse={this.onCollapse}>
           <div style={{ height: '32px', background: 'rgba(255,255,255,.2)', margin: '16px' }} />
-          
+
           <Menu theme={this.state.theme} mode={this.state.mode} defaultSelectedKeys={[pathname]}>
 
-          <SubMenu key="subEOS" title={<span><DesktopOutlined/><span>EOS</span></span>}>
-              {subEOSMenu.map(menu=>(
+            <SubMenu key="subEOS" title={<span><DesktopOutlined /><span>EOS</span></span>}>
+              {subEOSMenu.map(menu => (
                 <Menu.Item key={`/${menu.route}`}>
                   <Link to={menu.route}>{menu.name}</Link>
                 </Menu.Item>
-                
+
               ))}
             </SubMenu>
 
 
-            <SubMenu key="subHero" title={<span><DesktopOutlined/><span>王者荣耀资料库</span></span>}>
-              {subHeroMenu.map(menu=>(
+            <SubMenu key="subHero" title={<span><DesktopOutlined /><span>王者荣耀资料库</span></span>}>
+              {subHeroMenu.map(menu => (
                 <Menu.Item key={`/${menu.route}`}>
                   <Link to={menu.route}>{menu.name}</Link>
                 </Menu.Item>
-                
+
               ))}
             </SubMenu>
 
             <Menu.Item icon={<UserOutlined />} key={`/${demoMenu.route}`}>
-            <Link to={demoMenu.route}>{demoMenu.name}</Link> 
+              <Link to={demoMenu.route}>{demoMenu.name}</Link>
             </Menu.Item>
           </Menu>
         </Sider>
         <Layout>
-          <Header  style={{ background: '#fff', textAlign: 'center', padding: 24 }}>hello world!</Header>
+          <Header style={{ background: '#fff', textAlign: 'center', padding: 24 }}>hello world!</Header>
           <Content style={{ margin: '24px 16px 0' }}>
             <div style={{ padding: 24, background: '#fff', minHeight: 360 }}>
               {children}

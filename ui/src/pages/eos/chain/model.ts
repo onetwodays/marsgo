@@ -2,8 +2,10 @@ import { Effect, ImmerReducer, Reducer, Subscription,request } from 'umi';
 
 
 
+
 export interface ChainModelState {
   name: string;
+  chain_info:string;
 }
 
 export interface ChainModelType {
@@ -22,15 +24,19 @@ export interface ChainModelType {
 const ChainModel: ChainModelType = {
   namespace: 'chain',
   state: {
-    name: '',
+    name: 'eos',
+    chain_info:"",
   },
   effects: {
     *query({ payload }, { call, put }) {
         const data = yield request("eos/v1/chain/get_info");
+        console.log(data)
+        console.log(1234)
         yield put({
             type:"save",
             payload:{
-                name:data,
+                chain_info:JSON.stringify(data),
+                //chain_info:data,
             },
         });
 
@@ -52,6 +58,9 @@ const ChainModel: ChainModelType = {
     setup({ dispatch, history }) {
       return history.listen(({ pathname }) => {
         if (pathname === '/eos/chain') {
+          dispatch({
+            type:"query",
+          });
         
         }
       });

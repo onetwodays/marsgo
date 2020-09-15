@@ -36,7 +36,7 @@ export const request:RequestConfig= {
     //prefix: 'https://pvp.qq.com',这样会有跨域的问题
     prefix:'/api', //所有的请求的前缀,相当于ip+port部分
     errorHandler:(error:ResponseError)=>{
-        console.log(error);
+        //console.log(error);
         message.error(error.request);
         message.error(error);
         
@@ -45,14 +45,14 @@ export const request:RequestConfig= {
     errorConfig:{},
     middlewares:[ 
         async function middlewareA(ctx, next) {
-            console.log('A before');
+            //console.log('A before');
             await next();
-            console.log('A after');
+            //console.log('A after');
        },
        async function middlewareB(ctx, next) {
-            console.log('B before');
+            //console.log('B before');
             await next();
-            console.log('B after');
+            //console.log('B after');
        },
     ],
     requestInterceptors:[],
