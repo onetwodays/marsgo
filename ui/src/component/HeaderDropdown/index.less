@@ -1,0 +1,22 @@
+/*
+* 导入工作与你预期的一样。你可以导入一个 .less 文件，
+* 然后这个文件中的所有变量都可以使用了。 对于 .less 文件而言，其扩展名是可选的。
+* @import "library"; // library.less
+* @import "typo.css";
+*/
+@import '~antd/es/style/themes/default.less';
+
+.container > * {
+  background-color: @popover-bg;
+  border-radius: 4px;
+  box-shadow: @shadow-1-down;
+}
+
+@media screen and (max-width: @screen-xs) {
+  .container {
+    width: 100% !important;
+  }
+  .container > * {
+    border-radius: 0 !important;
+  }
+}
