@@ -1,4 +1,5 @@
 /**
+ * 代理是为了解决跨域的问题，同时方便联调而使用的技术，在 Pro 中我们内置了代理，并且做了环境的区分。一个标准的配置是这样的
  * 在生产环境 代理是无法生效的，所以这里没有生产环境的配置
  * The agent cannot take effect in the production environment
  * so there is no configuration of the production environment

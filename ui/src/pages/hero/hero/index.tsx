@@ -1,20 +1,20 @@
-import React,{FC} from 'react';
+import React, { FC } from 'react';
 import styles from './index.less';
-import {connect,HeroModelState,ConnectProps} from 'umi'; // 1 在这里看到，model文件中导出的类型 都可以通过umi导入
+import { connect, HeroModelState, ConnectProps } from 'umi'; // 1 在这里看到，model文件中导出的类型 都可以通过umi导入
 
 import { Row, Col, Radio, Card } from 'antd';
 import { RadioChangeEvent } from 'antd/es/radio/interface';
-import FreeHeroItem from '@/component/FreeHeroItem';
+import FreeHeroItem from '@/components/FreeHeroItem';
 
 
-const RadioGroup =Radio.Group;
+const RadioGroup = Radio.Group;
 
 
 
 
 
 interface PageProps extends ConnectProps {
-  hero:HeroModelState;
+  hero: HeroModelState;
 }
 
 const heroType = [
@@ -27,9 +27,9 @@ const heroType = [
   { key: 6, value: '辅助' },
 ];
 
-const Hero:FC<PageProps>= (props) =>{//2
+const Hero: FC<PageProps> = (props) => {//2
   console.log(props.hero);
-  
+
   //
   const { heros = [], filterKey = 0, freeheros = [], itemHover = 0 } = props.hero;
   const { dispatch } = props;
@@ -37,25 +37,25 @@ const Hero:FC<PageProps>= (props) =>{//2
   console.log(freeheros);
 
 
-  const onChange = (e:RadioChangeEvent)=>{
+  const onChange = (e: RadioChangeEvent) => {
     console.log(e.target.value);
     dispatch!({
-      type:"hero/save",
-      payload:{
-        filterKey:e.target.value
+      type: "hero/save",
+      payload: {
+        filterKey: e.target.value
       }
     });
   };
 
 
-  const onItemHover = (index:number)=>{
+  const onItemHover = (index: number) => {
     dispatch!({
-      type:"hero/save",
-      payload:{itemHover:index},
+      type: "hero/save",
+      payload: { itemHover: index },
     });
 
   };
-  
+
   return (
     <div className={styles.normal}>
       <div className={styles.info}>
@@ -103,8 +103,8 @@ const Hero:FC<PageProps>= (props) =>{//2
 //connect是用来连接前端的ui界面和和前端model的一个嫁接桥梁 ，通过使用connect将model里面定义的state，和dispatch，和histoey方法等传递到前端供前端使用
 //数据已经不再由组件自己管理
 export default connect(
-                      ({hero}:{hero:HeroModelState})=>({hero})
-                      )(Hero);//3
+  ({ hero }: { hero: HeroModelState }) => ({ hero })
+)(Hero);//3
 
 
 

@@ -1,3 +1,5 @@
+//约定式路由时的全局布局文件。
+
 import React, { Component } from 'react';
 //导入antd布局相关的组件
 import {

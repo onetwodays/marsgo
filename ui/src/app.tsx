@@ -1,4 +1,6 @@
 /*
+运行时配置文件，可以在这里扩展运行时的能力，比如修改路由、修改 render 方法等。
+运行时配置和配置的区别是他跑在浏览器端，基于此，我们可以在这里写函数、jsx、import 浏览器端依赖等等，注意不要引入 node 依赖
 http://localhost:3001
 在page下，定义_mock.js也可以使用mock功能。如./src/pages/index/_mock.js
  /web201605/js/herolist.json这个会变成/api/web201605/js/herolist.json
@@ -24,12 +26,81 @@ useRequest 提供了一些快捷的操作和状态，可以大大的节省我们
     └── app.ts
 */
 
-//import { createLogger } from 'redux-logger';
+import React from 'react';
+import { BasicLayoutProps, Settings as LayoutSettings } from '@ant-design/pro-layout';
+
+import RightContent from '@/components/RightContent';
+import Footer from '@/components/Footer';
+
+import { queryCurrent } from './services/user';
+//import defaultSettings from '../config/defaultSettings';
+
 import { ResponseError } from 'umi-request';
 import { notification } from 'antd';
 import { RequestConfig } from 'umi';
+import { history } from 'umi';
 
 
+//提供全局初始化数据，强调的是初始化数据;avatar:头像
+//该方法返回的数据最后会被默认注入到一个 namespace 为 @@initialState  的 model 中。可以通过 useModel  这个 hook 来消费它
+export interface initialStateType {
+    settings?: LayoutSettings;
+    currentUser?: API.CurrentUser;
+    fetchUserInfo: () => Promise<API.CurrentUser | undefined>;
+
+};
+//将请求用户信息和登陆拦截放到 src/app.tsx 
+export async function getInitialState(): Promise<initialStateType> {
+    //先定义一个函数变量
+    const fetchUserInfo = async () => {
+        try {
+            const currentUser = await queryCurrent();
+            return currentUser;
+        } catch (error) {
+            history.push('/user/login');
+        }
+        return undefined;
+    };
+    //非登录页面,
+    if (history.location.pathname !== '/user/login') {
+        const currentUser = await fetchUserInfo();
+        return {
+            fetchUserInfo,
+            currentUser,
+            settings: defaultSettings,
+        };
+    }
+
+    return {
+        fetchUserInfo,
+        settings: defaultSettings,
+    };
+
+};
+
+//这是一个函数啊 ，函数返回一个对象https://beta-pro.ant.design/docs/layout-cn
+/*
+export const layout = ({ initialState,
+}: {
+    initialState: { settings?: LayoutSettings; currentUser?: API.CurrentUser };
+}): BasicLayoutProps => {
+    return {
+        rightContentRender: () => <RightContent />,
+        disableContentMargin: false,
+        footerRender: () => <Footer />,
+        onPageChange: () => {
+            const { currentUser } = initialState;
+            const { location } = history;
+            // 如果没有登录，重定向到 login
+            if (!currentUser?.userid && location.pathname !== '/user/login') {
+                history.push('/user/login');
+            }
+        },
+        menuHeaderRender: undefined,
+        ...initialState?.settings,
+    };
+};
+*/
 
 const codeMessage: any = {
     200: '服务器成功返回请求的数据。',
@@ -172,7 +243,7 @@ export const request: RequestConfig = {
 
 
 
-
+/*
 const plugins = [];
 // 非生产环境添加 logger
 if (process.env.NODE_ENV !== "production") {
@@ -196,4 +267,4 @@ export const dva = {
 };
 
 
-
+*/

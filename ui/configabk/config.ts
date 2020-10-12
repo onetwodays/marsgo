@@ -1,11 +1,17 @@
 // https://umijs.org/config/
+//写配置时也有提示，可以通过 umi 的 defineConfig 方法定义配置
 import { defineConfig } from 'umi';
 import defaultSettings from './defaultSettings';
 import proxy from './proxy';
 
 const { REACT_APP_ENV } = process.env;
+console.log(process.env);
+console.log(REACT_APP_ENV);
 
 export default defineConfig({
+  nodeModulesTransform: {
+    type: 'none',
+  },
   hash: true,
   antd: {},
   dva: {
@@ -13,14 +19,13 @@ export default defineConfig({
   },
   layout: {
     name: 'Ant Design Pro',
-    locale: true,
+    //locale: true,
   },
   locale: {
-    // default zh-CN
-    default: 'zh-CN',
-    antd: true,
+    //default: 'zh-CN',
+    //antd: true,
     // default true, when it is true, will use `navigator.language` overwrite default
-    baseNavigator: true,
+    //baseNavigator: true,
   },
   dynamicImport: {
     loading: '@/components/PageLoading/index',
@@ -29,7 +34,7 @@ export default defineConfig({
     ie: 11,
   },
   // umi routes: https://umijs.org/docs/routing
-  /*
+
   routes: [
     {
       path: '/user',
@@ -77,7 +82,7 @@ export default defineConfig({
       component: './404',
     },
   ],
-  */
+
   // Theme for antd: https://ant.design/docs/react/customize-theme-cn
   theme: {
     // ...darkTheme,
