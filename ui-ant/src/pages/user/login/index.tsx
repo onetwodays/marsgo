@@ -25,6 +25,11 @@ const LoginMessage: React.FC<{
 
 /**
  * 此方法会跳转到 redirect 参数所在的位置
+ * 
+ *  location 对象，包含 pathname、search 和 hash
+    console.log(history.location.pathname);
+    console.log(history.location.search);
+    console.log(history.location.hash);
  */
 const replaceGoto = () => {
   setTimeout(() => {
@@ -41,7 +46,7 @@ const replaceGoto = () => {
 const Login: React.FC<{}> = () => {
   const [userLoginState, setUserLoginState] = useState<API.LoginStateType>({});
   const [submitting, setSubmitting] = useState(false);
-  const { initialState, setInitialState } = useModel('@@initialState');
+  const { initialState, setInitialState } = useModel('@@initialState'); //消费数据
   const [autoLogin, setAutoLogin] = useState(true);
   const [type, setType] = useState<string>('account');
   const handleSubmit = async (values: LoginParamsType) => {
@@ -79,10 +84,10 @@ const Login: React.FC<{}> = () => {
           <div className={styles.header}>
             <Link to="/">
               <img alt="logo" className={styles.logo} src={logo} />
-              <span className={styles.title}>Ant Design</span>
+              <span className={styles.title}>Mars Snow</span>
             </Link>
           </div>
-          <div className={styles.desc}>Ant Design 是西湖区最具影响力的 Web 设计规范</div>
+          <div className={styles.desc}>每一天，为明天</div>
         </div>
 
         <div className={styles.main}>
@@ -176,3 +181,10 @@ const Login: React.FC<{}> = () => {
 };
 
 export default Login;
+
+// div
+//    <div></div> //lang
+//    <div></div> //content
+//    <Footer/>
+// /usr/register
+// 

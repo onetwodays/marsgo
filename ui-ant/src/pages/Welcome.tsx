@@ -2,7 +2,9 @@ import React from 'react';
 import { PageContainer } from '@ant-design/pro-layout';
 import { Card, Alert, Typography } from 'antd';
 import styles from './Welcome.less';
-
+/*
+   pre 元素可定义预格式化的文本。 被包围在pre 元素中的文本通常会保留空格和换行符。 而文本也会呈现为等宽字体。 <pre> 标签的一个常见应用就是用来表示计算机的源代码。
+*/
 const CodePreview: React.FC<{}> = ({ children }) => (
   <pre className={styles.pre}>
     <code>

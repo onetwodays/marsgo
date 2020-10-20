@@ -42,6 +42,11 @@ export interface InitialStateType {
   fetchUserInfo: () => Promise<API.CurrentUser | undefined>;
 
 };
+/* 
+* 该方法返回的数据最后会被默认注入到一个 namespace 为 @@initialState  的 model 中。可以通过 useModel
+* const { initialState, loading, refresh, setInitialState } = useModel('@@initialState');
+
+*/
 export async function getInitialState(): Promise<InitialStateType> {
   // 先定义一个函数
   const fetchUserInfo = async () => {

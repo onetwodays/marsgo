@@ -75,6 +75,32 @@ export default defineConfig({
       component: './eos/chain',
     },
     {
+      path: '/antd',
+      name: 'antd',
+      icon: 'crown',
+      //component: './antd',
+      routes: [
+        {
+          path: '/antd/dataentry',
+          name: 'dataentry',
+          icon: 'smile',
+          component: './antd/dataentry',
+        },
+        {
+          path: '/antd/datadisplay',
+          name: 'datadisplay',
+          icon: 'smile',
+          component: './antd/datadisplay',
+        },
+        {
+          path: '/antd/react',
+          name: 'react',
+          icon: 'smile',
+          component: './antd/react',
+        }
+      ],
+    },
+    {
       name: 'list.table-list',
       icon: 'table',
       path: '/list',
