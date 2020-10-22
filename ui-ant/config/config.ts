@@ -69,10 +69,24 @@ export default defineConfig({
       ],
     },
     {
-      path: '/eos/chain',
+      path: '/eos',
       name: 'eos',
       icon: 'crown',
-      component: './eos/chain',
+      //component: './eos/chain',
+      routes: [
+        {
+          path: '/eos/chain',
+          name: 'chaninfo',
+          icon: 'smile',
+          component: './eos/chain',
+        },
+        {
+          path: '/eos/block',
+          name: 'blockinfo',
+          icon: 'smile',
+          component: './eos/block',
+        }
+      ]
     },
     {
       path: '/antd',

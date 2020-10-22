@@ -45,6 +45,7 @@ export interface InitialStateType {
 /* 
 * 该方法返回的数据最后会被默认注入到一个 namespace 为 @@initialState  的 model 中。可以通过 useModel
 * const { initialState, loading, refresh, setInitialState } = useModel('@@initialState');
+* 该配置是一个 async 的 function。会在整个应用最开始执行，返回值会作为全局共享的数据。Layout 插件、Access 插件以及用户都可以通过 useModel('@@initialState') 直接获取到这份数据。
 
 */
 export async function getInitialState(): Promise<InitialStateType> {
@@ -94,14 +95,14 @@ export const layout = ({
     disableContentMargin: false,
     footerRender: () => <Footer />,
     onPageChange: () => {
-      console.log("layout11111");
+      //console.log("layout11111");
       const { currentUser } = initialState;
       const { location } = history;
       // 如果没有登录，重定向到 login
       if (!currentUser && location.pathname !== '/user/login') {
         history.push('/user/login');
       }
-      console.log("layout 22222");
+      //console.log("layout 22222");
     },
     menuHeaderRender: undefined,
     ...initialState?.settings,
