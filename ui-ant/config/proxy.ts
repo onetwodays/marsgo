@@ -5,6 +5,7 @@
  * For details, please see
  * https://pro.ant.design/docs/deploy
  * 代理不会修改控制台的 url，它的所有操作都在 node.js 中进行。
+ * //target: 'http://127.0.0.1:18888',
  */
 export default {
   dev: {
@@ -14,8 +15,7 @@ export default {
       pathRewrite: { '^': '' },
     },
     '/v1/': {
-      //target: ' http://zhongyingying.qicp.io:38001',
-      target: 'http://127.0.0.1:18888',
+      target: 'http://zhongyingying.qicp.io:38000',
       changeOrigin: true,
       pathRewrite: { '^': '' },
     },
