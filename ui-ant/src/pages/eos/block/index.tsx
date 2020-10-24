@@ -1,31 +1,19 @@
-import React from 'react';
-import { fn_get_block } from '@/services/eos/get';
-
-import { useRequest } from 'umi';
-
-import { useState } from 'react';
-import { Button, Card } from 'antd';
-import { GetBlockResult } from 'eosjs/dist/eosjs-rpc-interfaces';
+import React, { FC } from 'react';
+import { connect, BlockModelState, ConnectProps } from 'umi'; // 1 在这里看到，model文件中导出的类型 都可以通过umi导入
+import { Card, Button } from 'antd';
 
 
-//formatResult: res => res?.data umi要求后端返回的http.body 里面必须有data字段
-const blockinfo: React.FC<{}> = () => {
-    const [state, setState] = useState<GetBlockResult>();
-    const { loading, run } = useRequest(fn_get_block, {
-        manual: true,
-        formatResult: (res: any) => res,
-        onSuccess: (res, params) => {
-            setState(res);
-        },
-
-    });
+interface PageProps extends ConnectProps {
+    block: BlockModelState;
+}
 
 
-    if (loading) {
-        return <div>loading...</div>;
-    }
 
-    const { timestamp,
+const Block: FC<PageProps> = ({ block, dispatch }) => {
+    console.log("block", block);
+
+    const {
+        timestamp,
         producer,
         confirmed,
         previous,
@@ -36,39 +24,40 @@ const blockinfo: React.FC<{}> = () => {
         id,
         block_num,
         ref_block_prefix
-    } = state;
+    } = block.block_info;
 
+    const onButtonClick = (event) => {
 
+        dispatch!({
+            type: "block/query",
+            payload: { blockno: 1 },
+        });
 
-
-
-
-
-
+    };
 
     return (
         <div>
-            <Button onClick={() => run(1)}>区块1</Button>
+            <Button type="primary" onClick={onButtonClick}>请求块</Button>
 
-            <Card>{id}</Card>
-            <Card>{schedule_version}</Card>
-            <Card>{block_num}</Card>
-            <Card>{ref_block_prefix}</Card>
-            <Card>{timestamp}</Card>
-            <Card>{producer}</Card>
-            <Card>{producer_signature}</Card>
-            <Card>{previous}</Card>
-            <Card>{confirmed}</Card>
-            <Card>{timestamp}</Card>
-            <Card>{transaction_mroot}</Card>
-            <Card>{action_mroot}</Card>
+            <Card title={`block ${block.block_no} info`}>
+                <p>timestamp:{timestamp}</p>
+                <p>producer:{producer}</p>
+                <p>confirmed:{confirmed}</p>
+                <p>previous:{previous}</p>
+                <p>transaction_mroot:{transaction_mroot}</p>
+                <p>action_mroot:{action_mroot}</p>
+                <p>schedule_version:{schedule_version}</p>
+                <p>producer_signature:{producer_signature}</p>
+                <p>id:{id}</p>
+                <p>block_num{block_num}</p>
+                <p>ref_block_prefix:{ref_block_prefix}</p>
+            </Card>
+        </div>
+    )
+
+}
 
 
-        </div >
-
-    );
-
-
-
-};
-export default blockinfo;
+export default connect(
+    ({ block }: { block: BlockModelState }) => ({ block })
+)(Block);

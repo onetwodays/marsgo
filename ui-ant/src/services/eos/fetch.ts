@@ -1,9 +1,8 @@
-import { Api, rpc, contract } from './config';
-export const fetchAll = async (table: string, scope: string, options: any) => {
+import { rpc, contract } from './config';
+export const fetchAll = async (table: string, options: any) => {
     const res = await rpc.get_table_rows({
         json: true,
         code: contract,
-        scope: scope,
         table: table,
         limit: 9999,
         reverse: true,
@@ -15,11 +14,10 @@ export const fetchAll = async (table: string, scope: string, options: any) => {
     return res.rows;
 }
 
-export const fetchOne = async (table, keyValue) => {
+export const fetchOne = async (table: string, keyValue:any) => {
     const res = await rpc.get_table_rows({
         json: true,
         code: contract,
-        scope: contract,
         table,
         lower_bound: keyValue,
         upper_bound: keyValue,

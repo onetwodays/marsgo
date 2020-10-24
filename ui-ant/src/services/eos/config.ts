@@ -33,7 +33,7 @@ const network = {
 // };
 
 
-// local
+// local  http://zhongyingying.qicp.io:38000
 const network = {
     blockchain: 'eos',
     protocol: 'http',
@@ -42,18 +42,20 @@ const network = {
     chainId: '215331c6c3863ad74a1e1680234f2237374d1d46ab2a3d7534126d01d815a488',
 };
 
-//ScatterJS.plugins(new ScatterEOS());
 
+
+//ScatterJS.plugins(new ScatterEOS());
 //const signatureProvider = ScatterJS.scatter.eosHook(network, null, true);
 
 
 
 
 const privateKeys = ["5JBdZDCH4NKsGXR4DJkiaSQQ4kBE9vnePA1Be2RLeaSFvDqBzLg"];
-const signatureProvider = new JsSignatureProvider(privateKeys);
+const signatureProvider = new JsSignatureProvider(privateKeys); // development only
+
 
 const url = network.protocol + '://' + network.host + ':' + network.port;
-
+//const rpc = new JsonRpc(url)
 const rpc = new JsonRpc(url, { fetch })
 const api = new Api({
     rpc,

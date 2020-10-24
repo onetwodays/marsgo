@@ -1,6 +1,7 @@
 import React, { FC } from 'react';
-import styles from './index.less';
 import { connect, HeroModelState, ConnectProps } from 'umi'; // 1 在这里看到，model文件中导出的类型 都可以通过umi导入
+import styles from './index.less';
+
 
 import { Row, Col, Radio, Card } from 'antd';
 import { RadioChangeEvent } from 'antd/es/radio/interface';

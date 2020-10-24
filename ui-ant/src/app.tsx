@@ -35,6 +35,8 @@ import Footer from '@/components/Footer';
 import { ResponseError } from 'umi-request';
 import { queryCurrent } from './services/user';
 import defaultSettings from '../config/defaultSettings';
+import { msgError } from '@/utils/notify'
+import { NodeExpandOutlined } from '@ant-design/icons';
 
 export interface InitialStateType {
   settings?: LayoutSettings;
@@ -143,41 +145,45 @@ const NotificationErrorStyle: any = {
         errorMessage: '嘿嘿请先登录！',
         success: true,
    }
+   //response
+   {
+      body: (...)
+      bodyUsed: false
+      headers: Headers
+      __proto__: Headers
+      ok: false
+      redirected: false
+      status: 404
+      statusText: "Not Found"
+      type: "basic"
+      url: "http://localhost:8000/v1/chain/get_info1"
+      useCache: false
+   }
  */
 const errorHandler = (error: ResponseError) => {
-  // 是否是 BizError 来判断是否是因为 success 为 false 抛出的错误
-  if (error.name === "BizError") {
-    notification.error({
-      message: `请求错误 ${error.data}`,
-      // description: error.data.msg,
-    });
-    return error.data.code;
-  }
+
+  //请求已发送但服务端返回状态码非2xx的响应
   const { response, data } = error;
+  console.log("error:", `${error}`);
+  console.log("response:", response);
+
   if (response && response.status) {
-    const errorText = codeMessage[response.status] || response.statusText; //自己生成的
+    const errorText = codeMessage[response.status] || response.statusText;
     const { status, url } = response;
-
-    //请求错误 401: http://localhost:8000/api/currentUser,[object Object]
-    //用户没有权限（令牌、用户名、密码错误）
-
-
     notification.error({
-      message: `请求错误 ${status}: ${url},${data}`,
+      message: `错误处理:请求错误 ${status}: ${url},${data}`,
       description: errorText,
       style: NotificationErrorStyle,
-
     });
-
   }
 
+  //服务端没有返回数据时
   if (!response) {
     notification.error({
       description: '您的网络发生异常，无法连接服务器',
       message: '网络异常',
       style: NotificationErrorStyle,
     });
-
   }
   throw error;
 };
@@ -207,6 +213,7 @@ interface RequestError extends Error {
 // 相当于做了一个格式转换
 const errorConfig: any = {
   adaptor: (res: any) => {
+    console.log("errorConfig:", res);
     return {
       //...res,
       success: res.code === 200, // success是false时
@@ -227,6 +234,7 @@ const middlewareA = async (ctx: any, next: Function) => {
 
 }
 
+
 const middlewareB = async (ctx: any, next: Function) => {
   console.log('B before');
   await next();
@@ -234,16 +242,48 @@ const middlewareB = async (ctx: any, next: Function) => {
 
 }
 
+const middlewareParseErrorMessage = async (ctx: any, next: Function) => {
+  const { code, message, error } = ctx.res.clone().json();
+  if (code && code != 200) {
+    notification.error({
+      description: JSON.stringify(error),
+      message: `拦截器EOS请求错误:${ctx.res.url} ${code}:${message}`,
+      style: NotificationErrorStyle,
+    });
+  }
+  await next();
+};
 
-/**
- * 配置request请求时的默认参数
- * 使用app.ts配置RequestConfig就 不能使用extend来配置,不然 errorConfig.adaptor 不会起作用
- * 
- * 该配置返回一个对象。除了 errorConfig 和 middlewares 以外其它配置都是直接透传 umi-request 的全局配置。
- * umi-request 提供中间件机制，之前是通过 request.use(middleware) 的方式引入，现在可以通过 request.middlewares 进行配置。
- * requestInterceptors 该配置接收一个数组，数组的每一项为一个 request 拦截器。等同于 umi-request 的 request.interceptors.request.use()。具体见 umi-request 的拦截器文档
- * responseInterceptors该配置接收一个数组，数组的每一项为一个 response 拦截器。等同于 umi-request 的 request.interceptors.response.use()。具体见 umi-request 的拦截器文档
- */
+const responseInterceptor = async (res, req) => {
+  let temp = await res.clone().json();
+  console.log("响应拦截器输出:", temp); //temp 是服务端返回的http body
+  console.log("响应拦截器输出res:", res); //temp 是服务端返回的http body
+  console.log("响应拦截器输出req:", req); //temp 是服务端返回的http body
+
+  //return res;
+
+
+  //eos的错误信息拦截
+  const { code, message, error } = temp;
+  if (code && code != 200) {
+    notification.error({
+      description: JSON.stringify(error),
+      message: `拦截器EOS请求错误:${res.url} ${code}:${message}`,
+      style: NotificationErrorStyle,
+    });
+    //const err = new Error(`{error}`);
+    //throw err;
+  }
+  return res;
+
+
+
+
+}
+
+
+
+
 export const request: RequestConfig = {
   //prefix: '/api', // 所有的请求的前缀,相当于ip+port部分
   errorHandler: errorHandler,
@@ -254,36 +294,22 @@ export const request: RequestConfig = {
   middlewares: [middlewareA, middlewareB],
 
   requestInterceptors: [],
-  responseInterceptors: [],
-
-
-
+  responseInterceptors: [responseInterceptor],
 };
 
 
-
-
-
-/*
-const plugins = [];
-// 非生产环境添加 logger
-if (process.env.NODE_ENV !== "production") {
-    plugins.push(
-        require("dva-logger")({
-            collapsed: true
-        })
-    );
-}
-
-
+//如果 model里面的effects 中抛异常没有被捕获，会执行 onError，然后才是组件的 dispatch 返回的 Promise 处理。
+//如果在 onError 中调用 err. preventDefault() 则后续 dispatch 的 catch 不会执行
 export const dva = {
-    config: {
-        //onAction: createLogger(),
-        onError(e: Error) {
-            e.preventDefault();
-            notification.error(e.message);
-        },
+  config: {
+    onError(e: Error) {
+      console.log("dva全局错误处理:", e.message)
+      msgError(e.message);
+      e.preventDefault();
     },
-    plugins,
+  },
 };
-*/
+
+
+
+
