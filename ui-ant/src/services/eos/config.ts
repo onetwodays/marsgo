@@ -55,8 +55,8 @@ const signatureProvider = new JsSignatureProvider(privateKeys); // development o
 
 
 const url = network.protocol + '://' + network.host + ':' + network.port;
-//const rpc = new JsonRpc(url)
-const rpc = new JsonRpc(url, { fetch })
+const rpc = new JsonRpc(url)
+//const rpc = new JsonRpc(url, { fetch })
 const api = new Api({
     rpc,
     signatureProvider,

@@ -11,10 +11,10 @@ export const fetchAll = async (table: string, options: any) => {
         ...options,
 
     });
-    return res.rows;
+    return res;
 }
 
-export const fetchOne = async (table: string, keyValue:any) => {
+export const fetchOne = async (table: string, keyValue: any) => {
     const res = await rpc.get_table_rows({
         json: true,
         code: contract,

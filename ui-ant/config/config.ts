@@ -75,12 +75,6 @@ export default defineConfig({
       //component: './eos/chain',
       routes: [
         {
-          path: '/eos/ad',
-          name: 'ad',
-          icon: 'smile',
-          component: './eos/ad',
-        },
-        {
           path: '/eos/chain',
           name: 'chaninfo',
           icon: 'smile',
@@ -91,7 +85,19 @@ export default defineConfig({
           name: 'blockinfo',
           icon: 'smile',
           component: './eos/block',
-        }
+        },
+        {
+          path: '/eos/code',
+          name: 'code',
+          icon: 'smile',
+          component: './eos/code',
+        },
+        {
+          path: '/eos/adorder',
+          name: 'ad',
+          icon: 'smile',
+          component: './eos/adorder',
+        },
       ]
     },
     {

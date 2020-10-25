@@ -1,10 +1,11 @@
 import React, { FC } from 'react';
-import { connect, BlockModelState, ConnectProps } from 'umi'; // 1 在这里看到，model文件中导出的类型 都可以通过umi导入
+import { Loading, connect, BlockModelState, ConnectProps } from 'umi'; // 1 在这里看到，model文件中导出的类型 都可以通过umi导入
 import { Card, Button } from 'antd';
 
 
 interface PageProps extends ConnectProps {
     block: BlockModelState;
+    loading: boolean;
 }
 
 
@@ -59,5 +60,5 @@ const Block: FC<PageProps> = ({ block, dispatch }) => {
 
 
 export default connect(
-    ({ block }: { block: BlockModelState }) => ({ block })
+    ({ block, loading }: { block: BlockModelState; loading: Loading }) => ({ block, loading: loading.models.block })
 )(Block);
