@@ -1,6 +1,6 @@
 import React, { useRef } from 'react';
-import { PlusOutlined } from '@ant-design/icons';
-import { Button, Tag, Space } from 'antd';
+import { PlusOutlined, QuestionCircleOutlined } from '@ant-design/icons';
+import { Button, Tag, Space, Tooltip } from 'antd';
 import ProTable, { ProColumns, TableDropdown, ActionType } from '@ant-design/pro-table';
 import { fetchAll } from '@/services/eos/fetch';
 import { msgError } from '@/utils/notify';
@@ -36,16 +36,17 @@ interface Adorder {
 const columns: ProColumns<Adorder>[] = [
     {
         title: 'id',
-        dataIndex: 'id', //第一列是序号列，没有标题
-        valueType: 'indexBorder',
+        dataIndex: 'id',
+        // valueType: 'indexBorder',
         width: 48,
+        // render: (_) => <a>{_}</a>,
+        sorter: (a, b) => a.id - b.id,
     },
     {
         title: '广告主',
         dataIndex: 'user',
         copyable: true,
-        ellipsis: true,
-        tip: '标题过长会自动收缩',
+        ellipsis: false,
         formItemProps: {
             rules: [
                 {
@@ -54,14 +55,14 @@ const columns: ProColumns<Adorder>[] = [
                 },
             ],
         },
-        //width: '30%',
-        search: false,
+        // width: '30%',
+        search: true,
     },
     {
         title: '交易对',
         dataIndex: 'pair',
         copyable: true,
-        ellipsis: true,
+        // ellipsis: true,
         tip: '标题过长会自动收缩',
         formItemProps: {
             rules: [
@@ -71,13 +72,53 @@ const columns: ProColumns<Adorder>[] = [
                 },
             ],
         },
-        //width: '30%',
+        // width: '30%',
         search: false,
+    },
+    {
+        title: '买卖',
+        dataIndex: 'side',
+        filters: true,
+        width: 48,
+    },
+    {
+        title: '价格',
+        dataIndex: 'price',
+        // filters: true,
+        // width: 48,
+    },
+    {
+        title: '数量',
+        dataIndex: 'amount',
+        // filters: true,
+        // width: 48,
+    },
+
+    {
+        title: '剩余',
+        dataIndex: 'left',
+        // filters: true,
+        // width: 48,
+    },
+
+    {
+        title: '待放币',
+        dataIndex: 'freeze',
+        // filters: true,
+        // width: 48,
     },
     {
         title: '状态',
         dataIndex: 'status',
         filters: true,
+        width: 48,
+    },
+    {
+        title: '状态描述',
+        dataIndex: 'status_str',
+        filters: true,
+        ellipsis: true,
+
     },
     {
         title: '成交记录',
@@ -91,18 +132,44 @@ const columns: ProColumns<Adorder>[] = [
                 ))}
             </Space>
         ),
+        search: false,
+        ellipsis: true,
     },
     {
-        title: '创建时间',
+        title: '付款方式',
+        dataIndex: 'pay_accounts',
+        render: (_, row) => (
+            <Space>
+                {row.pay_accounts.map((id) => (
+                    <Tag key={id}>
+                        {id}
+                    </Tag>
+                ))}
+            </Space>
+        ),
+        search: false,
+        ellipsis: true,
+    },
+    {
+        title: (
+            <>
+                创建时间
+                <Tooltip placement="top" title="这是一段描述">
+                    <QuestionCircleOutlined style={{ marginLeft: 4 }} />
+                </Tooltip>
+            </>
+        ),
         key: 'since',
         dataIndex: 'ctime',
         valueType: 'dateTime',
+        search: false,
     },
     {
         title: '更新时间',
         key: 'since1',
         dataIndex: 'utime',
         valueType: 'dateTime',
+        search: false,
     },
 
     {
@@ -111,21 +178,14 @@ const columns: ProColumns<Adorder>[] = [
         copyable: true,
         ellipsis: true,
         tip: '标题过长会自动收缩',
-        formItemProps: {
-            rules: [
-                {
-                    required: true,
-                    message: '此项为必填项',
-                },
-            ],
-        },
-        //width: '30%',
         search: false,
+        width: '20%',
     },
 
 
     {
         title: '操作',
+        key: 'option',
         valueType: 'option',
         render: (text, row, _, action) => [
             <Button title='手动下架'>下架</Button>,
@@ -148,8 +208,32 @@ export default () => {
         <ProTable<Adorder>
             columns={columns}
             actionRef={actionRef}
+            rowSelection={{}}
+            tableAlertRender={({ selectedRowKeys, selectedRows, onCleanSelected }) => (
+                <Space size={24}>
+                    <span>
+                        已选 {selectedRowKeys.length} 项
+                    <a style={{ marginLeft: 8 }} onClick={onCleanSelected}>
+                            取消选择
+                    </a>
+                    </span>
+                    <span>{`总成交记录: ${selectedRows.reduce(
+                        (pre, item) => pre + item.vec_deal.length,
+                        0,
+                    )} 个`}</span>
+
+                </Space>
+            )}
+            tableAlertOptionRender={() => {
+                return (
+                    <Space size={16}>
+                        <a>批量删除</a>
+                        <a>导出数据</a>
+                    </Space>
+                );
+            }}
             request={async () => {
-                let res = await fetchAll('adorders', {
+                const res = await fetchAll('adorders', {
                     scope: 'adxcnymkask',
                 });
                 console.log("xxx:", res);
@@ -159,12 +243,22 @@ export default () => {
             }}
             onRequestError={(e: Error) => msgError(e.message)}
             rowKey="id"
+            pagination={{
+                showQuickJumper: true,
+                pageSize: 20,
+            }}
+            search={{
+                // filterType: 'light',
+
+            }}
+            scroll={{ x: 1300 }}
+            options={false}
             dateFormatter="string"
-            headerTitle="高级表格"
+            headerTitle="广告表格"
             toolBarRender={() => [
-                <Button key="button" icon={<PlusOutlined />} type="primary">
+                <Button key="new" icon={<PlusOutlined />} type="primary">
                     新建
-        </Button>,
+                </Button>,
             ]}
         />
     );
