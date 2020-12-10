@@ -1,0 +1,1 @@
+go run hello.go -f etc/hello.yaml

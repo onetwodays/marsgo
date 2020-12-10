@@ -1,0 +1,60 @@
+    // 查询所有的支付方式
+    type GetPaymentTypeReply {
+        total int `json:"total"`
+        list interface{} `json:"list"`
+    }
+
+        // 查询某个用户的所有的收付款帐号
+    type (
+        GetPayAccountReq {
+            username string `json:"username,optional"`   //用户名
+            paymentType uint32 `json:"pmt_type,optional"`//支付方式id
+            isActived uint8 `json:"is_actived,optional"` //是否激活
+        }
+
+        GetPayAccountReply {
+            total int `json:"total"`
+            list interface{} `json:"list"`
+        }
+    )
+
+        // 新增一个收付款方式或者更新对应的内容
+    type (
+        UpsertPayAccountReq {
+            id uint32 `json:"pmt_id"`                         //=0插入 ！=0 update
+            username string `json:"username"`                 //用户名
+            paymentTypeId uint32 `json:"pmt_type"`            //支付方式id
+            isActived uint8 `json:"is_actived,options=1|2"`   //是否激活
+            detail string `json:"ciphertext"`                 //帐号详情
+        }
+
+        UpsertPayAccountReply {
+            ok bool `json:"ok"` //是否成功
+        }
+    )
+
+
+
+    @server(
+        middleware: GreetMiddleware1, GreetMiddleware2
+    )
+
+    service privatedb-api {
+        @doc(
+            summary: "查询所有的支付方式"
+        )
+        @handler GetPaymentTypeHandler
+        get /api/payment/types () returns (GetPaymentTypeReply)
+
+        @doc(
+            summary: "查询某个用户的支付帐号"
+        )
+        @handler GetPayAccountHandler
+        post /api/payment/account (GetPayAccountReq) returns (GetPayAccountReply)
+
+        @doc(
+            summary: "用户修改支付帐号"
+        )
+        @handler UpsertPayAccountHandler
+        post /api/payment/upsert (UpsertPayAccountReq) returns (UpsertPayAccountReply)
+    }

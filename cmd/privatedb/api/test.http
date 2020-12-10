@@ -1,0 +1,81 @@
+###
+
+# curl -i -X POST
+#  http://127.0.0.1:8888/msg/add
+#  -H 'cache-control: no-cache'
+#  -H 'content-type: application/json'
+#  -d '{
+#          "pair":"ADXCNY",
+#          "dealid":2,
+#          "sender":"1",
+#          "receiver":"1",
+#          "content":"2"
+#      }'
+POST http://127.0.0.1:8888/api/msg/add
+cache-control: no-cache
+Content-Type: application/json
+
+{
+  "pair": "ADXCNY",
+  "dealid": 13,
+  "sender": "1",
+  "receiver": "1",
+  "content": "2"
+}
+
+
+###
+
+# curl -i -X POST
+#  http://127.0.0.1:8888/user/register
+#  -H 'cache-control: no-cache'
+#  -H 'content-type: application/json'
+#  -d '{
+#        "username":"admin",
+#        "password":"666666",
+#        "mobile":"19988888888"
+#}'
+POST http://127.0.0.1:8888/user/register
+cache-control: no-cache
+Content-Type: application/json
+
+{
+  "username": "zhouhao",
+  "password": "666666",
+  "mobile": "18588250437"
+}
+
+###
+
+
+
+# curl -i -X POST
+#  http://127.0.0.1:8888/user/login
+#  -H 'cache-control: no-cache'
+#  -H 'content-type: application/json'
+#  -d '{
+#  "username":"admin",
+#  "password":"666666"
+#}'
+POST http://127.0.0.1:8888/user/login
+cache-control: no-cache
+Content-Type: application/json
+
+{
+  "username": "admin",
+  "password": "666666"
+}
+
+###
+
+
+# curl -i -X GET
+#  http://127.0.0.1:8888/user/info
+#  -H 'cache-control: no-cache'
+GET http://127.0.0.1:8888/user/info
+cache-control: no-cache
+x-user-id: 1
+authorization: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE2MDc1ODUxNzgsImlhdCI6MTYwNzQ5ODc3OCwidXNlcklkIjoxfQ._kv1vpyiE5dJb0CQ_yn5tNLab_G84Riy083DtjAC2OA
+###
+
+

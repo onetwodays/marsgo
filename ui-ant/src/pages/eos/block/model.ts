@@ -1,6 +1,5 @@
 import { Effect, Reducer } from 'umi';
 import { fn_get_block } from '@/services/eos/get'
-import { rpc } from './config';
 
 
 

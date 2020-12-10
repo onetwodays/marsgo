@@ -1,0 +1,22 @@
+info(
+	title: "privatedb api"
+	desc: "聊天消息 支付方式私有数据"
+	author: "dabaicai"
+	email: "dabaicai@gmail.com"
+)
+import "./api/user.api"
+import "./api/msg.api"
+import "./api/payment.api"
+
+type IndexReply {
+	resp string `json:"resp"`
+}
+
+
+service privatedb-api {
+	@doc(
+		summary : "index"
+	)
+	@handler IndexHandler
+	get /index () returns (IndexReply)
+}

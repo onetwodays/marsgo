@@ -8,8 +8,6 @@ const chaininfo: React.FC<{}> = () => {
         pollingInterval: 2000,
         pollingWhenHidden: false,
         formatResult: (res: any) => res,
-
-
     });
 
     if (loading) {
