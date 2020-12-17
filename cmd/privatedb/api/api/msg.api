@@ -32,7 +32,7 @@ type (
 
 
 @server(
-    middleware: GreetMiddleware1, GreetMiddleware2
+    middleware: EOSUserCheck
 )
 
 service privatedb-api {

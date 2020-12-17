@@ -11,9 +11,12 @@
 #          "receiver":"1",
 #          "content":"2"
 #      }'
-POST http://127.0.0.1:8888/api/msg/add
+#http://zhongyingying.qicp.io:38888
+POST http://zhongyingying.qicp.io:38888/api/msg/add
 cache-control: no-cache
 Content-Type: application/json
+x-user-name: otcexchange
+x-user-sign:SIG_K1_Jz4KTq5v3dhcRKYehza6NRF5SxZaEzdPiVohRhX5SqoDCjmjf6hh3vyqfFHzEUagWZHC3L6G6SaJvKdH3UWEVwJRLWc6jL
 
 {
   "pair": "ADXCNY",
@@ -22,6 +25,8 @@ Content-Type: application/json
   "receiver": "1",
   "content": "2"
 }
+
+
 
 
 ###
