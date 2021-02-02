@@ -12,3 +12,4 @@
 /ui/node_modules
 /ui/src/.umi
 **/data
+signalserver
