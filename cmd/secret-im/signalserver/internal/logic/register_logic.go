@@ -2,11 +2,11 @@ package logic
 
 import (
 	"context"
-	"secret-im/model"
 
+	"secret-im/model"
+	"secret-im/shared"
 	"secret-im/signalserver/internal/svc"
 	"secret-im/signalserver/internal/types"
-	"secret-im/shared"
 
 	"github.com/tal-tech/go-zero/core/logx"
 )
@@ -34,11 +34,11 @@ func NewRegisterLogic(ctx context.Context, svcCtx *svc.ServiceContext) RegisterL
 func (l *RegisterLogic) Register(req types.RegisterReq) error {
 	// todo: add your logic here and delete this line
 	_,err:=l.svcCtx.UserModel.FindOneByName(req.Username)
-	if err!=nil{
+	if err==nil{
 		return errorDuplicateUserName
 	}
 	_,err =l.svcCtx.UserModel.FindOneByMobile(req.Mobile)
-	if err!=nil{
+	if err==nil{
 		return errorDuplicateUserMobile
 	}
 	_,err= l.svcCtx.UserModel.Insert(model.User{

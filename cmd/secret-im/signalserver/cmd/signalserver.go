@@ -3,7 +3,9 @@ package main
 import (
 	"fmt"
 	"github.com/tal-tech/go-zero/core/logx"
+	"github.com/tal-tech/go-zero/rest/httpx"
 	"net/http"
+	"secret-im/shared"
 	"strings"
 
 	"github.com/tal-tech/go-zero/rest"
@@ -21,6 +23,7 @@ import (
 var isStartWss = true
 func main() {
 
+	//url 不存在时,个性化提示
 	rt := router.NewRouter()
 	rt.SetNotFoundHandler(http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
 		//这里内容可以定制
@@ -32,10 +35,36 @@ func main() {
 	server := rest.MustNewServer(config.AppConfig.RestConf, rest.WithRouter(rt)) //url 不存在时会报 服务器开小差了,这里可定制
 	//server := rest.MustNewServer(c.RestConf) //url 不存在时默认会报 404 page not found
 	defer server.Stop()
-	server.Use(middleware.GlobalMWWebsocketFunc) //global middleware
+	// 全局中间件
+	server.Use(middleware.GlobalMWLogFunc) //global middleware
 
-	handler.RegisterHandlers(server, ctx) // handle api
+	//静态文件服务
 	registerDirHandlers(server,ctx)
+
+	// 注册路由组件
+	handler.RegisterHandlers(server, ctx) // handle api
+
+
+
+	/*
+	httpx.Error(...) 调用会先经过自定义的 errorHandler 处理再返回。
+	• errorHandler 返回的 int 作为 http status code 返回客户端
+	• 如果 errorHandler 返回的 interface{} 是 error 类型的话，
+	那么会直接用 err.Error() 的内容以非 json 的格式返回客户端，
+	不是 error 的话，那么会 marshal 成 json 再返回
+	*/
+
+	httpx.SetErrorHandler(func(err error) (int, interface{}) {
+		switch e:=err.(type) {
+		case *shared.CodeError:
+			return http.StatusOK,e.Data()
+		default:
+			return http.StatusInternalServerError,nil
+
+		}
+
+	})
+
 
 
     //websocket server
@@ -52,9 +81,6 @@ func main() {
 			}
 		}()
 	}
-
-
-
 
 	server.AddRoute(rest.Route{
 		Method: http.MethodGet,

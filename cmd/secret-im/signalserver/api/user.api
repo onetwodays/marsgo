@@ -40,7 +40,7 @@ service signalserver-api {
 
 @server(
     jwt: Auth
-    middleware: Usercheck
+    middleware: UserCheck
 )
 service signalserver-api {
     @handler userInfo

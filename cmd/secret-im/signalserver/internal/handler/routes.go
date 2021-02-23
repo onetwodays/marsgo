@@ -37,7 +37,7 @@ func RegisterHandlers(engine *rest.Server, serverCtx *svc.ServiceContext) {
 
 	engine.AddRoutes(
 		rest.WithMiddlewares(
-			[]rest.Middleware{serverCtx.Usercheck},
+			[]rest.Middleware{serverCtx.UserCheck},
 			[]rest.Route{
 				{
 					Method:  http.MethodGet,

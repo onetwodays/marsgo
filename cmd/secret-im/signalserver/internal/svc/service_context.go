@@ -3,14 +3,18 @@
 package svc
 
 import (
-	"github.com/tal-tech/go-zero/core/stores/sqlx"
-	"secret-im/signalserver/config"
+	"github.com/tal-tech/go-zero/rest"
 	"secret-im/model"
+	"secret-im/signalserver/config"
+	"secret-im/signalserver/internal/middleware"
+
+	"github.com/tal-tech/go-zero/core/stores/sqlx"
 )
 
 type ServiceContext struct {
 	Config config.Config
-	UserModel model.UserModel
+	UserModel model.UserModel  //CRUD
+	UserCheck rest.Middleware  // middleware
 
 }
 
@@ -22,5 +26,6 @@ func NewServiceContext(c config.Config) *ServiceContext {
 	return &ServiceContext{
 		Config: c,
 		UserModel: um,
+		UserCheck: middleware.NewUsercheckMiddleware().Handle,
 	}
 }

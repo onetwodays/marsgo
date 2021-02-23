@@ -25,4 +25,6 @@ type IndexReply {
 service signalserver-api {
 	@handler IndexHandler
 	get /index () returns (IndexReply)
+
+
 }
