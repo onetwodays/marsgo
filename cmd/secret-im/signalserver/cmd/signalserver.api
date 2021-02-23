@@ -1,0 +1,28 @@
+syntax = "v2"
+info(
+	title: "signalserver api"
+	desc: "websocket server"
+	author: "dabaicai"
+	email: "dabaicai@gmail.com"
+)
+
+import (
+	"api/user.api"
+)
+
+type Request {
+	Name string `path:"name,options=you|me"`
+}
+
+type Response {
+	Message string `json:"message"`
+}
+
+type IndexReply {
+	Resp string `json:"resp"`
+}
+
+service signalserver-api {
+	@handler IndexHandler
+	get /index () returns (IndexReply)
+}

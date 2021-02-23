@@ -1,0 +1,50 @@
+type (
+    AddmsgReq {
+        pair string `json:"pair"`        // 交易对
+        dealid int64 `json:"dealid"`     //订单id
+        sender string `json:"sender"`    //发送者
+        receiver string `json:"receiver"`//接收者
+        content string `json:"content"`  //消息内容
+    }
+
+    AddmsgReply {
+        ok bool `json:"ok"` //是否成功
+    }
+)
+
+
+
+type (
+    GetmsgsReq {
+        pageIndex int `json:"pageIndex"`          //页数
+        pageSize int `json:"pageSize"`            //叶大小
+        pair string `json:"pair"`
+        dealid int64 `json:"dealid"`
+        status int `json:"status,optional"`       //1.未读2.已读 选填，没有查所有
+    }
+    GetmsgsReply {
+        total int `json:"total"`
+        pageSize int `json:"pageSize"`
+        data interface{} `json:"list"`
+    }
+)
+
+
+
+@server(
+    middleware: EOSUserCheck
+)
+
+service privatedb-api {
+    @doc(
+        summary: "添加一条消息"
+    )
+    @handler AddmsgHandler
+    post /api/msg/add (AddmsgReq) returns (AddmsgReply)
+
+    @doc(
+        summary: "查询消息"
+    )
+    @handler GetmsgHandler
+    post /api/msg/get (GetmsgsReq) returns (GetmsgsReply)
+}

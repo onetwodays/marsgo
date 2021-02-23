@@ -1,0 +1,1 @@
+request response的struct，根据api自动生成，不建议编辑

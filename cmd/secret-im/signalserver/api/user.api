@@ -1,0 +1,48 @@
+type RegisterReq {
+    Username string `json:"username"`
+    Mobile string `json:"mobile"`
+    Password string `json:"password"`
+}
+
+type LoginReq {
+    Username string `json:"username"`
+    Password string `json:"password"`
+}
+
+type UserReply {
+    Id int64 `json:"id"`
+    Username string `json:"username"`
+    Mobile string `json:"mobile"`
+    Nickname string `json:"nickname"`
+    Gender string `json:"gender"`
+    JwtToken
+}
+
+type JwtToken {
+    AccessToken string `json:"accessToken,omitempty"`
+    AccessExpire int64 `json:"accessExpire,omitempty"`
+    RefreshAfter int64 `json:"refreshAfter,omitempty"`
+}
+
+service signalserver-api {
+
+
+    @handler register
+    post /user/register (RegisterReq)
+
+    @handler login
+    post /user/login (LoginReq) returns (UserReply)
+
+
+}
+
+
+
+@server(
+    jwt: Auth
+    middleware: Usercheck
+)
+service signalserver-api {
+    @handler userInfo
+    get /user/info () returns (UserReply)
+}
