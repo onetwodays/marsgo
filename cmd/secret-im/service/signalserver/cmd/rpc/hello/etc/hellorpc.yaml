@@ -1,0 +1,16 @@
+Name: hellorpc.rpc #大小写敏感，缩进表示层级关系，缩进的空格数不重要，只要相同层级的元素左对齐即可
+ListenOn: 127.0.0.1:8080
+#对象键值对使用冒号结构表示 key: value，冒号后面要加一个空格。
+#也可以使用 key:{key1: value1, key2: value2, ...}。
+#还可以使用缩进表示层级关系；
+Etcd:
+  Hosts:
+    - 127.0.0.1:2379
+  Key: hellorpc.rpc
+Mysql:
+  DataSource: hopexdev:devhopex@tcp(127.0.0.1:3306)/privatedb?charset=utf8mb4&parseTime=true&loc=Asia%2
+CacheRedis:
+  -
+    Host: "127.0.0.1:6379"
+    Pass: ""
+    Type: node
