@@ -1,0 +1,24 @@
+syntax = "v2"
+
+type (
+    GetSmsCodeReq {
+        Number string `path:"number"`  // 路由path，如/foo/:id
+    }
+    GetSmsCodeResp { //获取验证码
+        SmsCode string `json:"SmsCode"`
+    }
+)
+
+
+@server(
+    group: accounts
+)
+service signalserver-api {
+    @handler GetSmsCodeHandler
+    get /v1/accounts/sms/code/:number (GetSmsCodeReq) returns (GetSmsCodeResp)
+}
+
+
+
+
+

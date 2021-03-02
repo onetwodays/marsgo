@@ -4,6 +4,7 @@ package handler
 import (
 	"net/http"
 
+	accounts "secret-im/service/signalserver/cmd/api/internal/handler/accounts"
 	bookstore "secret-im/service/signalserver/cmd/api/internal/handler/bookstore"
 	"secret-im/service/signalserver/cmd/api/internal/svc"
 
@@ -66,6 +67,16 @@ func RegisterHandlers(engine *rest.Server, serverCtx *svc.ServiceContext) {
 				Method:  http.MethodGet,
 				Path:    "/check",
 				Handler: bookstore.CheckHandler(serverCtx),
+			},
+		},
+	)
+
+	engine.AddRoutes(
+		[]rest.Route{
+			{
+				Method:  http.MethodGet,
+				Path:    "/v1/accounts/sms/code/:number",
+				Handler: accounts.GetSmsCodeHandler(serverCtx),
 			},
 		},
 	)

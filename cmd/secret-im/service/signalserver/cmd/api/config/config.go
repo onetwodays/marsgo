@@ -44,4 +44,9 @@ type Config struct {
 	}
 	BookStore zrpc.RpcClientConf
 
+	TestDevices []struct{
+		Number string
+		Code string
+	}
+
 }

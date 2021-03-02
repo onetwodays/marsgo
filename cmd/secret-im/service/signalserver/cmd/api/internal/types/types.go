@@ -56,3 +56,11 @@ type CheckResp struct {
 	Found bool  `json:"found"`
 	Price int64 `json:"price"`
 }
+
+type GetSmsCodeReq struct {
+	Number string `path:"number"` // 路由path，如/foo/:id
+}
+
+type GetSmsCodeResp struct {
+	SmsCode string `json:"SmsCode"`
+}

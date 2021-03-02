@@ -3,7 +3,7 @@ Host: 0.0.0.0
 Port: 8888
 LogConf:
   ServiceName: signalserver
-  Mode: file
+  Mode: console
   Path: ./deploy/logs/
   Level: info
 
@@ -29,3 +29,12 @@ BookStore:
     Hosts:
       - 127.0.0.1:2379
     Key: bookstore.rpc
+TestDevices:
+  -
+    Number: "+8618588250437"
+    Code: "123456"
+  -
+    Number: "+8618588250438"
+    Code: "123456"
+
+

@@ -9,6 +9,7 @@ info(
 import (
 	"user.api"
 	"bookstore.api"
+	"accounts.api"
 )
 
 type Request {
