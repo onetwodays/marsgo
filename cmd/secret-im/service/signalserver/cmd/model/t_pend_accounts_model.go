@@ -26,6 +26,7 @@ type (
 		FindOneByNumber(number string) (*TPendAccounts, error)
 		Update(data TPendAccounts) error
 		Delete(id int64) error
+		DeleteByNumber(number string) error
 	}
 
 	defaultTPendAccountsModel struct {
@@ -91,5 +92,10 @@ func (m *defaultTPendAccountsModel) Update(data TPendAccounts) error {
 func (m *defaultTPendAccountsModel) Delete(id int64) error {
 	query := fmt.Sprintf("delete from %s where `id` = ?", m.table)
 	_, err := m.conn.Exec(query, id)
+	return err
+}
+func (m *defaultTPendAccountsModel) DeleteByNumber(number string) error {
+	query := fmt.Sprintf("delete from %s where `number` = '?'", m.table)
+	_, err := m.conn.Exec(query, number)
 	return err
 }

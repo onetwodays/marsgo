@@ -1,13 +1,169 @@
 syntax = "v2"
 
+// 获取sms code
 type (
     GetSmsCodeReq {
         Number string `path:"number"`  // 路由path，如/foo/:id
     }
     GetSmsCodeResp { //获取验证码
-        SmsCode string `json:"SmsCode"`
+        SmsCode string `json:"smsCode"`
     }
 )
+
+// 帐号属性
+type AccountAttributes  {
+    SignalingKey    string `json:"signalingKey"`  // signalingKey is a randomly generated 32 byte AES key and a 20 byte HMAC-SHA1 MAC key, concatenated together and Base64 encoded.
+    FetchesMessages bool   `json:"fetchesMessages default=true"`
+    RegistrationId  uint64 `json:"registrationId"` //// registrationId is a 14 bit integer that's randomly generated at client install time. This will be used for clients to detect whether an app has reinstalled and lost their session state.
+    Name            string `json:"name"`
+    Voice           bool   `json:"voice"`
+    Video           bool   `json:"video"`
+}
+//设备属性
+type SimpleDevice{
+    Id int64 `json:"id"`
+    Name string `json:"name"`
+    LastSeen int64 `json:"lastSeen"`
+    Created int64  `json:"created"`
+
+}
+
+//优先级
+type PreKey {
+    KeyId     int64  `json:"keyId"`
+    PublicKey string `json:"publicKey"`
+}
+type SignedPreKey{
+    Prekey PreKey `json:"prekey"`
+    Signature string `json:"signature"`
+}
+
+
+type (
+    ConfirmVerificationCodeReq{
+        VerificationCode string  `path:"verificationCode"`
+        PhoneNumber string        `json:"phoneNumber"`
+        Password    string        `json:"password"`
+        SupportsSms bool         `json:"supportsSms"`   // supportsSms indicates whether a client supports SMS as a transport.
+        AccountAttributes AccountAttributes `json:"accountAttributes"`
+    }
+    ConfirmVerificationCodeRes{
+        Account string `json:"account"`
+    }
+)
+
+type (
+    PutAccountAttributesReq{
+        PhoneNumber string        `json:"phoneNumber"`
+        AccountAttributes AccountAttributes `json:"accountAttributes"`
+    }
+
+    PutAccountAttributesRes{
+        Account string `json:"account"`
+    }
+)
+
+type (
+
+    GetDevicesRes{
+        Total int `json:"total"`
+        List  []SimpleDevice  `json:"list"`
+    }
+
+    DelDeviceReq{
+        DeviceId int64 `path:"deviceId"`
+
+    }
+    DelDeviceRes{
+        Device SimpleDevice `json:"device"`
+    }
+    PutDeviceReq{
+        VerificationCode string  `path:"verificationCode"`
+        PhoneNumber string        `json:"phoneNumber"`
+        AccountAttributes AccountAttributes `json:"accountAttributes"`
+
+    }
+    PutDeviceRes{
+        Account string `json:"account"`
+    }
+    GetProfileReq{
+        Number string `path:"number"`  // 路由path，如/foo/:id
+    }
+    GetProfileResp{
+        Name string `json:"name"`
+        Avatar      string `json:"avatar"`
+        IdentityKey string `json:"identityKey"`
+    }
+    GetDirTokenReq{
+        Token string `path:"token"`
+    }
+    GetDirTokenRes{
+        Token string `json:"token"`
+        Relay string `json:"relay,omitempty"`
+        Voice bool   `json:"voice"`
+        Video bool   `json:"video"`
+    }
+
+    //实际是获取函数
+
+    GetDirTokensReq{
+        Tokens []string `json:"tokens"`
+    }
+
+    GetDirTokensRes{
+        Total int `json:"total"`
+        list []GetDirTokenRes `json:"list"`
+    }
+
+
+    GetKeysRes{
+        Total int `json:"total"`
+        List interface{} `json:"list"` //返回数据库表元素
+    }
+
+    KeyDevices{
+        DeviceId int64 `json:"deviceId"`
+        RegistrationId uint64 `json:"registrationId"`
+        SignedPreKey SignedPreKey `json:"signedPreKey"`
+        PreKey PreKey `json:"preKey"`
+    }
+
+    GetDeviceKeyReq{
+        Number string  `json:"number"`
+        DeviceId int   `json:"deviceId"`
+
+    }
+
+    GetDeviceKeyRes{
+        IdentityKey string  `json:"identityKey"`
+        Devices []KeyDevices `json:"devices"`
+
+    }
+    PutKeysReq{
+        PreKeys []PreKey   `json:"preKeys"`
+        IdentityKey string `json:"identityKey"`
+        SignedPreKey SignedPreKey `json:"signedPreKey"`
+    }
+    PutKeysResp{
+        Resp interface{} `json:"resp"`
+    }
+
+    GetKeysSignedRes{
+        SignedPreKey SignedPreKey `json:"signedPreKey"`
+    }
+
+    PutKeysSignedReq{
+       SignedPreKey SignedPreKey `json:"signedPreKey"`
+    }
+
+    PutKeysSignedRes{
+        resp interface{} `json:"resp"`
+    }
+
+
+
+)
+
 
 
 @server(
@@ -17,6 +173,63 @@ service signalserver-api {
     @handler GetSmsCodeHandler
     get /v1/accounts/sms/code/:number (GetSmsCodeReq) returns (GetSmsCodeResp)
 }
+
+@server(
+    middleware : CheckBasicAuth
+    group: accounts
+)
+service signalserver-api {
+    @handler ConfirmCodeHandler
+    put /v1/accounts/code/code/:verificationCode (ConfirmVerificationCodeReq) returns (ConfirmVerificationCodeRes)
+
+    @handler PutAttributesHandler
+    put /v1/accounts/attributes (PutAccountAttributesReq) returns (PutAccountAttributesRes)
+
+    @handler GetDevicesHandler
+    get /v1/devices () returns (GetDevicesRes)
+
+    @handler DeleteDeviceHandler
+    delete /v1/devices/:deviceId (DelDeviceReq) returns (DelDeviceRes)
+
+    @handler PutDeviceHandler
+    put /v1/devices/:verificationCode (PutDeviceReq) returns (PutDeviceRes)
+
+    @handler GetProfileHandler
+    get /v1/profile/:number (GetProfileReq) returns (GetProfileResp)
+
+    @handler GetDirTokenHandler
+    get /v1/directory/:token (GetDirTokenReq) returns (GetDirTokenRes)
+
+    @handler GetDirTokensHandler
+    post /v1/directory/tokens (GetDirTokensReq) returns (GetDirTokensRes)
+
+
+    @handler GetKeysHandler
+    get /v1/keys () returns (GetKeysRes)
+
+    @handler GetDeviceKeyHandler
+    get /v1/keys/:number/:deviceId (GetDeviceKeyReq) returns (GetDeviceKeyRes)
+
+    @handler PutKeysHandler
+    put /v1/keys (PutKeysReq) returns (PutKeysResp)
+
+    @handler GetKeysSignedHandler
+    get /v1/keys/signed () returns (GetKeysSignedRes)
+
+    @handler PutKeysSignedHandler
+    put /v1/keys/signed (PutKeysSignedReq) returns (PutKeysSignedRes)
+
+
+
+
+
+}
+
+
+
+
+
+
 
 
 

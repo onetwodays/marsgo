@@ -80,4 +80,77 @@ func RegisterHandlers(engine *rest.Server, serverCtx *svc.ServiceContext) {
 			},
 		},
 	)
+
+	engine.AddRoutes(
+		rest.WithMiddlewares(
+			[]rest.Middleware{serverCtx.CheckBasicAuth},
+			[]rest.Route{
+				{
+					Method:  http.MethodPut,
+					Path:    "/v1/accounts/code/code/:verificationCode",
+					Handler: accounts.ConfirmCodeHandler(serverCtx),
+				},
+				{
+					Method:  http.MethodPut,
+					Path:    "/v1/accounts/attributes",
+					Handler: accounts.PutAttributesHandler(serverCtx),
+				},
+				{
+					Method:  http.MethodGet,
+					Path:    "/v1/devices",
+					Handler: accounts.GetDevicesHandler(serverCtx),
+				},
+				{
+					Method:  http.MethodDelete,
+					Path:    "/v1/devices/:deviceId",
+					Handler: accounts.DeleteDeviceHandler(serverCtx),
+				},
+				{
+					Method:  http.MethodPut,
+					Path:    "/v1/devices/:verificationCode",
+					Handler: accounts.PutDeviceHandler(serverCtx),
+				},
+				{
+					Method:  http.MethodGet,
+					Path:    "/v1/profile/:number",
+					Handler: accounts.GetProfileHandler(serverCtx),
+				},
+				{
+					Method:  http.MethodGet,
+					Path:    "/v1/directory/:token",
+					Handler: accounts.GetDirTokenHandler(serverCtx),
+				},
+				{
+					Method:  http.MethodPost,
+					Path:    "/v1/directory/tokens",
+					Handler: accounts.GetDirTokensHandler(serverCtx),
+				},
+				{
+					Method:  http.MethodGet,
+					Path:    "/v1/keys",
+					Handler: accounts.GetKeysHandler(serverCtx),
+				},
+				{
+					Method:  http.MethodGet,
+					Path:    "/v1/keys/:number/:deviceId",
+					Handler: accounts.GetDeviceKeyHandler(serverCtx),
+				},
+				{
+					Method:  http.MethodPut,
+					Path:    "/v1/keys",
+					Handler: accounts.PutKeysHandler(serverCtx),
+				},
+				{
+					Method:  http.MethodGet,
+					Path:    "/v1/keys/signed",
+					Handler: accounts.GetKeysSignedHandler(serverCtx),
+				},
+				{
+					Method:  http.MethodPut,
+					Path:    "/v1/keys/signed",
+					Handler: accounts.PutKeysSignedHandler(serverCtx),
+				},
+			}...,
+		),
+	)
 }

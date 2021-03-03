@@ -74,6 +74,7 @@ func (l *GetSmsCodeLogic) GetSmsCode(req types.GetSmsCodeReq) (*types.GetSmsCode
 	if err!=nil{
 		return nil, err
 	}
+	//  send sms ignore
 
 	return &types.GetSmsCodeResp{
 		SmsCode: code,
