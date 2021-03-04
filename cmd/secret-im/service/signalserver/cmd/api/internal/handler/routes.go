@@ -6,6 +6,7 @@ import (
 
 	accounts "secret-im/service/signalserver/cmd/api/internal/handler/accounts"
 	bookstore "secret-im/service/signalserver/cmd/api/internal/handler/bookstore"
+	msgs "secret-im/service/signalserver/cmd/api/internal/handler/msgs"
 	"secret-im/service/signalserver/cmd/api/internal/svc"
 
 	"github.com/tal-tech/go-zero/rest"
@@ -38,6 +39,11 @@ func RegisterHandlers(engine *rest.Server, serverCtx *svc.ServiceContext) {
 				Method:  http.MethodPost,
 				Path:    "/user/login",
 				Handler: loginHandler(serverCtx),
+			},
+			{
+				Method:  http.MethodPost,
+				Path:    "/v1/accounts/login",
+				Handler: LoginChainHandler(serverCtx),
 			},
 		},
 	)
@@ -149,6 +155,24 @@ func RegisterHandlers(engine *rest.Server, serverCtx *svc.ServiceContext) {
 					Method:  http.MethodPut,
 					Path:    "/v1/keys/signed",
 					Handler: accounts.PutKeysSignedHandler(serverCtx),
+				},
+			}...,
+		),
+	)
+
+	engine.AddRoutes(
+		rest.WithMiddlewares(
+			[]rest.Middleware{serverCtx.CheckBasicAuth},
+			[]rest.Route{
+				{
+					Method:  http.MethodPut,
+					Path:    "/v1/messages/:destination",
+					Handler: msgs.PutMsgsSendHandler(serverCtx),
+				},
+				{
+					Method:  http.MethodPost,
+					Path:    "/v1/messages",
+					Handler: msgs.PostMsgsPendingHandler(serverCtx),
 				},
 			}...,
 		),

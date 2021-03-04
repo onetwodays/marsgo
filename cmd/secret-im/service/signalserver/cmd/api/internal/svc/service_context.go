@@ -4,8 +4,11 @@ package svc
 
 import (
 	"encoding/json"
+	eos "github.com/eoscanada/eos-go"
+	"github.com/tal-tech/go-zero/core/logx"
 	"github.com/tal-tech/go-zero/core/stores/sqlx"
 	"github.com/tal-tech/go-zero/rest"
+	"secret-im/service/signalserver/cmd/api/chat"
 	"secret-im/service/signalserver/cmd/api/config"
 	"secret-im/service/signalserver/cmd/api/db/redis"
 	"secret-im/service/signalserver/cmd/api/internal/middleware"
@@ -17,13 +20,20 @@ import (
 
 type ServiceContext struct {
 	Config    config.Config
+	Hub       *chat.Hub
 	UserModel model.UserModel //CRUD
+
+
+	//-----------------
 	PendAccountsModel model.TPendAccountsModel
 	AccountsModel model.TAccountsModel
 	KeysModel model.TKeysModel
-	UserCheck rest.Middleware // middleware
-	CheckBasicAuth rest.Middleware
+	MsgsModel model.TMessagesModel
+	// --------------------
+	UserCheck rest.Middleware // jwt
+	CheckBasicAuth rest.Middleware //basic auth
 	BookStoreClient bookstoreclient.Bookstore //这个是rpc客户端，发起rpc请求的
+	EosApi *eos.API
 
 
 }
@@ -32,16 +42,32 @@ func NewServiceContext(c config.Config) *ServiceContext {
 
 	mysqlConn := sqlx.NewMysql(c.Mysql.DataSource)
 	um:= model.NewUserModel(mysqlConn)
+	hub:=chat.NewHub()
+	go func() {
+		logx.Info("hub run start.....")
+		hub.Run()
+	}()
+
+	eosApi:=eos.New(c.EOSChainUrls[0])
+	eosApi.EnableKeepAlives()
+	eosApi.Debug=true
+
+
+
 
 	return &ServiceContext{
 		Config:    c,
+		Hub: hub,
 		UserModel: um,
+
 		PendAccountsModel: model.NewTPendAccountsModel(mysqlConn),
 		AccountsModel: model.NewTAccountsModel(mysqlConn),
 		KeysModel: model.NewTKeysModel(mysqlConn),
+		MsgsModel: model.NewTMessagesModel(mysqlConn),
 		UserCheck: middleware.NewUsercheckMiddleware().Handle,
 		CheckBasicAuth: middleware.NewCheckBasicAuthMiddleware().Handle,
 		//BookStoreClient: bookstoreclient.NewBookstore(zrpc.MustNewClient(c.BookStore,zrpc.WithUnaryClientInterceptor(interceptor.TimeInterceptor))),
+		EosApi: eosApi,
 	}
 }
 

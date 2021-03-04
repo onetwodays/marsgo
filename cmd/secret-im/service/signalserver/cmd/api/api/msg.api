@@ -1,50 +1,50 @@
-type (
-    AddmsgReq {
-        pair string `json:"pair"`        // 交易对
-        dealid int64 `json:"dealid"`     //订单id
-        sender string `json:"sender"`    //发送者
-        receiver string `json:"receiver"`//接收者
-        content string `json:"content"`  //消息内容
-    }
-
-    AddmsgReply {
-        ok bool `json:"ok"` //是否成功
-    }
-)
+syntax = "v2"
+type  IncomingMsg {
+    Type int `json:"type"`
+    Destination string `json:"destination"`
+    DestinationDeviceId int64 `json:"destinationDeviceId"`
+    DestinationRegistrationId int `json:"destinationRegistrationId"`
+    Body string `json:"body"`
+    Relay string `json:"relay"`
+    Silent bool `json:"silent"`
+    Content string `json:"content"`
+}
 
 
 
 type (
-    GetmsgsReq {
-        pageIndex int `json:"pageIndex"`          //页数
-        pageSize int `json:"pageSize"`            //叶大小
-        pair string `json:"pair"`
-        dealid int64 `json:"dealid"`
-        status int `json:"status,optional"`       //1.未读2.已读 选填，没有查所有
+    PutMsgsSendReq{
+        Destination string  `path:"destination"` //收件人的手机号
+        MsgList []IncomingMsg `json:"msgList"`   // 消息列表，可以多条消息一块发出
+        Relay string `json:"relay"`
+        Timestamp int64 `json:"timestamp"`
     }
-    GetmsgsReply {
-        total int `json:"total"`
-        pageSize int `json:"pageSize"`
-        data interface{} `json:"list"`
+    PutMsgSendRes{
+        Resp interface{} `json:"resp"`
+    }
+
+    PostMsgsPendingReq{
+        PageIndex int `json:"pageIndex"`
+        PageSize  int  `json:"pageSize"`
+        Destination string `json:"destination"`
+    }
+
+    PostMsgsPendingRes{
+        Total int `json:"total"`
+        PageSize int `json:"pageSize"`
+        PageIndex int `json:"pageIndex"`
+        List interface{} `json:"List"`
     }
 )
-
-
 
 @server(
-    middleware: EOSUserCheck
+    middleware : CheckBasicAuth
+    group: msgs
 )
+service signalserver-api {
+    @handler PutMsgsSendHandler
+    put /v1/messages/:destination (PutMsgsSendReq) returns (PutMsgSendRes)
 
-service privatedb-api {
-    @doc(
-        summary: "添加一条消息"
-    )
-    @handler AddmsgHandler
-    post /api/msg/add (AddmsgReq) returns (AddmsgReply)
-
-    @doc(
-        summary: "查询消息"
-    )
-    @handler GetmsgHandler
-    post /api/msg/get (GetmsgsReq) returns (GetmsgsReply)
+    @handler PostMsgsPendingHandler
+    post /v1/messages (PostMsgsPendingReq) returns (PostMsgsPendingRes)
 }

@@ -1,4 +1,10 @@
 package chat
+
+import (
+	"github.com/tal-tech/go-zero/core/logx"
+	"secret-im/service/signalserver/cmd/api/internal/types"
+)
+
 // Copyright 2013 The Gorilla WebSocket Authors. All rights reserved.
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
@@ -9,48 +15,59 @@ package chat
 // clients.
 type Hub struct {
 	// Registered clients.
-	clients map[*Client]bool
+	Clients map[*Client]bool
+	ClientMap map[string]*Client
 
 	// Inbound messages from the clients.
-	broadcast chan []byte
+	Broadcast chan []byte
 
 	// Register requests from the clients.
-	register chan *Client
+	Register chan *Client
 
 	// Unregister requests from clients.
-	unregister chan *Client
+	Unregister chan *Client
 
 	//
-	SendSingle chan *SingleMessage
+	SendSingle chan *types.SingleMessage
 }
 
-func newHub() *Hub {
+func NewHub() *Hub {
 	return &Hub{
-		broadcast:  make(chan []byte),
-		register:   make(chan *Client),
-		unregister: make(chan *Client),
-		clients:    make(map[*Client]bool),
-		SendSingle: make(chan *SingleMessage),
+		Broadcast:  make(chan []byte),
+		Register:   make(chan *Client),
+		Unregister: make(chan *Client),
+		Clients:    make(map[*Client]bool),
+		ClientMap:  make(map[string]*Client),
+		SendSingle: make(chan *types.SingleMessage),
 	}
 }
 
-func (h *Hub) run() {
+func (h *Hub) Run() {
 	for {
 		select {
-		case client := <-h.register:
-			h.clients[client] = true
-		case client := <-h.unregister:
-			if _, ok := h.clients[client]; ok {
-				delete(h.clients, client)
-				close(client.send)
+		case singleMsg:=<-h.SendSingle:
+			if client,ok:=h.ClientMap[singleMsg.Id];ok{
+				logx.Infof(">> send message %v %v %v ", client.Id, len(singleMsg.Message), singleMsg.Message)
+				client.Send<- singleMsg.Message
 			}
-		case message := <-h.broadcast:
-			for client := range h.clients {
+
+		case client := <-h.Register:
+			h.Clients[client] = true
+			h.ClientMap[client.Id]=client
+		case client := <-h.Unregister:
+			if _, ok := h.Clients[client]; ok {
+				delete(h.Clients, client)
+				delete(h.ClientMap,client.Id)
+				close(client.Send)
+			}
+		case message := <-h.Broadcast:
+			for client := range h.Clients {
 				select {
-				case client.send <- message:
+				case client.Send <- message:
 				default:
-					close(client.send)
-					delete(h.clients, client)
+					close(client.Send)
+					delete(h.Clients, client)
+					delete(h.ClientMap,client.Id)
 				}
 			}
 		}

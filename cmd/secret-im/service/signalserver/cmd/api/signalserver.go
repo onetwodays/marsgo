@@ -63,16 +63,16 @@ func main() {
 			return http.StatusInternalServerError,nil
 
 		}
-
 	})
 
 
 
     //websocket server
     if isStartWss{
-    	go chat.HubRun()
+    	chat.SetHub(ctx.Hub)
+    	//go chat.NewHub().Run()
 		http.HandleFunc("/", common.StaticFileHandler("./static/chat.html"))
-		http.HandleFunc("/ws",wshandler())
+		http.HandleFunc("/ws",http.HandlerFunc(chat.WsConnectHandler))
 		go func() {
 			err:=http.ListenAndServe(config.AppConfig.WssAddress,nil)
 			if err!=nil{
@@ -86,18 +86,14 @@ func main() {
 	server.AddRoute(rest.Route{
 		Method: http.MethodGet,
 		Path: "/ws",
-		Handler: wshandler(),
+		Handler: http.HandlerFunc(chat.WsConnectHandler),
 	})
 	fmt.Printf("Starting server at %s:%d...\n", config.AppConfig.Host, config.AppConfig.Port)
 	server.Start()
 
 
 }
-func wshandler() http.HandlerFunc {
-	return func(w http.ResponseWriter, req *http.Request) {
-		chat.ServeWs(w,req)
-	}
-}
+
 
 func registerDirHandlers(engine *rest.Server, serverCtx *svc.ServiceContext) {
 

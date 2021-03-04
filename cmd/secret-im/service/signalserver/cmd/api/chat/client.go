@@ -6,8 +6,11 @@ package chat
 
 import (
 	"bytes"
+	//"github.com/golang/protobuf/proto"
+	"github.com/tal-tech/go-zero/core/logx"
 	"log"
 	"net/http"
+	//"secret-im/service/signalserver/cmd/api/textsecure"
 	"time"
 
 	"github.com/gorilla/websocket"
@@ -37,18 +40,42 @@ var upgrader = websocket.Upgrader{
 	WriteBufferSize: 1024,
 }
 
-var hub = newHub()
+var xhub *Hub
+
+func SetHub(hub *Hub)  {
+	xhub = hub
+
+}
+
+
 
 // Client is a middleman between the websocket connection and the hub.
 type Client struct {
-	hub *Hub
+	Hub *Hub
 
 	// The websocket connection.
 	conn *websocket.Conn
 
 	// Buffered channel of outbound messages.
-	send chan []byte
-	id string  //标识每一个客户端
+	Send chan []byte
+	Id string  //标识每一个客户端
+}
+
+// serveWs handles websocket requests from the peer.
+func WsConnectHandler(w http.ResponseWriter, r *http.Request) {
+	conn, err := upgrader.Upgrade(w, r, nil)
+	if err != nil {
+		log.Println("xccccc")
+		log.Println(err)
+		return
+	}
+	client := &Client{Hub: xhub, conn: conn, Send: make(chan []byte, maxMessageSize)}
+	client.Hub.Register <- client // mutex
+
+	// Allow collection of memory referenced by the caller by doing all work in
+	// new goroutines.
+	go client.writePump()
+	go client.readPump()
 }
 
 // readPump pumps messages from the websocket connection to the hub.
@@ -58,7 +85,7 @@ type Client struct {
 // reads from this goroutine.
 func (c *Client) readPump() {
 	defer func() {
-		c.hub.unregister <- c
+		c.Hub.Unregister <- c
 		c.conn.Close()
 	}()
 	c.conn.SetReadLimit(maxMessageSize)
@@ -68,12 +95,26 @@ func (c *Client) readPump() {
 		_, message, err := c.conn.ReadMessage()
 		if err != nil {
 			if websocket.IsUnexpectedCloseError(err, websocket.CloseGoingAway, websocket.CloseAbnormalClosure) {
-				log.Printf("error: %v", err)
+				logx.Errorf("error: %v", err)
 			}
 			break
 		}
 		message = bytes.TrimSpace(bytes.Replace(message, newline, space, -1))
-		c.hub.broadcast <- message //读到的消息放到广播里面, to write redis
+		c.Hub.Broadcast <- message //读到的消息放到广播里面, to write redis
+		/*
+		msg:=new(textsecure.OutMessage)  //通过websocket来发送请求
+		err=proto.Unmarshal(message,msg)
+		if err != nil {
+			break
+		}
+		logx.Infof(">>>id  %v >>>>>> request messageContent >>>> %v", c.Id, msg)
+
+		if msg.GetType()==textsecure.OutMessage_CIPHERTEXT{
+
+		}
+		*/
+
+
 	}
 }
 
@@ -90,7 +131,7 @@ func (c *Client) writePump() {
 	}()
 	for {
 		select {
-		case message, ok := <-c.send:
+		case message, ok := <-c.Send:
 			c.conn.SetWriteDeadline(time.Now().Add(writeWait))
 			if !ok {
 				// The hub closed the channel.
@@ -105,11 +146,12 @@ func (c *Client) writePump() {
 			w.Write(message)
 
 			// Add queued chat messages to the current websocket message.
-			n := len(c.send)
+			n := len(c.Send)
 			for i := 0; i < n; i++ {
-				w.Write(newline)
-				w.Write(<-c.send)
+				w.Write(newline) //如果是二进制，这行请注释
+				w.Write(<-c.Send)
 			}
+
 
 			if err := w.Close(); err != nil {
 				return
@@ -123,25 +165,7 @@ func (c *Client) writePump() {
 	}
 }
 
-// serveWs handles websocket requests from the peer.
-func ServeWs(w http.ResponseWriter, r *http.Request) {
-	conn, err := upgrader.Upgrade(w, r, nil)
-	if err != nil {
-		log.Println("xccccc")
-		log.Println(err)
-		return
-	}
-	client := &Client{hub: hub, conn: conn, send: make(chan []byte, 256)}
-	client.hub.register <- client // mutex
 
-	// Allow collection of memory referenced by the caller by doing all work in
-	// new goroutines.
-	go client.writePump()
-	go client.readPump()
-}
 
-func HubRun(){
-	hub.run()
 
-}
 

@@ -10,6 +10,7 @@ import (
 	"user.api"
 	"bookstore.api"
 	"accounts.api"
+	"msg.api"
 )
 
 type Request {

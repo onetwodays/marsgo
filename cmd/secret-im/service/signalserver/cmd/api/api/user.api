@@ -24,6 +24,18 @@ type JwtToken {
     RefreshAfter int64 `json:"refreshAfter,omitempty"`
 }
 
+type ChainLoginReq {
+    Name string `json:"name"` //eos chain username,保证unique
+    Sign string `json:"sign"` //  eos 用户用自己的私钥对name的签名
+}
+
+type ChainLoginRes {
+    // TODO: add members here and delete this comment
+    JwtToken
+}
+
+
+
 service signalserver-api {
 
 
@@ -32,6 +44,9 @@ service signalserver-api {
 
     @handler login
     post /user/login (LoginReq) returns (UserReply)
+
+    @handler LoginChainHandler
+    post /v1/accounts/login (ChainLoginReq) returns (ChainLoginRes)
 
 
 }

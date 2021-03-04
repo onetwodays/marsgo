@@ -48,5 +48,6 @@ type Config struct {
 		Number string
 		Code string
 	}
+	EOSChainUrls []string
 
 }
