@@ -44,7 +44,7 @@ export interface InitialStateType {
   fetchUserInfo: () => Promise<API.CurrentUser | undefined>;
 
 };
-/* 
+/*
 * 该方法返回的数据最后会被默认注入到一个 namespace 为 @@initialState  的 model 中。可以通过 useModel
 * const { initialState, loading, refresh, setInitialState } = useModel('@@initialState');
 * 该配置是一个 async 的 function。会在整个应用最开始执行，返回值会作为全局共享的数据。Layout 插件、Access 插件以及用户都可以通过 useModel('@@initialState') 直接获取到这份数据。
@@ -64,7 +64,11 @@ export async function getInitialState(): Promise<InitialStateType> {
     return undefined;
   };
   // 如果是登录页面，不执行
-  if (history.location.pathname !== '/user/login') {
+	if (history.location.pathname !== '/user/login') {
+
+
+
+
     const currentUser = await fetchUserInfo();
     /*
     {
@@ -194,14 +198,14 @@ interface ErrorInfoStructure {
   success: boolean; // if request is success
   data?: any; // response data
   errorCode?: string; // code for errorType
-  errorMessage?: string; // message display to user 
+  errorMessage?: string; // message display to user
   showType?: number; // error display type： 0 silent; 1 message.warn; 2 message.error; 4 notification; 9 page
   traceId?: string; // Convenient for back-end Troubleshooting: unique request ID
   host?: string; // onvenient for backend Troubleshooting: host of current access server
 }
 自定义后端接口规范不满足时的适配
 
-当 success 返回是 false 的情况我们会按照 showType 和 errorMessage 
+当 success 返回是 false 的情况我们会按照 showType 和 errorMessage
 来做统一的错误提示，同时抛出一个异常，异常的格式如下
 interface RequestError extends Error {
   data?: any; // 这里是后端返回的原始数据
@@ -226,7 +230,7 @@ const errorConfig: any = {
 
 };
 
-// a1 -> b1 -> response -> b2 -> a2 
+// a1 -> b1 -> response -> b2 -> a2
 const middlewareA = async (ctx: any, next: Function) => {
   console.log('A before');
   await next();
