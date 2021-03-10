@@ -1,0 +1,1 @@
+goctl rpc proto -src hello_rpc.proto -dir ..

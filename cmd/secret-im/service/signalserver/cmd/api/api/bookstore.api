@@ -1,0 +1,35 @@
+
+// 本文件是用来学习grpc的
+type (
+    AddReq {
+        Book string `form:"book"`
+        Price int64 `form:"price"`
+    }
+
+    AddResp {
+        Ok bool `json:"ok"`
+    }
+)
+
+type (
+    CheckReq {
+        Book string `form:"book"`
+    }
+
+    CheckResp {
+        Found bool `json:"found"`
+        Price int64 `json:"price"`
+    }
+)
+
+@server (
+    group:bookstore
+)
+
+service signalserver-api {
+    @handler AddHandler
+    get /add (AddReq) returns (AddResp)
+
+    @handler CheckHandler
+    get /check (CheckReq) returns (CheckResp)
+}

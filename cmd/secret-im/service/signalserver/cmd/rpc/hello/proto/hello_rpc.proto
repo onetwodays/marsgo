@@ -1,0 +1,27 @@
+syntax = "proto3";
+
+package hello_rpc;
+
+message Request {
+  string ping = 1;
+}
+
+message Response {
+  string pong = 1;
+}
+
+message IdReq{
+  int64 id = 1;
+}
+
+message UserInfoReply{
+  int64 id = 1;
+  string name = 2;
+  string number = 3;
+  string gender = 4;
+}
+
+service Hello_rpc {
+  rpc Ping(Request) returns(Response);
+  rpc getUser(IdReq) returns (UserInfoReply);
+}
