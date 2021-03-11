@@ -63,9 +63,13 @@ type Client struct {
 
 // serveWs handles websocket requests from the peer.
 func WsConnectHandler(w http.ResponseWriter, r *http.Request) {
-	conn, err := upgrader.Upgrade(w, r, nil)
+	log.Println("xccccc1")
+	ww:=NewWsResponseWriter(w)
+	log.Println("xccccc2")
+	conn, err := upgrader.Upgrade(ww, r, nil)
+	log.Println("xccccc3")
 	if err != nil {
-		log.Println("xccccc")
+		log.Println("xccccc4")
 		log.Println(err)
 		return
 	}
@@ -76,6 +80,10 @@ func WsConnectHandler(w http.ResponseWriter, r *http.Request) {
 	// new goroutines.
 	go client.writePump()
 	go client.readPump()
+	select {
+
+	}
+
 }
 
 // readPump pumps messages from the websocket connection to the hub.

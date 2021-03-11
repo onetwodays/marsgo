@@ -91,7 +91,14 @@ export default  [
           name: 'react',
           icon: 'smile',
           component: './antd/react',
+        },
+        {
+          path: '/antd/productlist',
+          name: 'productlist',
+          icon: 'smile',
+          component: './antd/product',
         }
+
       ],
     },
     {
