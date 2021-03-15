@@ -27,166 +27,208 @@ useRequest 提供了一些快捷的操作和状态，可以大大的节省我们
 */
 
 import React from 'react';
-import { BasicLayoutProps, Settings as LayoutSettings } from '@ant-design/pro-layout';
+import { Settings as LayoutSettings, PageLoading } from '@ant-design/pro-layout';
 import { notification } from 'antd';
-import { history, RequestConfig } from 'umi';
+import { history, RequestConfig, RunTimeLayoutConfig } from 'umi';
 import RightContent from '@/components/RightContent';
 import Footer from '@/components/Footer';
 import { ResponseError } from 'umi-request';
 import { queryCurrent } from './services/user';
-import defaultSettings from '../config/defaultSettings';
+import MyLayout from '../config/layout';
 import { msgError } from '@/utils/notify'
-import { NodeExpandOutlined } from '@ant-design/icons';
 
+
+// const isDev = process.env.NODE_ENV === 'development';
+
+/** 获取用户信息比较慢的时候会展示一个 loading */
+export const initialStateConfig = {
+    loading: <PageLoading />,
+};
+
+
+// 定义一个类型
 export interface InitialStateType {
-  settings?: LayoutSettings;
-  currentUser?: API.CurrentUser;
-  fetchUserInfo: () => Promise<API.CurrentUser | undefined>;
+    settings?: LayoutSettings;  //默认是布局的属性
+    currentUser?: API.CurrentUser;//用户的属性
+    fetchUserInfo?: () => Promise<API.CurrentUser | undefined>; //获取用户信息的request
 
 };
-/* 
+/*
 * 该方法返回的数据最后会被默认注入到一个 namespace 为 @@initialState  的 model 中。可以通过 useModel
 * const { initialState, loading, refresh, setInitialState } = useModel('@@initialState');
 * 该配置是一个 async 的 function。会在整个应用最开始执行，返回值会作为全局共享的数据。Layout 插件、Access 插件以及用户都可以通过 useModel('@@initialState') 直接获取到这份数据。
 
 */
 export async function getInitialState(): Promise<InitialStateType> {
-  // 先定义一个函数
-  const fetchUserInfo = async () => {
-    try {
-      const currentUser = await queryCurrent();
-      return currentUser;
-    } catch (error) {
-      console.log("getInitialState异常");
-      history.push('/user/login');
-      console.log("getInitialState异常");
-    }
-    return undefined;
-  };
-  // 如果是登录页面，不执行
-  if (history.location.pathname !== '/user/login') {
-    const currentUser = await fetchUserInfo();
-    /*
-    {
-      data: {isLogin: false}
-      isLogin: false
-      errorCode: "401"
-      errorMessage: "嘿嘿请先登录！"
-      success: true
-    }
-    */
-    return {
-      fetchUserInfo,
-      currentUser,
-      settings: defaultSettings,
+    // 先定义一个函数
+    const fetchUserInfo = async () => {
+        try {
+            const currentUser = await queryCurrent();
+            return currentUser;
+        } catch (error) {
+            console.log("getInitialState异常");
+            history.push('/user/login');
+            console.log("getInitialState异常");
+        }
+        return undefined;
     };
-  }
-  return {
-    fetchUserInfo,
-    settings: defaultSettings,
-  };
-}
-// 运行时配置
-export const layout = ({
-  initialState,
-}: {
-  initialState: { settings?: LayoutSettings; currentUser?: API.CurrentUser };
-}): BasicLayoutProps => {
-  return {
-    rightContentRender: () => <RightContent />,
-    disableContentMargin: false,
-    footerRender: () => <Footer />,
-    onPageChange: () => {
-      //console.log("layout11111");
-      const { currentUser } = initialState;
-      const { location } = history;
-      // 如果没有登录，重定向到 login
-      if (!currentUser && location.pathname !== '/user/login') {
-        history.push('/user/login');
-      }
-      //console.log("layout 22222");
-    },
-    menuHeaderRender: undefined,
-    ...initialState?.settings,
 
-  };
+    if (history.location.pathname !== '/user/login') {
+        const currentUser = await fetchUserInfo();
+        /*
+        {
+          data: {isLogin: false}
+          isLogin: false
+          errorCode: "401"
+          errorMessage: "嘿嘿请先登录！"
+          success: true
+        }
+        */
+        return {
+            fetchUserInfo,
+            currentUser,
+            settings: MyLayout, //这个是布局的配置
+        };
+    }
+    return {
+        fetchUserInfo,
+        settings: MyLayout,
+    };
+}
+
+
+// 运行时配置
+export const layout: RunTimeLayoutConfig = ({ initialState }) => {
+    return {
+        rightContentRender: () => <RightContent />,
+        disableContentMargin: false,
+        footerRender: () => <Footer />, //自定义页脚
+        onPageChange: () => {
+
+            const { location } = history;
+            // 如果没有登录，重定向到 login
+            if (!initialState?.currentUser && location.pathname !== '/user/login') {
+                history.push('/user/login');
+            }
+
+        },
+        menuHeaderRender: undefined,
+        // 自定义 403 页面
+        // unAccessible: <div>unAccessible</div>,
+        ...initialState?.settings,
+
+    };
 };
 
 const codeMessage = {
-  200: '服务器成功返回请求的数据。',
-  201: '新建或修改数据成功。',
-  202: '一个请求已经进入后台排队（异步任务）。',
-  204: '删除数据成功。',
-  400: '发出的请求有错误，服务器没有进行新建或修改数据的操作。',
-  401: '用户没有权限（令牌、用户名、密码错误）。',
-  403: '用户得到授权，但是访问是被禁止的。',
-  404: '发出的请求针对的是不存在的记录，服务器没有进行操作。',
-  405: '请求方法不被允许。',
-  406: '请求的格式不可得。',
-  410: '请求的资源被永久删除，且不会再得到的。',
-  422: '当创建一个对象时，发生一个验证错误。',
-  500: '服务器发生错误，请检查服务器。',
-  502: '网关错误。',
-  503: '服务不可用，服务器暂时过载或维护。',
-  504: '网关超时。',
+    200: '服务器成功返回请求的数据。',
+    201: '新建或修改数据成功。',
+    202: '一个请求已经进入后台排队（异步任务）。',
+    204: '删除数据成功。',
+    400: '发出的请求有错误，服务器没有进行新建或修改数据的操作。',
+    401: '用户没有权限（令牌、用户名、密码错误）。',
+    403: '用户得到授权，但是访问是被禁止的。',
+    404: '发出的请求针对的是不存在的记录，服务器没有进行操作。',
+    405: '请求方法不被允许。',
+    406: '请求的格式不可得。',
+    410: '请求的资源被永久删除，且不会再得到的。',
+    422: '当创建一个对象时，发生一个验证错误。',
+    500: '服务器发生错误，请检查服务器。',
+    502: '网关错误。',
+    503: '服务不可用，服务器暂时过载或维护。',
+    504: '网关超时。',
 };
 
 const NotificationErrorStyle: any = {
-  width: 600,
+    width: 600,
 };
 
-/**
- * 异常处理程序
- * {
-        data: {
-          isLogin: false,
-        },
-        errorCode: '401',
-        errorMessage: '嘿嘿请先登录！',
-        success: true,
-   }
-   //response
-   {
-      body: (...)
-      bodyUsed: false
-      headers: Headers
-      __proto__: Headers
-      ok: false
-      redirected: false
-      status: 404
-      statusText: "Not Found"
-      type: "basic"
-      url: "http://localhost:8000/v1/chain/get_info1"
-      useCache: false
-   }
- */
+
 const errorHandler = (error: ResponseError) => {
 
-  //请求已发送但服务端返回状态码非2xx的响应
-  const { response, data } = error;
-  console.log("error:", `${error}`);
-  console.log("response:", response);
+    //请求已发送但服务端返回状态码非2xx的响应
+    const { response, data } = error;
+    console.log("error:", `${error}`);
+    console.log("response:", response);
 
-  if (response && response.status) {
-    const errorText = codeMessage[response.status] || response.statusText;
-    const { status, url } = response;
-    notification.error({
-      message: `错误处理:请求错误 ${status}: ${url},${data}`,
-      description: errorText,
-      style: NotificationErrorStyle,
-    });
-  }
+    if (response && response.status) {
+        const errorText = codeMessage[response.status] || response.statusText;
+        const { status, url } = response;
+        notification.error({
+            message: `请求错误:状态码:${status}: ${url},${data}`,
+            description: errorText,
+            style: NotificationErrorStyle,
+        });
+    }
 
-  //服务端没有返回数据时
-  if (!response) {
-    notification.error({
-      description: '您的网络发生异常，无法连接服务器',
-      message: '网络异常',
-      style: NotificationErrorStyle,
-    });
-  }
-  throw error;
+    //服务端没有返回数据时
+    if (!response) {
+        notification.error({
+            description: '您的网络发生异常，无法连接服务器(服务端没有返回数据)',
+            message: '网络异常',
+            style: NotificationErrorStyle,
+        });
+    }
+    throw error;
 };
+
+
+
+// a1 -> b1 -> response -> b2 -> a2
+const middlewareA = async (ctx: any, next: Function) => {
+    console.log('A before');
+    await next();
+    console.log('A after');
+
+}
+
+
+const middlewareB = async (ctx: any, next: Function) => {
+    console.log('B before');
+    await next();
+    console.log('B after');
+
+}
+
+const middlewareParseErrorMessage = async (ctx: any, next: Function) => {
+    const { code, message, error } = ctx.res.clone().json();
+    if (code && code != 200) {
+        notification.error({
+            description: JSON.stringify(error),
+            message: `拦截器EOS请求错误:${ctx.res.url} ${code}:${message}`,
+            style: NotificationErrorStyle,
+        });
+    }
+    await next();
+};
+
+const responseInterceptor = async (res, req) => {
+    let temp = await res.clone().json();
+    console.log("响应拦截器输出:", temp); //temp 是服务端返回的http body
+    console.log("响应拦截器输出res:", res); //temp 是服务端返回的http body
+    console.log("响应拦截器输出req:", req); //temp 是服务端返回的http body
+
+    //return res;
+
+
+    //eos的错误信息拦截
+    const { code, message, error } = temp;
+    if (code && code != 200) {
+        notification.error({
+            description: JSON.stringify(error),
+            message: `拦截器EOS请求错误:${res.url} ${code}:${message}`,
+            style: NotificationErrorStyle,
+        });
+        //const err = new Error(`{error}`);
+        //throw err;
+    }
+    return res;
+
+
+
+
+}
+
 
 /*
 umi支持的错误格式
@@ -194,14 +236,14 @@ interface ErrorInfoStructure {
   success: boolean; // if request is success
   data?: any; // response data
   errorCode?: string; // code for errorType
-  errorMessage?: string; // message display to user 
+  errorMessage?: string; // message display to user
   showType?: number; // error display type： 0 silent; 1 message.warn; 2 message.error; 4 notification; 9 page
   traceId?: string; // Convenient for back-end Troubleshooting: unique request ID
   host?: string; // onvenient for backend Troubleshooting: host of current access server
 }
 自定义后端接口规范不满足时的适配
 
-当 success 返回是 false 的情况我们会按照 showType 和 errorMessage 
+当 success 返回是 false 的情况我们会按照 showType 和 errorMessage
 来做统一的错误提示，同时抛出一个异常，异常的格式如下
 interface RequestError extends Error {
   data?: any; // 这里是后端返回的原始数据
@@ -212,102 +254,42 @@ interface RequestError extends Error {
 */
 // 相当于做了一个格式转换
 const errorConfig: any = {
-  adaptor: (res: any) => {
-    console.log("errorConfig:", res);
-    return {
-      //...res,
-      success: res.code === 200, // success是false时
-      data: res,
-      errorCode: res.errorCode,
-      errorMessage: res.errorMessage, // 显示的错误信息
-    };
-  },
-  // showType: 9, //当 showType 为 9 时，默认会跳转到 /exception 页面，你可以通过该配置来修改该路径。
+    adaptor: (res: any) => {
+        console.log("errorConfig:", res);
+        return {
+            //...res,
+            success: res.code === 200, // success是false时
+            data: res,
+            errorCode: res.errorCode,
+            errorMessage: res.errorMessage, // 显示的错误信息
+        };
+    },
+    // showType: 9, //当 showType 为 9 时，默认会跳转到 /exception 页面，你可以通过该配置来修改该路径。
 
 };
-
-// a1 -> b1 -> response -> b2 -> a2 
-const middlewareA = async (ctx: any, next: Function) => {
-  console.log('A before');
-  await next();
-  console.log('A after');
-
-}
-
-
-const middlewareB = async (ctx: any, next: Function) => {
-  console.log('B before');
-  await next();
-  console.log('B after');
-
-}
-
-const middlewareParseErrorMessage = async (ctx: any, next: Function) => {
-  const { code, message, error } = ctx.res.clone().json();
-  if (code && code != 200) {
-    notification.error({
-      description: JSON.stringify(error),
-      message: `拦截器EOS请求错误:${ctx.res.url} ${code}:${message}`,
-      style: NotificationErrorStyle,
-    });
-  }
-  await next();
-};
-
-const responseInterceptor = async (res, req) => {
-  let temp = await res.clone().json();
-  console.log("响应拦截器输出:", temp); //temp 是服务端返回的http body
-  console.log("响应拦截器输出res:", res); //temp 是服务端返回的http body
-  console.log("响应拦截器输出req:", req); //temp 是服务端返回的http body
-
-  //return res;
-
-
-  //eos的错误信息拦截
-  const { code, message, error } = temp;
-  if (code && code != 200) {
-    notification.error({
-      description: JSON.stringify(error),
-      message: `拦截器EOS请求错误:${res.url} ${code}:${message}`,
-      style: NotificationErrorStyle,
-    });
-    //const err = new Error(`{error}`);
-    //throw err;
-  }
-  return res;
-
-
-
-
-}
-
-
-
 
 export const request: RequestConfig = {
-  //prefix: '/api', // 所有的请求的前缀,相当于ip+port部分
-  errorHandler: errorHandler,
-  credentials: 'include', // 默认请求是否带上cookie
-  timeout: 5000,
-
-  //errorConfig: errorConfig, // 自定义接口规范
-  middlewares: [middlewareA, middlewareB],
-
-  requestInterceptors: [],
-  responseInterceptors: [responseInterceptor],
+    //prefix: '/api', // 所有的请求的前缀,相当于ip+port部分
+    errorConfig: errorConfig,
+    errorHandler: errorHandler,
+    credentials: 'include', // 默认请求是否带上cookie
+    timeout: 5000,
+    middlewares: [middlewareA, middlewareB],
+    requestInterceptors: [],
+    responseInterceptors: [responseInterceptor],
 };
 
 
 //如果 model里面的effects 中抛异常没有被捕获，会执行 onError，然后才是组件的 dispatch 返回的 Promise 处理。
 //如果在 onError 中调用 err. preventDefault() 则后续 dispatch 的 catch 不会执行
 export const dva = {
-  config: {
-    onError(e: Error) {
-      console.log("dva全局错误处理:", e.message)
-      msgError(e.message);
-      e.preventDefault();
+    config: {
+        onError(e: Error) {
+            console.log("dva全局错误处理:", e.message)
+            msgError(e.message);
+            e.preventDefault();
+        },
     },
-  },
 };
 
 
