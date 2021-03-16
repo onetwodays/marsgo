@@ -5,7 +5,7 @@ go 1.15
 require (
 	github.com/antlr/antlr4 v0.0.0-20210302031819-dc460a0514b7 // indirect
 	github.com/dgrijalva/jwt-go v3.2.0+incompatible
-	github.com/eoscanada/eos-go v0.9.0 // indirect
+	github.com/eoscanada/eos-go v0.9.0
 	github.com/go-redis/redis v6.15.7+incompatible
 	github.com/golang/protobuf v1.4.2
 	github.com/google/go-cmp v0.5.4 // indirect

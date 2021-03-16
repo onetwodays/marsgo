@@ -6,6 +6,7 @@ import (
 	"github.com/tal-tech/go-zero/rest/httpx"
 	"net/http"
 	"secret-im/common"
+	"secret-im/service/signalserver/cmd/api/middleware"
 	"secret-im/service/signalserver/cmd/shared"
 	"strings"
 
@@ -16,7 +17,6 @@ import (
 	"secret-im/service/signalserver/cmd/api/config"
 	"secret-im/service/signalserver/cmd/api/internal/handler"
 	"secret-im/service/signalserver/cmd/api/internal/svc"
-	"secret-im/service/signalserver/cmd/api/middleware"
 )
 
 
@@ -72,7 +72,7 @@ func main() {
     	chat.SetHub(ctx.Hub)
     	//go chat.NewHub().Run()
 		http.HandleFunc("/", common.StaticFileHandler("./static/chat.html"))
-		http.HandleFunc("/ws",http.HandlerFunc(chat.WsConnectHandler))
+		http.HandleFunc("/ws",chat.WsConnectHandler)
 		go func() {
 			err:=http.ListenAndServe(config.AppConfig.WssAddress,nil)
 			if err!=nil{
@@ -86,7 +86,7 @@ func main() {
 	server.AddRoute(rest.Route{
 		Method: http.MethodGet,
 		Path: "/ws",
-		Handler: http.HandlerFunc(chat.WsConnectHandler),
+		Handler: chat.WsConnectHandler,
 	})
 	fmt.Printf("Starting server at %s:%d...\n", config.AppConfig.Host, config.AppConfig.Port)
 	server.Start()
