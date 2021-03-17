@@ -14,11 +14,7 @@ export default [
             },
         ],
     },
-    {   //菜单跳转到外部地址
-        path: 'https://beta-pro.ant.design/docs/router-and-nav-cn',
-        target: '_blank', // 点击新窗口打开
-        name: "文档",
-    },
+
     {
         path: '/welcome',
         name: 'welcome',
@@ -79,6 +75,17 @@ export default [
         icon: 'crown',
         //component: './antd',
         routes: [
+            {   //菜单跳转到外部地址
+                path: 'https://beta-pro.ant.design/docs/router-and-nav-cn',
+                target: '_blank', // 点击新窗口打开
+                icon: 'smile',
+                name: "ant.design文档",
+            },
+            {   //菜单跳转到外部地址
+                path: 'https://ahooks.js.org/zh-CN/hooks/async/',
+                target: '_blank', // 点击新窗口打开
+                name: "useRequest文档",
+            },
             {
                 path: '/antd/dataentry',
                 name: 'dataentry',

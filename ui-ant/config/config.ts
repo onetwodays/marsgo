@@ -7,6 +7,7 @@ import routes from "./routes";
 
 const { REACT_APP_ENV } = process.env;
 
+// 这是一个函数
 export default defineConfig({
     hash: true,
     antd: {},
@@ -40,7 +41,7 @@ export default defineConfig({
     // @ts-ignore
     title: false,
     ignoreMomentLocale: true,
-    proxy: proxy[REACT_APP_ENV || 'dev'],
+    proxy: proxy[REACT_APP_ENV || 'dev'], //代理
     manifest: {
         basePath: '/',
     },
