@@ -1,18 +1,24 @@
 import React from 'react';
 import { useRequest } from 'umi';
 import { fn_get_block } from '@/services/eos/get'
-import { GetBlockResult } from 'eosjs/dist/eosjs-rpc-interfaces';
 
-export default {
-    const { data } = useRequest<GetBlockResult>(() => { return fn_get_block(1); });
+
+//异常没有处理
+const Blockn = () => {
+
+    const { data, loading, run } = useRequest(fn_get_block, { manual: true, });
     console.log(data);
+    console.log(Object.prototype.toString.call(data));
 
-    return(
-    <p> 111</p >
+    return (
+        <div>
+            <p>Enter Block number</p>
+            <input placeholder={"1"} onChange={(e) => run(e.target.value)}></input>
+            {loading ? (<p>loading</p>) : (<p>{JSON.stringify(data, null, 4)}</p>)}
 
-     );
+        </div>
 
-
-
-
+    );
 };
+
+export default Blockn;

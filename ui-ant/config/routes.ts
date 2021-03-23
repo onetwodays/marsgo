@@ -55,6 +55,14 @@ export default [
                 icon: 'smile',
                 component: './eos/block',
             },
+
+            {
+                path: '/eos/blockn',
+                name: 'blockninfo',
+                icon: 'smile',
+                component: './eos/Blockn',
+            },
+
             {
                 path: '/eos/code',
                 name: 'code',

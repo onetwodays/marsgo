@@ -59,6 +59,7 @@ const Block: FC<PageProps> = ({ block, dispatch }) => {
 }
 
 
+// 绑定数据到组件
 export default connect(
     ({ block, loading }: { block: BlockModelState; loading: Loading }) => ({ block, loading: loading.models.block })
 )(Block);

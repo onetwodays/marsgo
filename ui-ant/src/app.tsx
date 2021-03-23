@@ -140,7 +140,7 @@ const NotificationErrorStyle: any = {
     width: 600,
 };
 
-
+//
 const errorHandler = (error: ResponseError) => {
 
     //请求已发送但服务端返回状态码非2xx的响应
@@ -265,7 +265,7 @@ const errorConfig: any = {
 
 export const request: RequestConfig = {
     //prefix: '/api', // 所有的请求的前缀,相当于ip+port部分
-    //errorConfig: errorConfig,
+    errorConfig: errorConfig,
     errorHandler: errorHandler,
     credentials: 'include', // 默认请求是否带上cookie
     timeout: 5000,

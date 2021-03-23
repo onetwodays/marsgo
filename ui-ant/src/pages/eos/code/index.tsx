@@ -41,12 +41,6 @@ export default () => {
             <p>
                 code:{loading ? 'loading' : JSON.stringify(data)}
             </p>
-
-
-
-
-
-
         </div>
     );
 };
