@@ -2,12 +2,14 @@
 root = true
 
 [*]
-indent_style = space
-indent_size = 2
-end_of_line = lf
+tab_width = 4
+indent_style = tab #tab space
+indent_size = 4
+
+end_of_line = lf # 换行符类型 cr crlf  lf
 charset = utf-8
-trim_trailing_whitespace = true
-insert_final_newline = true
+trim_trailing_whitespace = true #否删除行尾空格
+insert_final_newline = true  # 是否让文件以空行结束
 
 [*.md]
 trim_trailing_whitespace = false

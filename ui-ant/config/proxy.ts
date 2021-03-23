@@ -8,30 +8,30 @@
  * //target: 'http://127.0.0.1:18888',
  */
 export default {
-  dev: {
-    '/api/': {
-      target: 'https://preview.pro.ant.design',
-      changeOrigin: true,
-      pathRewrite: { '^': '' },
-    },
-    '/v1/': {
-      target: 'http://zhongyingying.qicp.io:38000',
-      changeOrigin: true,
-      pathRewrite: { '^': '' },
-    },
-  },
-  test: {
-    '/api/': {
-      target: 'https://preview.pro.ant.design',
-      changeOrigin: true,
-      pathRewrite: { '^': '' },
-    },
-  },
-  pre: {
-    '/api/': {
-      target: 'your pre url',
-      changeOrigin: true,
-      pathRewrite: { '^': '' },
-    },
-  },
+	dev: {
+		'/api/': {
+			target: 'https://preview.pro.ant.design',
+			changeOrigin: true,
+			pathRewrite: { '^': '' },
+		},
+		'/v1/': {
+			target: 'http://zhongyingying.qicp.io:38000',
+			changeOrigin: true,
+			pathRewrite: { '^': '' },
+		},
+	},
+	test: {
+		'/api/': {
+			target: 'https://preview.pro.ant.design',
+			changeOrigin: true,
+			pathRewrite: { '^': '' },
+		},
+	},
+	pre: {
+		'/api/': {
+			target: 'your pre url',
+			changeOrigin: true,
+			pathRewrite: { '^': '' },
+		},
+	},
 };
