@@ -79,13 +79,35 @@ export default [
                 path: 'https://beta-pro.ant.design/docs/router-and-nav-cn',
                 target: '_blank', // 点击新窗口打开
                 icon: 'smile',
-                name: "ant.design文档",
+                name: "ant.pro文档",
             },
             {   //菜单跳转到外部地址
                 path: 'https://ahooks.js.org/zh-CN/hooks/async/',
                 target: '_blank', // 点击新窗口打开
+                icon: 'GiftTwoTone',
                 name: "useRequest文档",
             },
+            {   //菜单跳转到外部地址
+                path: 'https://umijs.org/zh-CN/docs',
+                target: '_blank', // 点击新窗口打开
+                icon: 'MessageTwoTone',
+                name: "umi文档",
+            },
+            {   //菜单跳转到外部地址
+                path: 'https://ant.design/components/overview-cn/',
+                target: '_blank', // 点击新窗口打开
+                icon: 'EyeTwoTone',
+                name: "antd文档",
+            },
+            {   //菜单跳转到外部地址
+                path: 'https://procomponents.ant.design/components/',
+                target: '_blank', // 点击新窗口打开
+                icon: 'EyeTwoTone',
+                name: "antdpro文档",
+            },
+
+
+
             {
                 path: '/antd/dataentry',
                 name: 'dataentry',
@@ -122,7 +144,7 @@ export default [
     },
     {
         path: '/',
-        redirect: '@/pages/welcome',
+        redirect: './welcome',
     },
     {
         component: './404',
