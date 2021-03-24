@@ -7,7 +7,7 @@ import routes from "./routes";
 
 const { REACT_APP_ENV } = process.env;
 
-// 这是一个函数
+// 这是一个函数,聚合umi的插件的配置和其他配置，
 export default defineConfig({
     hash: true,
     antd: {},
@@ -46,6 +46,7 @@ export default defineConfig({
         basePath: '/',
     },
     request: {
+        // dataField 对应接口统一格式中的数据字段，比如接口如果统一的规范是 { success: boolean, data: any} ，那么就不需要配置，这样你通过 useRequest 消费的时候会生成一个默认的 formatResult，直接返回 data 中的数据，方便使用。如果你的后端接口不符合这个规范，可以自行配置 dataField 。配置为 '' （空字符串）的时候不做处理。
         dataField: '',
     }
 

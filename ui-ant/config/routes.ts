@@ -4,84 +4,9 @@
 
 export default [
     {
-        path: '/user',
-        layout: false,
-        routes: [
-            {
-                name: 'login',
-                path: '/user/login',
-                component: './user/Login',
-            },
-        ],
-    },
-
-    {
-        path: '/welcome',
-        name: 'welcome',
-        icon: 'smile',
-        component: './Welcome',
-
-    },
-    {
-        path: '/admin',
-        name: 'admin',
-        icon: 'crown',
-        access: 'canAdmin',
-        component: './Admin',
-        routes: [
-            {
-                path: '/admin/sub-page',
-                name: 'sub-page',
-                icon: 'smile',
-                component: './Welcome',
-            },
-        ],
-    },
-    {
-        path: '/eos',
-        name: 'eos',
-        icon: 'crown',
-        //component: './eos/chain',
-        routes: [
-            {
-                path: '/eos/chain',
-                name: 'chaninfo',
-                icon: 'smile',
-                component: './eos/chain',
-            },
-            {
-                path: '/eos/block',
-                name: 'blockinfo',
-                icon: 'smile',
-                component: './eos/block',
-            },
-
-            {
-                path: '/eos/blockn',
-                name: 'blockninfo',
-                icon: 'smile',
-                component: './eos/Blockn',
-            },
-
-            {
-                path: '/eos/code',
-                name: 'code',
-                icon: 'smile',
-                component: './eos/code',
-            },
-            {
-                path: '/eos/adorder',
-                name: 'ad',
-                icon: 'smile',
-                component: './eos/adorder',
-            },
-        ]
-    },
-    {
         path: '/antd',
         name: 'antd',
         icon: 'crown',
-        //component: './antd',
         routes: [
             {   //菜单跳转到外部地址
                 path: 'https://beta-pro.ant.design/docs/router-and-nav-cn',
@@ -145,6 +70,84 @@ export default [
         ],
     },
     {
+        path: '/user',
+        layout: false,
+        routes: [
+            {
+                name: 'login',
+                path: '/user/login',
+                component: './user/Login',
+            },
+        ],
+    },
+
+    {
+        path: '/welcome',
+        name: 'welcome',
+        icon: 'smile',
+        component: './Welcome',
+
+    },
+    {
+        path: '/admin',
+        name: 'admin',
+        icon: 'crown',
+        access: 'canAdmin',
+        component: './Admin',
+        routes: [
+            {
+                path: '/admin/sub-page',
+                name: 'sub-page',
+                icon: 'smile',
+                component: './Welcome',
+            },
+        ],
+    },
+    {
+        path: '/eos',
+        name: 'eos',
+        icon: 'crown',
+        routes: [
+
+            {
+                path: '/eos/chain',
+                name: 'chaninfo',
+                icon: 'smile',
+                component: './eos/chain',
+            },
+            {
+                path: '/eos/block',
+                name: 'blockinfo',
+                icon: 'smile',
+                component: './eos/block',
+            },
+
+            {
+                path: '/eos/blockn',
+                name: 'blockninfo',
+                icon: 'smile',
+                component: './eos/Blockn',
+            },
+
+            {
+                path: '/eos/code',
+                name: 'code',
+                icon: 'smile',
+                component: './eos/code',
+            },
+            {
+                path: '/eos/adorder',
+                name: 'ad',
+                icon: 'smile',
+                component: './eos/adorder',
+            },
+            {
+                "redirect": "/eos/chain" //当使用 mix 模式后，点击一级菜单，并不会直接定位到第一个子级菜单页面，而是会呈现空白页面，需要于配置中设置一下 redirect 的地址
+            },
+        ]
+    },
+
+    {
         name: 'list.table-list',
         icon: 'table',
         path: '/list',
@@ -157,5 +160,9 @@ export default [
     {
         component: './404',
     },
+    {
+        path: '/test',
+        component: '@/layouts/BaseLayout',
+    }
 
 ]

@@ -1,38 +1,16 @@
-/*
-运行时配置文件，可以在这里扩展运行时的能力，比如修改路由、修改 render 方法等。
-运行时配置和配置的区别是他跑在浏览器端，基于此，我们可以在这里写函数、jsx、import 浏览器端依赖等等，注意不要引入 node 依赖
-在page下，定义_mock.js也可以使用mock功能。如./src/pages/index/_mock.js
- /web201605/js/herolist.json这个会变成/api/web201605/js/herolist.json
- mock/freeheros.json 这个会变成/apimock/freeheros.json
- 由于/api/这个的前缀会走代理，而/apimock走不成代理，就走mock数据
-在一个中后台中很多页面并不需要跨页面的信息流，也不需要把信息放入 model 中，
-所以我们提供了 useRequest hooks，
-useRequest 提供了一些快捷的操作和状态，可以大大的节省我们的代码
-├── package.json
-├── .umirc.ts
-├── .env
-├── dist
-├── mock
-├── public
-└── src
-    ├── .umi
-    ├── layouts/index.tsx
-    ├── pages
-        ├── index.less
-        └── index.tsx
-    └── app.ts
-*/
 
 import React from 'react';
 import { Settings as LayoutSettings, PageLoading } from '@ant-design/pro-layout';
-import { notification } from 'antd';
+
 import { history, RequestConfig, RunTimeLayoutConfig } from 'umi';
 import RightContent from '@/components/RightContent';
 import Footer from '@/components/Footer';
-import { ResponseError } from 'umi-request';
+
 import { queryCurrent } from './services/user';
 import MyLayout from '../config/layout';
 import { msgError } from '@/utils/notify'
+import { errorConfig, errorHandler } from "@/net/request";
+import { eosResponseInterceptor } from '@/net/resInterceptor';
 
 
 // const isDev = process.env.NODE_ENV === 'development';
@@ -45,7 +23,7 @@ export const initialStateConfig = {
 
 // 定义一个类型
 export interface InitialStateType {
-    settings?: LayoutSettings;  //默认是布局的属性
+    settings?: LayoutSettings;  //默认的布局的属性
     currentUser?: API.CurrentUser;//用户的属性
     fetchUserInfo?: () => Promise<API.CurrentUser | undefined>; //获取用户信息的request
 
@@ -97,11 +75,10 @@ export async function getInitialState(): Promise<InitialStateType> {
 // 运行时配置
 export const layout: RunTimeLayoutConfig = ({ initialState }) => {
     return {
-        rightContentRender: () => <RightContent />,
+        rightContentRender: () => <RightContent />, //右上角 UI 完全的自定义
         disableContentMargin: false,
         footerRender: () => <Footer />, //自定义页脚
         onPageChange: () => {
-
             const { location } = history;
             // 如果没有登录，重定向到 login
             if (!initialState?.currentUser && location.pathname !== '/user/login') {
@@ -117,161 +94,18 @@ export const layout: RunTimeLayoutConfig = ({ initialState }) => {
     };
 };
 
-const codeMessage = {
-    200: '服务器成功返回请求的数据。',
-    201: '新建或修改数据成功。',
-    202: '一个请求已经进入后台排队（异步任务）。',
-    204: '删除数据成功。',
-    400: '发出的请求有错误，服务器没有进行新建或修改数据的操作。',
-    401: '用户没有权限（令牌、用户名、密码错误）。',
-    403: '用户得到授权，但是访问是被禁止的。',
-    404: '发出的请求针对的是不存在的记录，服务器没有进行操作。',
-    405: '请求方法不被允许。',
-    406: '请求的格式不可得。',
-    410: '请求的资源被永久删除，且不会再得到的。',
-    422: '当创建一个对象时，发生一个验证错误。',
-    500: '服务器发生错误，请检查服务器。',
-    502: '网关错误。',
-    503: '服务不可用，服务器暂时过载或维护。',
-    504: '网关超时。',
-};
-
-const NotificationErrorStyle: any = {
-    width: 600,
-};
-
-//
-const errorHandler = (error: ResponseError) => {
-
-    //请求已发送但服务端返回状态码非2xx的响应
-    const { response, data } = error;
-    console.log("error:", `${error}`);
-    console.log("response:", response);
-
-    if (response && response.status) {
-        const errorText = codeMessage[response.status] || response.statusText;
-        const { status, url } = response;
-        notification.error({
-            message: `请求错误:状态码:${status}: ${url},${data}`,
-            description: errorText,
-            style: NotificationErrorStyle,
-        });
-    }
-
-    //服务端没有返回数据时
-    if (!response) {
-        notification.error({
-            description: '您的网络发生异常，无法连接服务器(服务端没有返回数据)',
-            message: '网络异常',
-            style: NotificationErrorStyle,
-        });
-    }
-    throw error;
-};
 
 
-
-// a1 -> b1 -> response -> b2 -> a2
-const middlewareA = async (ctx: any, next: Function) => {
-    console.log('A before');
-    await next();
-    console.log('A after');
-
-}
-
-
-const middlewareB = async (ctx: any, next: Function) => {
-    console.log('B before');
-    await next();
-    console.log('B after');
-
-}
-
-const middlewareParseErrorMessage = async (ctx: any, next: Function) => {
-    const { code, message, error } = ctx.res.clone().json();
-    if (code && code != 200) {
-        notification.error({
-            description: JSON.stringify(error),
-            message: `拦截器EOS请求错误:${ctx.res.url} ${code}:${message}`,
-            style: NotificationErrorStyle,
-        });
-    }
-    await next();
-};
-
-const responseInterceptor = async (res, req) => {
-    let temp = await res.clone().json();
-    console.log("响应拦截器输出:", temp); //temp 是服务端返回的http body
-    console.log("响应拦截器输出res:", res); //temp 是服务端返回的http body
-    console.log("响应拦截器输出req:", req); //temp 是服务端返回的http body
-
-    //return res;
-
-
-    //eos的错误信息拦截
-    const { code, message, error } = temp;
-    if (code && code != 200) {
-        notification.error({
-            description: JSON.stringify(error),
-            message: `拦截器EOS请求错误:${res.url} ${code}:${message}`,
-            style: NotificationErrorStyle,
-        });
-        //const err = new Error(`{error}`);
-        //throw err;
-    }
-    return res;
-
-
-
-
-}
-
-
-/*
-umi支持的错误格式
-interface ErrorInfoStructure {
-  success: boolean; // if request is success
-  data?: any; // response data
-  errorCode?: string; // code for errorType
-  errorMessage?: string; // message display to user
-  showType?: number; // error display type： 0 silent; 1 message.warn; 2 message.error; 4 notification; 9 page
-  traceId?: string; // Convenient for back-end Troubleshooting: unique request ID
-  host?: string; // onvenient for backend Troubleshooting: host of current access server
-}
-自定义后端接口规范不满足时的适配
-当 success 返回是 false 的情况我们会按照 showType 和 errorMessage
-来做统一的错误提示，同时抛出一个异常，异常的格式如下
-interface RequestError extends Error {
-  data?: any; // 这里是后端返回的原始数据
-  info?: ErrorInfoStructure;
-}
-可以通过 Error.name 是否是 BizError 来判断是否是因为 success 为 false 抛出的错误
-*/
-// 相当于做了一个格式转换
-const errorConfig: any = {
-    adaptor: (res: any) => {
-        console.log("errorConfig:", res);
-        return {
-            //...res,
-            success: res.code === 200, // success是false时
-            data: res,
-            errorCode: res.errorCode,
-            errorMessage: res.errorMessage, // 显示的错误信息
-        };
-    },
-    // showType: 9, //当 showType 为 9 时，默认会跳转到 /exception 页面，你可以通过该配置来修改该路径。
-
-};
-
+// 网络请求的运行时配置（在浏览器里运行）
 export const request: RequestConfig = {
     //prefix: '/api', // 所有的请求的前缀,相当于ip+port部分
-    errorConfig: errorConfig,
+    //errorConfig: errorConfig,
     errorHandler: errorHandler,
     credentials: 'include', // 默认请求是否带上cookie
     timeout: 5000,
-    middlewares: [middlewareA, middlewareB],
+    middlewares: [],
     requestInterceptors: [],
-    responseInterceptors: [responseInterceptor],
+    responseInterceptors: [eosResponseInterceptor],
 };
 
 
