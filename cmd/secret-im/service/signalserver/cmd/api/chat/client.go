@@ -63,13 +63,8 @@ type Client struct {
 
 // serveWs handles websocket requests from the peer.
 func WsConnectHandler(w http.ResponseWriter, r *http.Request) {
-	log.Println("xccccc1")
-	ww:=NewWsResponseWriter(w)
-	log.Println("xccccc2")
-	conn, err := upgrader.Upgrade(ww, r, nil)
-	log.Println("xccccc3")
+	conn, err := upgrader.Upgrade(w, r, nil)
 	if err != nil {
-		log.Println("xccccc4")
 		log.Println(err)
 		return
 	}

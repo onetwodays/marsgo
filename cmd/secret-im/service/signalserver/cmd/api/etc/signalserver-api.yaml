@@ -14,7 +14,7 @@ Auth:
   AccessExpire: 86400
 EOSChainUrls:
   - http://zhongyingying.qicp.io:38000
-WssAddress: 0.0.0.0:8889
+
 CacheRedis:
   Addr: "127.0.0.1:6379"
   Password: ""

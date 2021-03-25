@@ -6,6 +6,7 @@ import (
 	"github.com/tal-tech/go-zero/rest/httpx"
 	"net/http"
 	"secret-im/common"
+	"secret-im/service/signalserver/cmd/api/chat"
 	"secret-im/service/signalserver/cmd/api/middleware"
 	"secret-im/service/signalserver/cmd/shared"
 	"strings"
@@ -13,7 +14,6 @@ import (
 	"github.com/tal-tech/go-zero/rest"
 	"github.com/tal-tech/go-zero/rest/router"
 
-	"secret-im/service/signalserver/cmd/api/chat"
 	"secret-im/service/signalserver/cmd/api/config"
 	"secret-im/service/signalserver/cmd/api/internal/handler"
 	"secret-im/service/signalserver/cmd/api/internal/svc"
@@ -69,25 +69,14 @@ func main() {
 
     //websocket server
     if isStartWss{
-    	chat.SetHub(ctx.Hub)
-    	//go chat.NewHub().Run()
-		http.HandleFunc("/", common.StaticFileHandler("./static/chat.html"))
-		http.HandleFunc("/ws",chat.WsConnectHandler)
-		go func() {
-			err:=http.ListenAndServe(config.AppConfig.WssAddress,nil)
-			if err!=nil{
-				fmt.Printf("\"Starting WebsocketServer at %s happend error:",err.Error())
-			}else{
-				fmt.Printf("Starting WebsocketServer at %s...\n", config.AppConfig.WssAddress)
-			}
-		}()
+		server.AddRoute(rest.Route{
+			Method: http.MethodGet,
+			Path: "/ws",
+			Handler: chat.WsConnectHandler,
+		})
 	}
 
-	server.AddRoute(rest.Route{
-		Method: http.MethodGet,
-		Path: "/ws",
-		Handler: chat.WsConnectHandler,
-	})
+
 	fmt.Printf("Starting server at %s:%d...\n", config.AppConfig.Host, config.AppConfig.Port)
 	server.Start()
 

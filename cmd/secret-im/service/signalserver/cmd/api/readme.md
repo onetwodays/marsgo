@@ -1,3 +1,8 @@
+#0. 安装更新
+```
+GOPROXY=https://goproxy.cn/,direct go get -u github.com/tal-tech/go-zero
+GO111MODULE=on GOPROXY=https://goproxy.cn/,direct go get -u github.com/tal-tech/go-zero/tools/goctl
+```
 
 #1 .创建项目
 https://www.yuque.com/tal-tech/go-zero/rslrhx
