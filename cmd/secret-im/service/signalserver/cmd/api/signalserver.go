@@ -65,10 +65,9 @@ func main() {
 		}
 	})
 
-
-
     //websocket server
     if isStartWss{
+    	chat.SetHub(ctx.Hub)
 		server.AddRoute(rest.Route{
 			Method: http.MethodGet,
 			Path: "/ws",

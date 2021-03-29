@@ -39,12 +39,12 @@ type JwtToken struct {
 	RefreshAfter int64  `json:"refreshAfter,omitempty"`
 }
 
-type ChainLoginReq struct {
+type AdxUserLoginReq struct {
 	Name string `json:"name"` //eos chain username,保证unique
 	Sign string `json:"sign"` //  eos 用户用自己的私钥对name的签名
 }
 
-type ChainLoginRes struct {
+type AdxUserLoginRes struct {
 	JwtToken
 }
 

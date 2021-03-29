@@ -54,6 +54,7 @@ func (h *Hub) Run() {
 		case client := <-h.Register:
 			h.Clients[client] = true
 			h.ClientMap[client.Id]=client
+			logx.Info("websocket client (%s) Registed",client.Id)
 		case client := <-h.Unregister:
 			if _, ok := h.Clients[client]; ok {
 				delete(h.Clients, client)

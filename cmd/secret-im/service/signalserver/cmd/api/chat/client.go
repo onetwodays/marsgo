@@ -6,6 +6,8 @@ package chat
 
 import (
 	"bytes"
+	"secret-im/service/signalserver/cmd/api/util"
+
 	//"github.com/golang/protobuf/proto"
 	"github.com/tal-tech/go-zero/core/logx"
 	"log"
@@ -44,7 +46,6 @@ var xhub *Hub
 
 func SetHub(hub *Hub)  {
 	xhub = hub
-
 }
 
 
@@ -68,17 +69,12 @@ func WsConnectHandler(w http.ResponseWriter, r *http.Request) {
 		log.Println(err)
 		return
 	}
-	client := &Client{Hub: xhub, conn: conn, Send: make(chan []byte, maxMessageSize)}
+	client := &Client{Hub: xhub, conn: conn, Send: make(chan []byte, maxMessageSize),Id:util.GenSalt()}
 	client.Hub.Register <- client // mutex
-
 	// Allow collection of memory referenced by the caller by doing all work in
 	// new goroutines.
 	go client.writePump()
 	go client.readPump()
-	select {
-
-	}
-
 }
 
 // readPump pumps messages from the websocket connection to the hub.

@@ -42,8 +42,8 @@ func RegisterHandlers(engine *rest.Server, serverCtx *svc.ServiceContext) {
 			},
 			{
 				Method:  http.MethodPost,
-				Path:    "/v1/accounts/login",
-				Handler: LoginChainHandler(serverCtx),
+				Path:    "/api/v1/adxuser/login",
+				Handler: AdxUserLoginHandler(serverCtx),
 			},
 		},
 	)

@@ -4,6 +4,7 @@ package svc
 
 import (
 	"encoding/json"
+	//eos "github.com/eoscanada/eos-go"
 	eos "github.com/eoscanada/eos-go"
 	"github.com/tal-tech/go-zero/core/logx"
 	"github.com/tal-tech/go-zero/core/stores/sqlx"
