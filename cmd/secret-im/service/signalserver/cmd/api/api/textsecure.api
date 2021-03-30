@@ -1,0 +1,39 @@
+syntax = "v2"
+
+
+
+type JwtTokenAdx {
+    AccessToken string `json:"accessToken,omitempty"`
+    AccessExpire int64 `json:"accessExpire,omitempty"`
+    RefreshAfter int64 `json:"refreshAfter,omitempty"`
+}
+
+type AdxUserLoginReq {
+    Name string `json:"name"` //eos chain username,保证unique
+    Sign string `json:"sign"` //  eos 用户用自己的私钥对name的签名
+}
+
+type AdxUserLoginRes {
+    // TODO: add members here and delete this comment
+    JwtTokenAdx
+}
+
+@server(
+    group: textsecret
+)
+service  signalserver-api {
+    @handler AdxUserLoginHandler
+    post /api/v1/adxuser/login (AdxUserLoginReq) returns (AdxUserLoginRes)
+}
+
+
+@server(
+    jwt: Auth
+    middleware:UserNameCheck
+    group: textsecret
+)
+
+service  signalserver-api {
+    @handler AdxUserWSHandler
+    get /api/v1/adxuser/ws () returns ()
+}

@@ -24,18 +24,11 @@ type JwtToken {
     RefreshAfter int64 `json:"refreshAfter,omitempty"`
 }
 
-type AdxUserLoginReq {
-    Name string `json:"name"` //eos chain username,保证unique
-    Sign string `json:"sign"` //  eos 用户用自己的私钥对name的签名
-}
-
-type AdxUserLoginRes {
-    // TODO: add members here and delete this comment
-    JwtToken
-}
 
 
-
+@server (
+group : website
+)
 service signalserver-api {
 
 
@@ -45,10 +38,6 @@ service signalserver-api {
     @handler login
     post /user/login (LoginReq) returns (UserReply)
 
-    @handler AdxUserLoginHandler
-    post /api/v1/adxuser/login (AdxUserLoginReq) returns (AdxUserLoginRes)
-
-
 }
 
 
@@ -56,6 +45,7 @@ service signalserver-api {
 @server(
     jwt: Auth
     middleware: UserCheck
+    group : website
 )
 service signalserver-api {
     @handler userInfo

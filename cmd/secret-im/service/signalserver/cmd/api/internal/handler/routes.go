@@ -7,6 +7,8 @@ import (
 	accounts "secret-im/service/signalserver/cmd/api/internal/handler/accounts"
 	bookstore "secret-im/service/signalserver/cmd/api/internal/handler/bookstore"
 	msgs "secret-im/service/signalserver/cmd/api/internal/handler/msgs"
+	textsecret "secret-im/service/signalserver/cmd/api/internal/handler/textsecret"
+	website "secret-im/service/signalserver/cmd/api/internal/handler/website"
 	"secret-im/service/signalserver/cmd/api/internal/svc"
 
 	"github.com/tal-tech/go-zero/rest"
@@ -20,11 +22,6 @@ func RegisterHandlers(engine *rest.Server, serverCtx *svc.ServiceContext) {
 				Path:    "/index",
 				Handler: IndexHandler(serverCtx),
 			},
-			{
-				Method:  http.MethodGet,
-				Path:    "/test",
-				Handler: TestHandler(serverCtx),
-			},
 		},
 	)
 
@@ -33,17 +30,12 @@ func RegisterHandlers(engine *rest.Server, serverCtx *svc.ServiceContext) {
 			{
 				Method:  http.MethodPost,
 				Path:    "/user/register",
-				Handler: registerHandler(serverCtx),
+				Handler: website.RegisterHandler(serverCtx),
 			},
 			{
 				Method:  http.MethodPost,
 				Path:    "/user/login",
-				Handler: loginHandler(serverCtx),
-			},
-			{
-				Method:  http.MethodPost,
-				Path:    "/api/v1/adxuser/login",
-				Handler: AdxUserLoginHandler(serverCtx),
+				Handler: website.LoginHandler(serverCtx),
 			},
 		},
 	)
@@ -55,7 +47,7 @@ func RegisterHandlers(engine *rest.Server, serverCtx *svc.ServiceContext) {
 				{
 					Method:  http.MethodGet,
 					Path:    "/user/info",
-					Handler: userInfoHandler(serverCtx),
+					Handler: website.UserInfoHandler(serverCtx),
 				},
 			}...,
 		),
@@ -176,5 +168,29 @@ func RegisterHandlers(engine *rest.Server, serverCtx *svc.ServiceContext) {
 				},
 			}...,
 		),
+	)
+
+	engine.AddRoutes(
+		[]rest.Route{
+			{
+				Method:  http.MethodPost,
+				Path:    "/api/v1/adxuser/login",
+				Handler: textsecret.AdxUserLoginHandler(serverCtx),
+			},
+		},
+	)
+
+	engine.AddRoutes(
+		rest.WithMiddlewares(
+			[]rest.Middleware{serverCtx.UserNameCheck},
+			[]rest.Route{
+				{
+					Method:  http.MethodGet,
+					Path:    "/api/v1/adxuser/ws",
+					Handler: textsecret.AdxUserWSHandler(serverCtx),
+				},
+			}...,
+		),
+		rest.WithJwt(serverCtx.Config.Auth.AccessSecret),
 	)
 }

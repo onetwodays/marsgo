@@ -1,5 +1,7 @@
 package shared
 
+import "encoding/json"
+
 const (
 	DEFAULTCODE = 1001
 	// 注册的错误码
@@ -19,7 +21,6 @@ const (
 
 	//参数错误
 	ParamError =1009
-
 )
 
 var CodeErrorMap =map[int]string{
@@ -36,6 +37,7 @@ var CodeErrorMap =map[int]string{
 	ParamError:   "参数错误",
 }
 var ErrorParam = NewCodeError(ParamError, CodeErrorMap[ParamError])
+
 
 
 
@@ -58,7 +60,8 @@ func NewDefaultCodeError(msg string) error{
 	return &CodeError{Code: DEFAULTCODE,Msg: msg}
 }
 func(e *CodeError) Error() string{
-	return e.Msg
+	bytes,_:=json.Marshal(e)
+	return string(bytes)
 }
 
 func (e *CodeError) Data() *CodeErrorResponse {

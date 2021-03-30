@@ -11,15 +11,8 @@ import (
 	"bookstore.api"
 	"accounts.api"
 	"msg.api"
+	"textsecure.api"
 )
-
-type Request {
-	Name string `path:"name,options=you|me"`
-}
-
-type Response {
-	Message string `json:"message"`
-}
 
 type IndexReply {
 	Resp string `json:"resp"`
@@ -28,8 +21,5 @@ type IndexReply {
 service signalserver-api {
 	@handler IndexHandler
 	get /index () returns (IndexReply)
-	
-	@handler TestHandler
-	get /test (Request) returns (Response)
 	
 }

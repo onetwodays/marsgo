@@ -3,7 +3,7 @@ package handler
 import (
 	"github.com/tal-tech/go-zero/rest/httpx"
 	"net/http"
-	"secret-im/service/signalserver/cmd/api/internal/logic"
+	logic "secret-im/service/signalserver/cmd/api/internal/logic"
 	"secret-im/service/signalserver/cmd/api/internal/svc"
 )
 

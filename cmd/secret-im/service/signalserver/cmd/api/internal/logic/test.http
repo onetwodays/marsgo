@@ -56,3 +56,8 @@ Content-Type: application/json
 
 }
 
+
+###
+GET http://127.0.0.1:8888//api/v1/adxuser/ws
+x-user-name: otcexchange
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE2MTQ3NjI4MjYsImlhdCI6MTYxNDY3NjQyNiwidXNlcklkIjoxfQ.MvqQUsDoo_14wU2QmXXyskYQnB7AUCyEhxtBDokE9No

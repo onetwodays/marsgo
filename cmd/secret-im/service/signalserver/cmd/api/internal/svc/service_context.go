@@ -4,8 +4,7 @@ package svc
 
 import (
 	"encoding/json"
-	//eos "github.com/eoscanada/eos-go"
-	eos "github.com/eoscanada/eos-go"
+	eos "github.com/marsofsnow/eos-go"
 	"github.com/tal-tech/go-zero/core/logx"
 	"github.com/tal-tech/go-zero/core/stores/sqlx"
 	"github.com/tal-tech/go-zero/rest"
@@ -33,6 +32,9 @@ type ServiceContext struct {
 	// --------------------
 	UserCheck rest.Middleware // jwt
 	CheckBasicAuth rest.Middleware //basic auth
+	UserNameCheck    rest.Middleware
+
+	//---------------------
 	BookStoreClient bookstoreclient.Bookstore //这个是rpc客户端，发起rpc请求的
 	EosApi *eos.API
 
@@ -48,6 +50,7 @@ func NewServiceContext(c config.Config) *ServiceContext {
 		logx.Info("hub run start.....")
 		hub.Run()
 	}()
+	chat.SetHub(hub)
 
 	eosApi:=eos.New(c.EOSChainUrls[0])
 	eosApi.EnableKeepAlives()
@@ -67,6 +70,7 @@ func NewServiceContext(c config.Config) *ServiceContext {
 		MsgsModel: model.NewTMessagesModel(mysqlConn),
 		UserCheck: middleware.NewUsercheckMiddleware().Handle,
 		CheckBasicAuth: middleware.NewCheckBasicAuthMiddleware().Handle,
+		UserNameCheck: middleware.NewUserNameCheckMiddleware().Handle,
 		//BookStoreClient: bookstoreclient.NewBookstore(zrpc.MustNewClient(c.BookStore,zrpc.WithUnaryClientInterceptor(interceptor.TimeInterceptor))),
 		EosApi: eosApi,
 	}
@@ -106,8 +110,6 @@ func (sc *ServiceContext) UpdateDirectory(number string,voice,video bool) error 
 		return  err
 	}
 	return nil
-
-
 }
 
 
