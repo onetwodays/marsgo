@@ -52,20 +52,15 @@ func (h *Hub) Run() {
 			}
 
 		case client := <-h.Register:
-			if _,ok:=h.ClientMap[client.Id];!ok{ // 已经存在的话
-				delete(h.Clients, client)
-				delete(h.ClientMap,client.Id)
-				close(client.Send)
-			}
 			h.Clients[client] = true
 			h.ClientMap[client.Id]=client
-			logx.Info("websocket client (%s) Registed",client.Id)
+			logx.Infof("websocket client (%s)  Registed",client.Id)
 		case client := <-h.Unregister:
 			if _, ok := h.Clients[client]; ok {
 				delete(h.Clients, client)
 				delete(h.ClientMap,client.Id)
 				close(client.Send)
-				logx.Info("websocket client (%s) left",client.Id)
+				logx.Infof("websocket client (%s) left",client.Id)
 			}
 		case message := <-h.Broadcast:
 			for client := range h.Clients {

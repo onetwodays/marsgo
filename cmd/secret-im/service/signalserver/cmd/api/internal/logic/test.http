@@ -59,5 +59,10 @@ Content-Type: application/json
 
 ###
 GET http://127.0.0.1:8888//api/v1/adxuser/ws
+Sec-WebSocket-Key: x3JJHMbDL1EzLkh9GBhXDw==
+Sec-WebSocket-Protocol: chat, superchat
+Sec-WebSocket-Version: 13
+Upgrade: websocket
+Connection: Upgrade
 x-user-name: otcexchange
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE2MTQ3NjI4MjYsImlhdCI6MTYxNDY3NjQyNiwidXNlcklkIjoxfQ.MvqQUsDoo_14wU2QmXXyskYQnB7AUCyEhxtBDokE9No
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE2MTc3ODgyOTAsImlhdCI6MTYxNzcwMTg5MCwibmFtZSI6Im90Y2V4Y2hhbmdlIn0.m5Li3TFwv1FpkFGBZUvRsR-TcmeyO0TnB6n_wvDRma4

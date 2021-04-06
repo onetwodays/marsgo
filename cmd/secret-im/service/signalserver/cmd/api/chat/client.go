@@ -77,21 +77,18 @@ func WsConnectHandler(w http.ResponseWriter, r *http.Request) {
 	go client.readPump()
 }
 
-func AdxWsConnectHandler(adxName string) http.HandlerFunc{
-	return func(w http.ResponseWriter, r *http.Request) {
+func AdxWsConnectHandler(adxName string,w http.ResponseWriter, r *http.Request) {
 		conn, err := upgrader.Upgrade(w, r, nil)
 		if err != nil {
 			log.Println(err)
 			return
 		}
-
 		client := &Client{Hub: xhub, conn: conn, Send: make(chan []byte, maxMessageSize),Id:adxName}
-		client.Hub.Register <- client // mutex
-		// Allow collection of memory referenced by the caller by doing all work in
-		// new goroutines.
+		client.Hub.Register <- client
 		go client.writePump()
 		go client.readPump()
-	}
+
+
 
 }
 
