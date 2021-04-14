@@ -89,10 +89,11 @@ func (l *PutMsgsSendLogic) sendLocalMessage(src,dst *types.Account,req *types.Pu
 		sm.Id = dst.Number
 		sm.Message, _ = util.AESCBCEncrypt(out, dst.Devices[0].AccountAttributes.SignalingKey)
 		l.Logger.Infof("%v", sm.Message)
+		/*
 		if clinet, ok := l.svcCtx.Hub.ClientMap[sm.Id]; ok {
 			clinet.Hub.SendSingle <- sm
 			break
-		}
+		}*/
 	}
 	return
 }

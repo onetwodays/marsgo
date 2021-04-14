@@ -24,6 +24,7 @@ import (
 var isStartWss = true
 func main() {
 
+
 	//url 不存在时,个性化提示
 	rt := router.NewRouter()
 	rt.SetNotFoundHandler(http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
@@ -60,10 +61,11 @@ func main() {
 		case *shared.CodeError:
 			return http.StatusOK,e.Data()
 		default:
-			return http.StatusInternalServerError,nil
+			return http.StatusInternalServerError,err
 
 		}
 	})
+
 
     //websocket server
     if isStartWss{

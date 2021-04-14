@@ -55,10 +55,19 @@ Content-Type: application/json
 "sign":"SIG_K1_Jz4KTq5v3dhcRKYehza6NRF5SxZaEzdPiVohRhX5SqoDCjmjf6hh3vyqfFHzEUagWZHC3L6G6SaJvKdH3UWEVwJRLWc6jL"
 
 }
+###
+GET http://127.0.0.1:8888/ws
+Sec-WebSocket-Key: x3JJHMbDL1EzLkh9GBhXDw==
+Sec-WebSocket-Protocol: chat, superchat
+Sec-WebSocket-Version: 13
+Upgrade: websocket
+Connection: Upgrade
+x-user-name: otcexchange
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE2MTc3ODgyOTAsImlhdCI6MTYxNzcwMTg5MCwibmFtZSI6Im90Y2V4Y2hhbmdlIn0.m5Li3TFwv1FpkFGBZUvRsR-TcmeyO0TnB6n_wvDRma4
 
 
 ###
-GET http://127.0.0.1:8888//api/v1/adxuser/ws
+GET http://127.0.0.1:8888/api/v1/adxuser/ws
 Sec-WebSocket-Key: x3JJHMbDL1EzLkh9GBhXDw==
 Sec-WebSocket-Protocol: chat, superchat
 Sec-WebSocket-Version: 13

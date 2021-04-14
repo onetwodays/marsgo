@@ -1,5 +1,4 @@
 {
-
   "name": "ant-design-pro",
   "version": "5.0.0-beta.0",
   "private": true,
@@ -51,6 +50,7 @@
     "@ant-design/pro-form": "^1.0.2",
     "@ant-design/pro-layout": "^6.4.19",
     "@ant-design/pro-table": "^2.8.1",
+    "@polkadot/api": "^4.5.1",
     "@umijs/route-utils": "^1.0.33",
     "antd": "^4.7.0",
     "classnames": "^2.2.6",
