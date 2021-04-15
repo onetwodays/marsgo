@@ -35,11 +35,11 @@ const network = {
 
 // local  http://zhongyingying.qicp.io:38000
 const network = {
-    blockchain: 'eos',
-    protocol: 'http',
-    host: 'zhongyingying.qicp.io',
-    port: 38000,
-    chainId: '215331c6c3863ad74a1e1680234f2237374d1d46ab2a3d7534126d01d815a488',
+        blockchain: 'eos',
+        protocol: 'http',
+        host: 'zhongyingying.qicp.io',
+        port: 38000,
+        chainId: '215331c6c3863ad74a1e1680234f2237374d1d46ab2a3d7534126d01d815a488',
 };
 
 
@@ -58,11 +58,11 @@ const url = network.protocol + '://' + network.host + ':' + network.port;
 const rpc = new JsonRpc(url)
 //const rpc = new JsonRpc(url, { fetch })
 const api = new Api({
-    rpc,
-    signatureProvider,
-    chainId: network.chainId,
-    textDecoder: new TextDecoder(),
-    textEncoder: new TextEncoder(),
+        rpc,
+        signatureProvider,
+        chainId: network.chainId,
+        textDecoder: new TextDecoder(),
+        textEncoder: new TextEncoder(),
 });
 
 export { api, rpc, network, appName, contract }
