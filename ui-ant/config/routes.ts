@@ -79,6 +79,13 @@ export default [
                 component: './antd/product',
             },
 
+            {
+                path: '/antd/userequest',
+                name: 'userequest',
+                icon: 'smile',
+                component: 'antd/UseRequest',
+            },
+
 
         ],
     },

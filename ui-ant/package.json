@@ -62,6 +62,10 @@
     "react": "^16.8.6",
     "react-dom": "^16.8.6",
     "react-helmet-async": "^1.0.4",
+    "react-json-inspector": "^7.1.1",
+    "react-json-tree": "^0.15.0",
+    "react-json-view": "^1.21.3",
+    "react-treeview": "^0.4.7",
     "umi": "^3.2.14",
     "umi-request": "^1.0.8",
     "use-merge-value": "^1.0.1"
