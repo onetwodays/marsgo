@@ -9,6 +9,7 @@ const { REACT_APP_ENV } = process.env;
 
 // 这是一个函数,聚合umi的插件的配置和其他配置，
 export default defineConfig({
+    fastRefresh: {},
     hash: true,
     antd: {},
     dva: {

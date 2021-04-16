@@ -1,4 +1,4 @@
-// 相对路径，会从 src/pages 开始找起 ./user/login
+// 相对路径，会从 src/pages 开始找起 ./user/login 或者usr/login
 // 如果指向 src 目录的文件，可以用 @,比如 component: '@/layouts/basic'
 // 路由管理 通过约定的语法根据在 config.ts 中配置路由。
 
@@ -13,6 +13,8 @@ export default [
                 target: '_blank', // 点击新窗口打开
                 icon: 'smile',
                 name: "ant.pro文档",
+
+
             },
             {   //菜单跳转到外部地址
                 path: 'https://ahooks.js.org/zh-CN/hooks/async/',
@@ -51,7 +53,7 @@ export default [
                 path: '/antd/datadisplay',
                 name: 'datadisplay',
                 icon: 'smile',
-                component: './antd/datadisplay',
+                component: 'antd/datadisplay',
             },
             {
                 path: '/antd/react',
