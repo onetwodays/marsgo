@@ -4,6 +4,19 @@
 
 export default [
     {
+        path: '/substrate',
+        name: 'substrate',
+        icon: 'crown',
+        routes: [
+            {
+                path: '/substrate/info',
+                name: 'info',
+                icon: 'smile',
+                component: 'substrate/Info',
+            },
+        ]
+    },
+    {
         path: '/antd',
         name: 'antd',
         icon: 'crown',
@@ -13,8 +26,6 @@ export default [
                 target: '_blank', // 点击新窗口打开
                 icon: 'smile',
                 name: "ant.pro文档",
-
-
             },
             {   //菜单跳转到外部地址
                 path: 'https://ahooks.js.org/zh-CN/hooks/async/',
@@ -53,7 +64,7 @@ export default [
                 path: '/antd/datadisplay',
                 name: 'datadisplay',
                 icon: 'smile',
-                component: 'antd/datadisplay',
+                component: './antd/datadisplay',
             },
             {
                 path: '/antd/react',
