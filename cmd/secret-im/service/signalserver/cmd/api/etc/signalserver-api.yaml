@@ -4,7 +4,7 @@ Port: 8888
 Timeout: 0  # websocket长链接，关闭超时
 LogConf:
   ServiceName: signalserver
-  Mode: console
+  Mode: file
   Path: ./deploy/logs/
   Level: info
 

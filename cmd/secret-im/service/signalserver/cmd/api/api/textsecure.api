@@ -23,7 +23,7 @@ type AdxUserLoginRes {
 )
 service  signalserver-api {
     @handler AdxUserLoginHandler
-    post /api/v1/adxuser/login (AdxUserLoginReq) returns (AdxUserLoginRes)
+    post /api/v1/textsecret/login (AdxUserLoginReq) returns (AdxUserLoginRes)
 }
 
 
@@ -35,5 +35,5 @@ service  signalserver-api {
 
 service  signalserver-api {
     @handler AdxUserWSHandler
-    get /api/v1/adxuser/ws () returns ()
+    get /api/v1/textsecret/ws () returns ()
 }

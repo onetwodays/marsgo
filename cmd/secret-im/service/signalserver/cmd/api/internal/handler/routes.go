@@ -174,7 +174,7 @@ func RegisterHandlers(engine *rest.Server, serverCtx *svc.ServiceContext) {
 		[]rest.Route{
 			{
 				Method:  http.MethodPost,
-				Path:    "/api/v1/adxuser/login",
+				Path:    "/api/v1/textsecret/login",
 				Handler: textsecret.AdxUserLoginHandler(serverCtx),
 			},
 		},
@@ -186,7 +186,7 @@ func RegisterHandlers(engine *rest.Server, serverCtx *svc.ServiceContext) {
 			[]rest.Route{
 				{
 					Method:  http.MethodGet,
-					Path:    "/api/v1/adxuser/ws",
+					Path:    "/api/v1/textsecret/ws",
 					Handler: textsecret.AdxUserWSHandler(serverCtx),
 				},
 			}...,
