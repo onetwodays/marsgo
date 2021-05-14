@@ -8,6 +8,7 @@ import (
 	bookstore "secret-im/service/signalserver/cmd/api/internal/handler/bookstore"
 	msgs "secret-im/service/signalserver/cmd/api/internal/handler/msgs"
 	textsecret "secret-im/service/signalserver/cmd/api/internal/handler/textsecret"
+	textsecret_messages "secret-im/service/signalserver/cmd/api/internal/handler/textsecret_messages"
 	website "secret-im/service/signalserver/cmd/api/internal/handler/website"
 	"secret-im/service/signalserver/cmd/api/internal/svc"
 
@@ -188,6 +189,25 @@ func RegisterHandlers(engine *rest.Server, serverCtx *svc.ServiceContext) {
 					Method:  http.MethodGet,
 					Path:    "/api/v1/textsecret/ws",
 					Handler: textsecret.AdxUserWSHandler(serverCtx),
+				},
+			}...,
+		),
+		rest.WithJwt(serverCtx.Config.Auth.AccessSecret),
+	)
+
+	engine.AddRoutes(
+		rest.WithMiddlewares(
+			[]rest.Middleware{serverCtx.UserNameCheck},
+			[]rest.Route{
+				{
+					Method:  http.MethodPut,
+					Path:    "/api/v1/textsecret/messages/:destination",
+					Handler: textsecret_messages.PutMsgsHandler(serverCtx),
+				},
+				{
+					Method:  http.MethodGet,
+					Path:    "/api/v1/textsecret/messages",
+					Handler: textsecret_messages.GetMsgsHandler(serverCtx),
 				},
 			}...,
 		),

@@ -47,7 +47,7 @@ Content-Type: application/json
 }
 ###
 
-POST http://127.0.0.1:8888/api/v1/adxuser/login
+POST http://127.0.0.1:38888/api/v1/textsecret/login
 Content-Type: application/json
 
 {
@@ -56,6 +56,42 @@ Content-Type: application/json
 
 }
 ###
+
+
+PUT http://127.0.0.1:38888/api/v1/textsecret/messages/otcexchange
+Content-Type: application/json
+x-user-name: otcexchange
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE2MjEwNjkzMjQsImlhdCI6MTYyMDk4MjkyNCwibmFtZSI6Im90Y2V4Y2hhbmdlIn0.VvM3HuZcPgpWY1QN8CJVfoVui4uxeaPdIVRBqIiXjnM
+
+{
+"destination":"otcexchange",
+"online":false,
+"timestamp": 1,
+"messages": [
+   {
+    "type": 1,
+    "destination": "otcexchange",
+    "destinationDeviceId": 1,
+    "destinationRegistrationId": 1,
+    "body": "11111",
+    "content": "22222",
+    "relay": "wwww.baidu.com"
+  }
+
+]
+
+}
+
+###
+GET http://127.0.0.1:38888/api/v1/textsecret/messages
+Content-Type: application/json
+x-user-name: otcexchange
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE2MjEwNjkzMjQsImlhdCI6MTYyMDk4MjkyNCwibmFtZSI6Im90Y2V4Y2hhbmdlIn0.VvM3HuZcPgpWY1QN8CJVfoVui4uxeaPdIVRBqIiXjnM
+
+
+
+
+###
 GET http://127.0.0.1:8888/ws
 Sec-WebSocket-Key: x3JJHMbDL1EzLkh9GBhXDw==
 Sec-WebSocket-Protocol: chat, superchat
@@ -63,7 +99,7 @@ Sec-WebSocket-Version: 13
 Upgrade: websocket
 Connection: Upgrade
 x-user-name: otcexchange
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE2MTc3ODgyOTAsImlhdCI6MTYxNzcwMTg5MCwibmFtZSI6Im90Y2V4Y2hhbmdlIn0.m5Li3TFwv1FpkFGBZUvRsR-TcmeyO0TnB6n_wvDRma4
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE2MjEwNjkzMjQsImlhdCI6MTYyMDk4MjkyNCwibmFtZSI6Im90Y2V4Y2hhbmdlIn0.VvM3HuZcPgpWY1QN8CJVfoVui4uxeaPdIVRBqIiXjnM
 
 
 ###

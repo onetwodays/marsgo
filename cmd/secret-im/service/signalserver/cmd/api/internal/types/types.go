@@ -250,3 +250,47 @@ type AdxUserLoginReq struct {
 type AdxUserLoginRes struct {
 	JwtTokenAdx
 }
+
+type IncomingMessagex struct {
+	Type                      int    `json:"type"`
+	Destination               string `json:"destination"`
+	DestinationDeviceId       int    `json:"destinationDeviceId,default=1"`
+	DestinationRegistrationId int    `json:"destinationRegistrationId"`
+	Body                      string `json:"body"`
+	Content                   string `json:"content"`
+	Relay                     string `json:"relay"`
+}
+
+type PutMessagesReq struct {
+	Destination string             `json:"destination"`
+	Online      bool               `json:"online"`
+	Timestamp   int64              `json:"timestamp"`
+	Messages    []IncomingMessagex `json:"messages"`
+}
+
+type PutMessagesRes struct {
+	NeedsSync bool `json:"needsSync"`
+}
+
+type OutcomingMessagex struct {
+	Id              int64  `json:"id"`
+	Cached          bool   `json:"cached"`
+	Guid            string `json:"guid"`
+	Type            int    `json:"type"`
+	Relay           string `json:"relay"`
+	Timestamp       int64  `json:"timestamp"`
+	Source          string `json:"source"`
+	SourceUuid      string `json:"sourceUuid"`
+	SourceDevice    int64  `json:"sourceDevice"`
+	Message         string `json:"message"`
+	Content         string `json:"content"`
+	ServerTimestamp int64  `json:"serverTimestamp"`
+}
+
+type GetPendingMsgsReq struct {
+}
+
+type GetPendingMsgsRes struct {
+	List []OutcomingMessagex `json:"list"`
+	More bool                `json:"more"`
+}

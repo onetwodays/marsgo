@@ -10,8 +10,6 @@ import (
 	"github.com/tal-tech/go-zero/core/stores/sqlx"
 	"github.com/tal-tech/go-zero/core/stringx"
 	"github.com/tal-tech/go-zero/tools/goctl/model/sql/builderx"
-
-
 )
 
 var (
@@ -25,7 +23,7 @@ type (
 	TMessagesModel interface {
 		Insert(data TMessages) (sql.Result, error)
 		FindOne(id int64) (*TMessages, error)
-		FindMany(destination string,deviceId int64,pageSize,pageIndex int) ([]TMessages,error)
+		FindManyByDst(device string,deviceId int64) ([]TMessages,error)
 		Update(data TMessages) error
 		Delete(id int64) error
 	}
@@ -36,17 +34,20 @@ type (
 	}
 
 	TMessages struct {
-		Relay             string    `db:"relay"`   // 类似cdn
-		Source            string    `db:"source"`  // 源手机号
-		Message           string    `db:"message"` // 消息
+		Id                int64     `db:"id"`
+		Type              int64     `db:"type"`
+		Relay             string    `db:"relay"`
+		Timestamp         int64     `db:"timestamp"`
+		Source            string    `db:"source"`
+		SourceDevice      int64     `db:"source_device"`
+		Destination       string    `db:"destination"`
+		DestinationDevice int64     `db:"destination_device"`
+		Message           string    `db:"message"`
 		Content           string    `db:"content"`
-		Destination       string    `db:"destination"` // 目的手机号
-		CreateTime        time.Time `db:"create_time"`
-		Id                int64     `db:"id"`                 // pk
-		Type              int64     `db:"type"`               // 消息类型
-		Tm                int64     `db:"tm"`                 // unix  时间戳
-		SourceDevice      int64     `db:"source_device"`      // 源手机号绑定的设备id
-		DestinationDevice int64     `db:"destination_device"` // 源手机号绑定的设备id
+		Guid              string    `db:"guid"`
+		ServerTimestamp   int64     `db:"server_timestamp"`
+		SourceUuid        string    `db:"source_uuid"`
+		Ctime             time.Time `db:"ctime"`
 	}
 )
 
@@ -58,8 +59,8 @@ func NewTMessagesModel(conn sqlx.SqlConn) TMessagesModel {
 }
 
 func (m *defaultTMessagesModel) Insert(data TMessages) (sql.Result, error) {
-	query := fmt.Sprintf("insert into %s (%s) values (?, ?, ?, ?, ?, ?, ?, ?, ?)", m.table, tMessagesRowsExpectAutoSet)
-	ret, err := m.conn.Exec(query, data.Relay, data.Source, data.Message, data.Content, data.Destination, data.Type, data.Tm, data.SourceDevice, data.DestinationDevice)
+	query := fmt.Sprintf("insert into %s (%s) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)", m.table, tMessagesRowsExpectAutoSet)
+	ret, err := m.conn.Exec(query, data.Type, data.Relay, data.Timestamp, data.Source, data.SourceDevice, data.Destination, data.DestinationDevice, data.Message, data.Content, data.Guid, data.ServerTimestamp, data.SourceUuid, data.Ctime)
 	return ret, err
 }
 
@@ -77,14 +78,13 @@ func (m *defaultTMessagesModel) FindOne(id int64) (*TMessages, error) {
 	}
 }
 
-func (m *defaultTMessagesModel) FindMany(destination string,deviceId int64,pageSize,pageIndex int) ([]TMessages,error){
-	query := fmt.Sprintf("select %s from %s where destination=? and destination_device=?  ", tMessagesRows, m.table)
+func(m *defaultTMessagesModel) FindManyByDst(device string,deviceId int64) ([]TMessages,error){
+	query := fmt.Sprintf("select %s from %s where destination='%s' and destination_device=%d ", tMessagesRows, m.table,device,deviceId)
 
-	query+=" order by create_time ASC limit ? offset ?"
-
-
+	query+=" order by id ASC limit 10 "
 	var resp []TMessages
-	err := m.conn.QueryRows(&resp, query, destination, deviceId,pageSize,pageIndex*pageSize)
+	fmt.Println("=====xxx=====",query)
+	err := m.conn.QueryRows(&resp, query)
 	switch err {
 	case nil:
 		return resp, nil
@@ -97,7 +97,7 @@ func (m *defaultTMessagesModel) FindMany(destination string,deviceId int64,pageS
 
 func (m *defaultTMessagesModel) Update(data TMessages) error {
 	query := fmt.Sprintf("update %s set %s where `id` = ?", m.table, tMessagesRowsWithPlaceHolder)
-	_, err := m.conn.Exec(query, data.Relay, data.Source, data.Message, data.Content, data.Destination, data.Type, data.Tm, data.SourceDevice, data.DestinationDevice, data.Id)
+	_, err := m.conn.Exec(query, data.Type, data.Relay, data.Timestamp, data.Source, data.SourceDevice, data.Destination, data.DestinationDevice, data.Message, data.Content, data.Guid, data.ServerTimestamp, data.SourceUuid, data.Ctime, data.Id)
 	return err
 }
 

@@ -51,7 +51,7 @@ func (l *PutMsgsSendLogic) PutMsgsSend(req types.PutMsgsSendReq,number string) (
 			//保存到数据库或者redis
 			_,err=l.svcCtx.MsgsModel.Insert(model.TMessages{
 				Content: req.MsgList[0].Content,
-				Tm: req.Timestamp,
+				Timestamp: req.Timestamp,
 				Type: int64(req.MsgList[0].Type),
 				Source: account.Number,
 				SourceDevice: account.Devices[0].Id,
