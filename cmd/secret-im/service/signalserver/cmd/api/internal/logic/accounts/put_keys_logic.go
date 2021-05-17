@@ -2,9 +2,6 @@ package logic
 
 import (
 	"context"
-	"encoding/json"
-	"secret-im/service/signalserver/cmd/model"
-
 	"secret-im/service/signalserver/cmd/api/internal/svc"
 	"secret-im/service/signalserver/cmd/api/internal/types"
 
@@ -27,6 +24,7 @@ func NewPutKeysLogic(ctx context.Context, svcCtx *svc.ServiceContext) PutKeysLog
 
 func (l *PutKeysLogic) PutKeys(req types.PutKeysReq,number string) (*types.PutKeysResp, error) {
 	// todo: add your logic here and delete this line
+	/*
 	dbId,account,err:=l.svcCtx.GetOneAccountByNumber(number)
 	if err!=nil{
 		return nil, err
@@ -79,6 +77,7 @@ func (l *PutKeysLogic) PutKeys(req types.PutKeysReq,number string) (*types.PutKe
 			return nil, err
 		}
 	}
+	*/
 
 	return &types.PutKeysResp{}, nil
 }

@@ -4,6 +4,7 @@ import (
 	"database/sql"
 	"fmt"
 	"strings"
+	"time"
 
 	"github.com/tal-tech/go-zero/core/stores/sqlc"
 	"github.com/tal-tech/go-zero/core/stores/sqlx"
@@ -22,11 +23,9 @@ type (
 	TKeysModel interface {
 		Insert(data TKeys) (sql.Result, error)
 		FindOne(id int64) (*TKeys, error)
+		FindMany(number string, deviceId int64) ([]TKeys, error)
 		Update(data TKeys) error
 		Delete(id int64) error
-		DeleteMany(number string,deviceId int64) error
-		FindMany (number string,deviceId int64) ([]TKeys,error)
-		FindManyFirst (number string,deviceId int64) (*TKeys,error)
 	}
 
 	defaultTKeysModel struct {
@@ -35,12 +34,15 @@ type (
 	}
 
 	TKeys struct {
-		Id         int64  `db:"id"`
-		Number     string `db:"number"`
-		Keyid      int64  `db:"keyid"`
-		Publickey  string `db:"publickey"`
-		LastResort int64  `db:"last_resort"`
-		Deviceid   int64  `db:"deviceid"`
+		Id           int64     `db:"id"`
+		Number       string    `db:"number"`
+		KeyId        int64     `db:"key_id"`
+		PublicKey    string    `db:"public_key"`
+		LastResort   int64     `db:"last_resort"`
+		DeviceId     int64     `db:"device_id"`
+		CreateTime   time.Time `db:"create_time"`
+		SignedPrekey string    `db:"signed_prekey"`
+		IdentityKey  string    `db:"identity_key"`
 	}
 )
 
@@ -52,8 +54,8 @@ func NewTKeysModel(conn sqlx.SqlConn) TKeysModel {
 }
 
 func (m *defaultTKeysModel) Insert(data TKeys) (sql.Result, error) {
-	query := fmt.Sprintf("insert into %s (%s) values (?, ?, ?, ?, ?)", m.table, tKeysRowsExpectAutoSet)
-	ret, err := m.conn.Exec(query, data.Number, data.Keyid, data.Publickey, data.LastResort, data.Deviceid)
+	query := fmt.Sprintf("insert into %s (%s) values (?, ?, ?, ?, ?, ?, ?)", m.table, tKeysRowsExpectAutoSet)
+	ret, err := m.conn.Exec(query, data.Number, data.KeyId, data.PublicKey, data.LastResort, data.DeviceId, data.SignedPrekey, data.IdentityKey)
 	return ret, err
 }
 
@@ -71,18 +73,10 @@ func (m *defaultTKeysModel) FindOne(id int64) (*TKeys, error) {
 	}
 }
 
-
-func (m *defaultTKeysModel) FindMany (number string,deviceId int64) ([]TKeys,error) {
-	query := fmt.Sprintf("select %s from %s where 1=1 ", tKeysRows, m.table)
-	if len(number)>0{
-		query = fmt.Sprintf("%s and number='%s'  ",query,number)
-	}
-	if deviceId >=0{
-		query = fmt.Sprintf("%s and deviceid=%d  ",query,deviceId)
-	}
-	query+=" order by id desc "
+func (m * defaultTKeysModel) FindMany(number string, deviceId int64) ([]TKeys, error){
+	query := fmt.Sprintf("select %s from %s where `number` = ? and `device_id`=? ", tKeysRows, m.table)
 	var resp []TKeys
-	err := m.conn.QueryRows(&resp, query)
+	err := m.conn.QueryRows(&resp, query, number,deviceId)
 	switch err {
 	case nil:
 		return resp, nil
@@ -93,32 +87,9 @@ func (m *defaultTKeysModel) FindMany (number string,deviceId int64) ([]TKeys,err
 	}
 }
 
-
-func (m *defaultTKeysModel) FindManyFirst (number string,deviceId int64) (*TKeys,error){
-	query := fmt.Sprintf("select %s from %s where 1=1 ", tKeysRows, m.table)
-	if len(number)>0{
-		query = fmt.Sprintf("%s and number='%s'  ",query,number)
-	}
-	if deviceId >=0{
-		query = fmt.Sprintf("%s and deviceid=%d  ",query,deviceId)
-	}
-	query+=" order by id ASC limit 1 "
-	var resp []TKeys
-	err := m.conn.QueryRows(&resp, query)
-	switch err {
-	case nil:
-		return &resp[0], nil
-	case sqlc.ErrNotFound:
-		return nil, ErrNotFound
-	default:
-		return nil, err
-	}
-}
-
-
 func (m *defaultTKeysModel) Update(data TKeys) error {
 	query := fmt.Sprintf("update %s set %s where `id` = ?", m.table, tKeysRowsWithPlaceHolder)
-	_, err := m.conn.Exec(query, data.Number, data.Keyid, data.Publickey, data.LastResort, data.Deviceid, data.Id)
+	_, err := m.conn.Exec(query, data.Number, data.KeyId, data.PublicKey, data.LastResort, data.DeviceId, data.SignedPrekey, data.IdentityKey, data.Id)
 	return err
 }
 
@@ -127,12 +98,3 @@ func (m *defaultTKeysModel) Delete(id int64) error {
 	_, err := m.conn.Exec(query, id)
 	return err
 }
-
-func (m *defaultTKeysModel) DeleteMany(number string,deviceId int64) error{
-	query := fmt.Sprintf("delete from %s where `number` = '%s' and deviceid=%d", m.table,number,deviceId)
-	_, err := m.conn.Exec(query)
-	return err
-
-}
-
-

@@ -2,6 +2,7 @@ package logic
 
 import (
 	"context"
+	"secret-im/service/signalserver/cmd/shared"
 
 	"secret-im/service/signalserver/cmd/api/internal/svc"
 	"secret-im/service/signalserver/cmd/api/internal/types"
@@ -27,7 +28,7 @@ func (l *GetMsgsLogic) GetMsgs(who string,deviceId int64 ) (*types.GetPendingMsg
 	// todo: add your logic here and delete this line
 	resp,err:=l.svcCtx.MsgsModel.FindManyByDst(who,deviceId)
 	if err!=nil{
-		return nil, err
+		return nil,shared.NewCodeError(shared.ERRCODE_SQLQUERY,err.Error())
 	}
 	list:=make([]types.OutcomingMessagex,len(resp))
 	for i:=range resp{

@@ -13,6 +13,7 @@ import (
 	"msg.api"
 	"textsecure.api"
 	"messages.api"
+	"keys.api"
 )
 
 type IndexReply {

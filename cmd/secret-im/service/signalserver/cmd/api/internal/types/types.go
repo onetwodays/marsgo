@@ -294,3 +294,36 @@ type GetPendingMsgsRes struct {
 	List []OutcomingMessagex `json:"list"`
 	More bool                `json:"more"`
 }
+
+type PreKeyx struct {
+	KeyId     int64  `json:"keyId"`
+	PublicKey string `json:"publickey"`
+}
+
+type SignedPrekeyx struct {
+	Signature string  `json:"signature"`
+	PreKey    PreKeyx `json:"prekey"`
+}
+
+type PutKeysReqx struct {
+	IdentityKey  string        `json:"identityKey"`
+	SignedPreKey SignedPrekeyx `json:"signedPreKey"`
+	PreKeys      []PreKeyx     `json:"prekeys"`
+}
+
+type GetKeysReq struct {
+	Identifier string `path:"identifier"`
+	DeviceId   int64  `path:"deviceId"`
+}
+
+type PreKeyResponseItem struct {
+	DeviceId       int64         `json:"deviceId"`
+	RegistrationId int64         `json:"registrationId"`
+	PreKey         PreKeyx       `json:"preKey"`
+	SignedPrekey   SignedPrekeyx `json:"signedPreKey"`
+}
+
+type GetKeysResx struct {
+	IdentityKey string               `json:"identityKey"`
+	Devices     []PreKeyResponseItem `json:"devices"`
+}

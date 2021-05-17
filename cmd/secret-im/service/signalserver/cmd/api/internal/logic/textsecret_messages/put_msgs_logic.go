@@ -2,8 +2,8 @@ package logic
 
 import (
 	"context"
-	"fmt"
 	"secret-im/service/signalserver/cmd/model"
+	"secret-im/service/signalserver/cmd/shared"
 	"time"
 
 	"secret-im/service/signalserver/cmd/api/internal/svc"
@@ -43,10 +43,10 @@ func (l *PutMsgsLogic) PutMsgs(req types.PutMessagesReq) (*types.PutMessagesRes,
 		row.Content=msg.Content
 		row.Relay=msg.Relay
 		row.Ctime=time.Now()
-		fmt.Println("======",row)
+
 		_,err:=l.svcCtx.MsgsModel.Insert(*row)
 		if err!=nil{
-			return nil, err
+			return nil, shared.NewCodeError(shared.ERRCODE_SQLINSERT,err.Error())
 		}
 	}
 	return &types.PutMessagesRes{NeedsSync: true}, nil

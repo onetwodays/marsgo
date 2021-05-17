@@ -62,7 +62,6 @@ func main() {
 			return http.StatusOK,e.Data()
 		default:
 			return http.StatusInternalServerError,err
-
 		}
 	})
 

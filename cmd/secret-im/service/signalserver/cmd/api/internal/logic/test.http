@@ -56,6 +56,45 @@ Content-Type: application/json
 
 }
 ###
+GET http://127.0.0.1:38888/api/v1/textsecret/keys/otcexchange/1
+Content-Type: application/json
+x-user-name: otcexchange
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE2MjEzMjQ1MDAsImlhdCI6MTYyMTIzODEwMCwibmFtZSI6Im90Y2V4Y2hhbmdlIn0.wGlrSPtsAkChPSMLF6j1hi3VmzWM49GMXYztzTtB_2U
+
+
+
+
+###
+
+PUT http://127.0.0.1:38888/api/v1/textsecret/keys
+Content-Type: application/json
+x-user-name: otcexchange
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE2MjEzMjQ1MDAsImlhdCI6MTYyMTIzODEwMCwibmFtZSI6Im90Y2V4Y2hhbmdlIn0.wGlrSPtsAkChPSMLF6j1hi3VmzWM49GMXYztzTtB_2U
+
+{
+  "identityKey":"identityKey",
+  "signedPreKey":{
+      "signature": "signature",
+      "prekey": {
+        "keyId": 1,
+        "publickey": "54"
+      }
+    },
+
+  "prekeys":[
+    {
+      "keyId": 0,
+      "publickey": "pk1"
+    },
+    {
+      "keyId": 1,
+      "publickey": "pk2"
+    }
+  ]
+
+}
+
+###
 
 
 PUT http://127.0.0.1:38888/api/v1/textsecret/messages/otcexchange

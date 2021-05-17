@@ -25,6 +25,7 @@ func NewGetDeviceKeyLogic(ctx context.Context, svcCtx *svc.ServiceContext) GetDe
 
 func (l *GetDeviceKeyLogic) GetDeviceKey(req types.GetDeviceKeyReq) (*types.GetDeviceKeyRes, error) {
 	// todo: add your logic here and delete this line
+	/*
 	_,account,err:=l.svcCtx.GetOneAccountByNumber(req.Number)
 	if err!=nil{
 		return nil,err
@@ -52,4 +53,6 @@ func (l *GetDeviceKeyLogic) GetDeviceKey(req types.GetDeviceKeyReq) (*types.GetD
 		Devices: devices,
 
 	}, nil
+	*/
+	return &types.GetDeviceKeyRes{},nil
 }
