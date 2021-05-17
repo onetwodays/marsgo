@@ -41,7 +41,7 @@ func (l *GetKeysLogic) GetKeys(req types.GetKeysReq) (*types.GetKeysResx, error)
 			}
 
 
-			err=json.Unmarshal([]byte(keys[i].SignedPrekey),devices[i].SignedPrekey) // 为什么这里要传指针呢？
+			err=json.Unmarshal([]byte(keys[i].SignedPrekey),&devices[i].SignedPrekey) // 为什么这里要传指针呢？
 			if err!=nil{
 				return nil, shared.NewCodeError(shared.ERRCODE_JSONUNMARSHAL,err.Error())
 			}

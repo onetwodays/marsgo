@@ -1,0 +1,152 @@
+
+# curl -i "http://localhost:8888/add?book=go-zero&price=10"
+GET http://localhost:8888/add?book=go-zero&price=10
+
+###
+# curl -i "http://localhost:8888/check?book=go-zero"
+GET http://localhost:8888/check?book=go-zero
+
+###
+
+
+
+###
+GET http://127.0.0.1:8888/user/info
+Content-Type: application/json
+x-User-Id: 1
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE2MTQ3NjI4MjYsImlhdCI6MTYxNDY3NjQyNiwidXNlcklkIjoxfQ.MvqQUsDoo_14wU2QmXXyskYQnB7AUCyEhxtBDokE9No
+
+<> 2021-02-23T135639.200.json
+
+
+
+###
+POST http://127.0.0.1:8888/user/login
+Content-Type: application/json
+
+{
+  "username":"admin",
+  "password":"666666",
+  "mobile":"19988888888"
+}
+
+
+<> 2021-02-23T135549.200.json
+<> 2021-02-23T135534.200.json
+
+
+
+###
+POST http://127.0.0.1:8888/user/register
+Content-Type: application/json
+
+{
+  "username":"admin",
+  "password":"666666",
+  "mobile":"19988888888"
+}
+###
+
+POST http://127.0.0.1:38888/api/v1/textsecret/login
+Content-Type: application/json
+
+{
+"name":"otcexchange",
+"sign":"SIG_K1_Jz4KTq5v3dhcRKYehza6NRF5SxZaEzdPiVohRhX5SqoDCjmjf6hh3vyqfFHzEUagWZHC3L6G6SaJvKdH3UWEVwJRLWc6jL"
+
+}
+###
+GET http://127.0.0.1:38888/api/v1/textsecret/keys/otcexchange/1
+Content-Type: application/json
+x-user-name: otcexchange
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE2MjEzMjQ1MDAsImlhdCI6MTYyMTIzODEwMCwibmFtZSI6Im90Y2V4Y2hhbmdlIn0.wGlrSPtsAkChPSMLF6j1hi3VmzWM49GMXYztzTtB_2U
+
+
+
+
+###
+
+PUT http://127.0.0.1:38888/api/v1/textsecret/keys
+Content-Type: application/json
+x-user-name: otcexchange
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE2MjEzMjQ1MDAsImlhdCI6MTYyMTIzODEwMCwibmFtZSI6Im90Y2V4Y2hhbmdlIn0.wGlrSPtsAkChPSMLF6j1hi3VmzWM49GMXYztzTtB_2U
+
+{
+  "identityKey":"identityKey",
+  "signedPreKey":{
+      "signature": "signature",
+      "prekey": {
+        "keyId": 1,
+        "publickey": "54"
+      }
+    },
+
+  "prekeys":[
+    {
+      "keyId": 0,
+      "publickey": "pk1"
+    },
+    {
+      "keyId": 1,
+      "publickey": "pk2"
+    }
+  ]
+
+}
+
+###
+
+
+PUT http://127.0.0.1:38888/api/v1/textsecret/messages/otcexchange
+Content-Type: application/json
+x-user-name: otcexchange
+Authorization: Bearer ey1JhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE2MjEwNjkzMjQsImlhdCI6MTYyMDk4MjkyNCwibmFtZSI6Im90Y2V4Y2hhbmdlIn0.VvM3HuZcPgpWY1QN8CJVfoVui4uxeaPdIVRBqIiXjnM
+
+{
+"destination":"otcexchange",
+"online":false,
+"timestamp": 1,
+"messages": [
+   {
+    "type": 1,
+    "destination": "otcexchange",
+    "destinationDeviceId": 1,
+    "destinationRegistrationId": 1,
+    "body": "11111",
+    "content": "22222",
+    "relay": "wwww.baidu.com"
+  }
+
+]
+
+}
+
+###
+GET http://127.0.0.1:38888/api/v1/textsecret/messages
+Content-Type: application/json
+x-user-name: otcexchange
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE2MjEzMjQ1MDAsImlhdCI6MTYyMTIzODEwMCwibmFtZSI6Im90Y2V4Y2hhbmdlIn0.wGlrSPtsAkChPSMLF6j1hi3VmzWM49GMXYztzTtB_2U
+
+
+
+
+###
+GET http://127.0.0.1:38888/ws
+Sec-WebSocket-Key: x3JJHMbDL1EzLkh9GBhXDw==
+Sec-WebSocket-Protocol: chat, superchat
+Sec-WebSocket-Version: 13
+Upgrade: websocket
+Connection: Upgrade
+x-user-name: otcexchange
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE2MjEwNjkzMjQsImlhdCI6MTYyMDk4MjkyNCwibmFtZSI6Im90Y2V4Y2hhbmdlIn0.VvM3HuZcPgpWY1QN8CJVfoVui4uxeaPdIVRBqIiXjnM
+
+
+###
+GET http://127.0.0.1:8888/api/v1/adxuser/ws
+Sec-WebSocket-Key: x3JJHMbDL1EzLkh9GBhXDw==
+Sec-WebSocket-Protocol: chat, superchat
+Sec-WebSocket-Version: 13
+Upgrade: websocket
+Connection: Upgrade
+x-user-name: otcexchange
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE2MTc3ODgyOTAsImlhdCI6MTYxNzcwMTg5MCwibmFtZSI6Im90Y2V4Y2hhbmdlIn0.m5Li3TFwv1FpkFGBZUvRsR-TcmeyO0TnB6n_wvDRma4
