@@ -2,6 +2,7 @@ package handler
 
 import (
 	"net/http"
+	"secret-im/service/signalserver/cmd/shared"
 
 	"secret-im/service/signalserver/cmd/api/internal/logic/textsecret"
 	"secret-im/service/signalserver/cmd/api/internal/svc"
@@ -23,7 +24,7 @@ func AdxUserLoginHandler(ctx *svc.ServiceContext) http.HandlerFunc {
 		if err != nil {
 			httpx.Error(w, err)
 		} else {
-			httpx.OkJson(w, resp)
+			httpx.OkJson(w, shared.NewOkResponse(resp))
 		}
 	}
 }
