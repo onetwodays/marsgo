@@ -49,5 +49,6 @@ func (l *PutMsgsLogic) PutMsgs(req types.PutMessagesReq) (*types.PutMessagesRes,
 			return nil, shared.NewCodeError(shared.ERRCODE_SQLINSERT,err.Error())
 		}
 	}
+
 	return &types.PutMessagesRes{NeedsSync: true}, nil
 }

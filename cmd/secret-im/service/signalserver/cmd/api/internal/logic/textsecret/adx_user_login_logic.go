@@ -92,7 +92,6 @@ func (l *AdxUserLoginLogic) AdxUserLogin(req types.AdxUserLoginReq) (*types.AdxU
 			AccessToken: jwtToken,
 			AccessExpire: now+accessExpire,
 			RefreshAfter: now+accessExpire/2,
-
 		},
 	}, nil
 }
