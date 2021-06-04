@@ -1,1 +1,1 @@
-protoc --go_out=./ ./msgstruct.proto
+protoc --go_out=./  ./*.proto

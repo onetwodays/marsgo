@@ -3,7 +3,7 @@ syntax = "v2"
 type IncomingMessagex {
     Type int `json:"type"`
     Destination string  `json:"destination"`
-    DestinationDeviceId int `json:"destinationDeviceId,default=1"`
+    DestinationDeviceId int `json:"destinationDeviceId,default=1"` //发到哪一个设备
     DestinationRegistrationId int `json:"destinationRegistrationId"`
     Body   string `json:"body"`
     Content string `json:"content"`
@@ -13,7 +13,7 @@ type IncomingMessagex {
 
 
 type PutMessagesReq{
-    Destination string  `json:"destination"`
+    Destination string  `path:"destination"`
     Online bool `json:"online"`
     Timestamp int64 `json:"timestamp"`
     Messages []IncomingMessagex `json:"messages"`
@@ -46,6 +46,9 @@ type GetPendingMsgsRes{
     List []OutcomingMessagex `json:"list"`
     More bool `json:"more"`
 }
+
+
+
 
 
 @server(
