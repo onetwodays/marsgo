@@ -6,7 +6,6 @@ import (
 
 	accounts "secret-im/service/signalserver/cmd/api/internal/handler/accounts"
 	bookstore "secret-im/service/signalserver/cmd/api/internal/handler/bookstore"
-	msgs "secret-im/service/signalserver/cmd/api/internal/handler/msgs"
 	textsecret "secret-im/service/signalserver/cmd/api/internal/handler/textsecret"
 	textsecret_keys "secret-im/service/signalserver/cmd/api/internal/handler/textsecret_keys"
 	textsecret_messages "secret-im/service/signalserver/cmd/api/internal/handler/textsecret_messages"
@@ -149,24 +148,6 @@ func RegisterHandlers(engine *rest.Server, serverCtx *svc.ServiceContext) {
 					Method:  http.MethodPut,
 					Path:    "/v1/keys/signed",
 					Handler: accounts.PutKeysSignedHandler(serverCtx),
-				},
-			}...,
-		),
-	)
-
-	engine.AddRoutes(
-		rest.WithMiddlewares(
-			[]rest.Middleware{serverCtx.CheckBasicAuth},
-			[]rest.Route{
-				{
-					Method:  http.MethodPut,
-					Path:    "/v1/messages/:destination",
-					Handler: msgs.PutMsgsSendHandler(serverCtx),
-				},
-				{
-					Method:  http.MethodPost,
-					Path:    "/v1/messages",
-					Handler: msgs.PostMsgsPendingHandler(serverCtx),
 				},
 			}...,
 		),

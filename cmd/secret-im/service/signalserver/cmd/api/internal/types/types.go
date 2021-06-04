@@ -201,41 +201,6 @@ type PutKeysSignedRes struct {
 	Resp interface{} `json:"resp"`
 }
 
-type IncomingMsg struct {
-	Type                      int    `json:"type"`
-	Destination               string `json:"destination"`
-	DestinationDeviceId       int64  `json:"destinationDeviceId"`
-	DestinationRegistrationId int    `json:"destinationRegistrationId"`
-	Body                      string `json:"body"`
-	Relay                     string `json:"relay"`
-	Silent                    bool   `json:"silent"`
-	Content                   string `json:"content"`
-}
-
-type PutMsgsSendReq struct {
-	Destination string        `path:"destination"` //收件人的手机号
-	MsgList     []IncomingMsg `json:"msgList"`     // 消息列表，可以多条消息一块发出
-	Relay       string        `json:"relay"`
-	Timestamp   int64         `json:"timestamp"`
-}
-
-type PutMsgSendRes struct {
-	Resp interface{} `json:"resp"`
-}
-
-type PostMsgsPendingReq struct {
-	PageIndex   int    `json:"pageIndex"`
-	PageSize    int    `json:"pageSize"`
-	Destination string `json:"destination"`
-}
-
-type PostMsgsPendingRes struct {
-	Total     int         `json:"total"`
-	PageSize  int         `json:"pageSize"`
-	PageIndex int         `json:"pageIndex"`
-	List      interface{} `json:"List"`
-}
-
 type JwtTokenAdx struct {
 	AccessToken  string `json:"accessToken,omitempty"`
 	AccessExpire int64  `json:"accessExpire,omitempty"`
@@ -254,7 +219,7 @@ type AdxUserLoginRes struct {
 type IncomingMessagex struct {
 	Type                      int    `json:"type"`
 	Destination               string `json:"destination"`
-	DestinationDeviceId       int    `json:"destinationDeviceId,default=1"`
+	DestinationDeviceId       int    `json:"destinationDeviceId,default=1"` //发到哪一个设备
 	DestinationRegistrationId int    `json:"destinationRegistrationId"`
 	Body                      string `json:"body"`
 	Content                   string `json:"content"`
@@ -262,7 +227,7 @@ type IncomingMessagex struct {
 }
 
 type PutMessagesReq struct {
-	Destination string             `json:"destination"`
+	Destination string             `path:"destination"`
 	Online      bool               `json:"online"`
 	Timestamp   int64              `json:"timestamp"`
 	Messages    []IncomingMessagex `json:"messages"`

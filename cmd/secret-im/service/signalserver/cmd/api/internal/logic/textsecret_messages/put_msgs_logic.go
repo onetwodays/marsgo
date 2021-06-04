@@ -2,6 +2,7 @@ package logic
 
 import (
 	"context"
+	"fmt"
 	"secret-im/service/signalserver/cmd/model"
 	"secret-im/service/signalserver/cmd/shared"
 	"time"
@@ -53,6 +54,7 @@ func (l *PutMsgsLogic) PutMsgs(sender string,req types.PutMessagesReq) (*types.P
 		row.Relay=msg.Relay
 		row.Guid=""
 		row.Ctime=time.Now()
+		fmt.Println("row=%T",*row)
 
 
 
