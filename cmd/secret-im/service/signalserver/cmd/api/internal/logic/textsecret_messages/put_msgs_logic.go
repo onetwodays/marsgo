@@ -54,7 +54,7 @@ func (l *PutMsgsLogic) PutMsgs(sender string,req types.PutMessagesReq) (*types.P
 		row.Relay=msg.Relay
 		row.Guid=""
 		row.Ctime=time.Now()
-		fmt.Println("row=%T",*row)
+		fmt.Printf("row=%T",*row)
 
 
 
