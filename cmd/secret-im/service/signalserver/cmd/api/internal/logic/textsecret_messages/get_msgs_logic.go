@@ -43,7 +43,7 @@ func (l *GetMsgsLogic) GetMsgs(who string,deviceId int64 ) (*types.GetPendingMsg
 		item.Source=row.Source
 		item.SourceUuid=row.SourceUuid
 		item.Cached=false
-		item.Guid="miss"
+		item.Guid=row.Guid
 		item.ServerTimestamp=row.Timestamp
 		item.Timestamp=row.Timestamp
 		list[i]=item
