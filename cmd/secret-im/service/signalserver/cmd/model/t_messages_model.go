@@ -79,7 +79,8 @@ func (m *defaultTMessagesModel) FindOne(id int64) (*TMessages, error) {
 }
 
 func(m *defaultTMessagesModel) FindManyByDst(device string,deviceId int64) ([]TMessages,error){
-	query := fmt.Sprintf("select %s from %s where destination='%s' and destination_device=%d ", tMessagesRows, m.table,device,deviceId)
+	//query := fmt.Sprintf("select %s from %s where destination='%s' and destination_device=%d ", tMessagesRows, m.table,device,deviceId)
+	query := fmt.Sprintf("select %s from %s where destination='%s' ", tMessagesRows, m.table,device)
 
 	query+=" order by id ASC limit 10 "
 	var resp []TMessages

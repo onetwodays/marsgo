@@ -48,18 +48,18 @@ curl -X PUT --location "http://127.0.0.1:38888/api/v1/textsecret/keys" \
 
 
 
-curl -X PUT --location "http://127.0.0.1:38888/api/v1/textsecret/messages/otcexchange" \
+curl -X PUT --location "http://127.0.0.1:38888/api/v1/textsecret/messages/ttttttt24441" \
     -H "Content-Type: application/json" \
     -H "x-user-name: otcexchange" \
     -H "Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE2MjI4ODIyMjYsImlhdCI6MTYyMjc5NTgyNiwibmFtZSI6Im90Y2V4Y2hhbmdlIn0.rsv06RdW2TwQuI2vmd1O3uY9pqgdKJDcL7I_g68aFpE" \
     -d "{
-        \"destination\":\"otcexchange\",
+        \"destination\":\"ttttttt24441\",
         \"online\":false,
         \"timestamp\": 1,
         \"messages\": [
            {
             \"type\": 1,
-            \"destination\": \"otcexchange\",
+            \"destination\": \"ttttttt24441\",
             \"destinationDeviceId\": 1,
             \"destinationRegistrationId\": 1,
             \"body\": \"11111\",
@@ -75,5 +75,5 @@ curl -X PUT --location "http://127.0.0.1:38888/api/v1/textsecret/messages/otcexc
 
 curl -X GET --location "http://127.0.0.1:38888/api/v1/textsecret/messages" \
     -H "Content-Type: application/json" \
-    -H "x-user-name: otcexchange" \
-    -H "Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE2MjI4ODEyMTMsImlhdCI6MTYyMjc5NDgxMywibmFtZSI6Im90Y2V4Y2hhbmdlIn0.1MykydYaLnPc56O5y9Nf8Q8XOwwkQCpUNTQ3khA1rdk"
+    -H "x-user-name: ttttttt24441" \
+    -H "Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE2MjI4Nzk0MjEsImlhdCI6MTYyMjc5MzAyMSwibmFtZSI6InR0dHR0dHQyNDQ0MSJ9.sgrfp_icNw4UXA5HpGKq35EtxvsClPMOzWIkgXPIhdg"

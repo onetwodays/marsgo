@@ -46,7 +46,7 @@ func (l *PutMsgsLogic) PutMsgs(sender string,req types.PutMessagesReq) (*types.P
 		row.Source= sender
 		row.SourceUuid=""
 		row.SourceDevice=1
-		row.Destination=req.Destination
+		row.Destination=msg.Destination
 		row.DestinationDevice=int64(msg.DestinationDeviceId)
 		row.Timestamp=req.Timestamp
 		row.Message=msg.Body
