@@ -26,6 +26,7 @@ type (
 		FindManyByDst(device string,deviceId int64) ([]TMessages,error)
 		Update(data TMessages) error
 		Delete(id int64) error
+		DeleteManyByGuid(guids []string) error
 	}
 
 	defaultTMessagesModel struct {
@@ -107,3 +108,13 @@ func (m *defaultTMessagesModel) Delete(id int64) error {
 	_, err := m.conn.Exec(query, id)
 	return err
 }
+
+
+func (m *defaultTMessagesModel) DeleteManyByGuid(guids []string) error{
+	guidList:=strings.Join(guids,",")
+	guidList="("+guidList+")"
+	query := fmt.Sprintf("delete from %s where `id` in  ?", m.table)
+	_, err := m.conn.Exec(query, guidList)
+	return err
+}
+

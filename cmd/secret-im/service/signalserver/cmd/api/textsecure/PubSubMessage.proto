@@ -32,5 +32,5 @@ message PubSubMessage {
   }
 
    Type  type    = 1;
-   bytes content = 2;
+   string content = 2;
 }

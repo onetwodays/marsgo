@@ -260,6 +260,24 @@ type GetPendingMsgsRes struct {
 	More bool                `json:"more"`
 }
 
+type Envelope struct {
+	Xtype           int    `json:"type"`
+	Source          string `json:"source"`
+	SourceUuid      string `json:"sourceUuid"`
+	SourceDevice    int    `json:"sourceDevice"`
+	Relay           string `json:"relay"`
+	Timestamp       uint64 `json:"timestamp"`
+	LegacyMessage   string `json:"legacyMessage"`
+	Content         string `json:"content"`
+	ServerGuid      string `json:"guid"`
+	ServerTimestamp uint64 `json:"serverTimestamp"`
+}
+
+type PubsubMessage struct {
+	Xtype   int      `json:"type"`
+	Content Envelope `json:"envelop"`
+}
+
 type PreKeyx struct {
 	KeyId     int64  `json:"keyId"`
 	PublicKey string `json:"publickey"`

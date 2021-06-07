@@ -48,6 +48,28 @@ type GetPendingMsgsRes{
 }
 
 
+type (
+    Envelope {
+        xtype int `json:"type"`
+        source string `json:"source"`
+        sourceUuid string `json:"sourceUuid"`
+        sourceDevice int `json:"sourceDevice"`
+        relay string   `json:"relay"`
+        timestamp uint64 `json:"timestamp"`
+        legacyMessage string   `json:"legacyMessage"`
+        content string `json:"content"`
+        serverGuid string `json:"guid"`
+        serverTimestamp uint64 `json:"serverTimestamp"`
+
+    }
+
+    PubsubMessage{
+        xtype int `json:"type"`
+        content Envelope `json:"envelop"`
+    }
+)
+
+
 
 
 

@@ -13,7 +13,7 @@ require (
 	github.com/onsi/gomega v1.10.5 // indirect
 	github.com/stretchr/testify v1.6.1 // indirect
 	github.com/tal-tech/go-zero v1.1.6
-	github.com/tidwall/gjson v1.7.4 // indirect
+	github.com/tidwall/gjson v1.7.4
 	github.com/tidwall/sjson v1.1.5 // indirect
 	go.uber.org/automaxprocs v1.4.0 // indirect
 	go.uber.org/multierr v1.6.0 // indirect

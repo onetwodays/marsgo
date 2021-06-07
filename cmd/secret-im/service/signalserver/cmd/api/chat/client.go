@@ -8,7 +8,9 @@ import (
 	"bytes"
 	"errors"
 	"github.com/tal-tech/go-zero/rest/httpx"
+	"secret-im/service/signalserver/cmd/api/internal/svc"
 	"secret-im/service/signalserver/cmd/api/util"
+	"secret-im/service/signalserver/cmd/shared"
 	"sync"
 
 	//"github.com/golang/protobuf/proto"
@@ -18,6 +20,7 @@ import (
 	"time"
 
 	"github.com/gorilla/websocket"
+	"github.com/tidwall/gjson"
 )
 
 const (
@@ -52,6 +55,17 @@ func SetHub(hub *Hub)  {
 	xhub = hub
 }
 
+func init()  {
+	xhub=NewHub()
+	go xhub.Run()
+
+}
+
+func Broadcast(msg []byte){
+	if xhub!=nil{
+		xhub.broadcast<-msg
+	}
+}
 
 
 // Client is a middleman between the websocket connection and the hub.
@@ -62,58 +76,82 @@ type Client struct {
 	rwlock sync.RWMutex
 	isClosed bool
 	hub *Hub  //管理所有的连接
+	src *svc.ServiceContext
+
+
 
 }
 
 // serveWs handles websocket requests from the peer.
-func WsConnectHandler(w http.ResponseWriter, r *http.Request) {
-	conn, err := upgrader.Upgrade(w, r, nil)
-	if err != nil {
-		logx.Info(err)
-		return
-	}
-	client := &Client{
-		hub: xhub,
-		conn: conn,
-		outputQueue: make(chan []byte, maxMessageSize),
-		id:util.GenSalt(),
-		isClosed: false,
-
-	}
-	client.hub.register <- client // mutex
-	go client.writePump()
-	go client.readPump()
-}
-
-func AdxWsConnectHandler(adxName string,w http.ResponseWriter, r *http.Request) {
-
+func WsConnectHandler(ctx *svc.ServiceContext) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		adxName:= r.Header.Get(shared.HEADADXUSERNAME)
+		if len(adxName)==0 {
+			adxName=util.GenSalt()
+		}
+		if _,exist:=HasOne(adxName);exist{ //已经建立一个连接了，不运行在建立一个
+			err:=shared.NewCodeError(shared.ERRCODE_WSCONNECTDUP,"one account only has one ws connection")
+			httpx.Error(w, err)
+			return
+		}
 		conn, err := upgrader.Upgrade(w, r, nil)
 		if err != nil {
 			logx.Info(err)
-			httpx.Error(w,err) // tell client  an error of type HandshakeError
-		}else{
-			logx.Info("receive handshake from ",conn.RemoteAddr().String())
-			client := &Client{
-				hub: xhub,
-				conn: conn,
-				outputQueue: make(chan []byte, maxMessageSize),
-				id:adxName,
-				isClosed: false,
-			}
-			client.hub.register <- client
-			go client.writePump()
-			go client.readPump()
+			err:=shared.NewCodeError(shared.ERRCODE_WSCONNECTERR,err.Error())
+			httpx.Error(w, err)
+			return
 		}
+
+
+		client := &Client{
+			id:adxName,
+			conn: conn,
+			outputQueue: make(chan []byte, maxMessageSize),
+			isClosed: false,
+			hub: xhub,
+			src:ctx,
+
+		}
+		client.hub.register <- client // mutex
+		go client.writePump()
+		go client.readPump()
+
+	}
 
 }
 
+
+
+
 func (c *Client) close(){
-	close(c.outputQueue)
+
 	c.rwlock.Lock()
 	defer c.rwlock.Unlock()
-	c.isClosed=true
-	c.conn.Close()
-	c.hub.unregister <- c
+	if !c.isClosed{
+		close(c.outputQueue)
+		c.isClosed=true
+		c.conn.Close()
+		c.hub.unregister <- c
+	}
+
+}
+
+
+
+func (c *Client) handleMsg(msg string){
+	method:=gjson.Get(msg,"method")
+	content:=gjson.Get(msg,"content")
+	if method.Exists() && method.String()=="delete.received.msgs" && content.IsArray(){
+		guidList:=make ([]string,len(content.Array()))
+		for i:=range content.Array(){
+			guidList[i] = content.Array()[i].String()
+
+		}
+		err:=c.src.MsgsModel.DeleteManyByGuid(guidList)
+		if err!=nil{
+			logx.Error("delete.received.msgs %v error",guidList,err.Error())
+		}
+	}
 }
 // readPump pumps messages from the websocket connection to the hub.
 //
@@ -137,7 +175,8 @@ func (c *Client) readPump() {
 			break
 		}
 		message = bytes.TrimSpace(bytes.Replace(message, newline, space, -1))
-		c.hub.broadcast <- message //读到的消息放到广播里面, to write redis
+		c.hub.broadcast <- message //读到的消息放到广播里面, to write redis,测试用
+		c.handleMsg(string(message))
 
 		/*
 		msg:=new(textsecure.OutMessage)  //通过websocket来发送请求
@@ -195,20 +234,23 @@ func (c *Client) writePump() {
 	ticker := time.NewTicker(pingPeriod) //每隔一定时间发ping
 	defer func() {
 		ticker.Stop()
-		c.conn.Close()
+		c.conn.Close() //这里只是关闭连接，并不是c.close()的调用
 	}()
+
 	for {
 		select {
 		case message, ok := <-c.outputQueue:
-			c.conn.SetWriteDeadline(time.Now().Add(writeWait))
-			if !ok {
+
+			if !ok { //已经关闭了
 				// The hub closed the channel.
 				c.conn.WriteMessage(websocket.CloseMessage, []byte{})
 				return
 			}
+			c.conn.SetWriteDeadline(time.Now().Add(writeWait))
 
 			w, err := c.conn.NextWriter(websocket.TextMessage)
 			if err != nil {
+				logx.Error("ws sender(%s) get NextWriter error:%s ",c.id,err.Error())
 				return
 			}
 			w.Write(message)
@@ -220,6 +262,7 @@ func (c *Client) writePump() {
 				w.Write(<-c.outputQueue)
 			}
 			if err := w.Close(); err != nil { //写完关闭w，不是关闭连接
+				logx.Error("ws sender(%s) close got NextWriter error:%s ",c.id,err.Error())
 				return
 			}
 		case <-ticker.C:

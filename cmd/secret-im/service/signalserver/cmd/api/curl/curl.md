@@ -48,10 +48,10 @@ curl -X PUT --location "http://127.0.0.1:38888/api/v1/textsecret/keys" \
 
 
 
-curl -X PUT --location "http://127.0.0.1:38888/api/v1/textsecret/messages/ttttttt24441" \
+curl -X PUT --location "http://127.0.0.1:38888/api/v1/textsecret/messages/tttttt1" \
     -H "Content-Type: application/json" \
     -H "x-user-name: otcexchange" \
-    -H "Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE2MjI4ODIyMjYsImlhdCI6MTYyMjc5NTgyNiwibmFtZSI6Im90Y2V4Y2hhbmdlIn0.rsv06RdW2TwQuI2vmd1O3uY9pqgdKJDcL7I_g68aFpE" \
+    -H "Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE2MjMxMTcyNDIsImlhdCI6MTYyMzAzMDg0MiwibmFtZSI6Im90Y2V4Y2hhbmdlIn0.mEDJ9yzQMc8e1_DZmqIieLA8KQLLbRkfsa_YW2Ma0v4" \
     -d "{
         \"destination\":\"ttttttt24441\",
         \"online\":false,
@@ -63,7 +63,7 @@ curl -X PUT --location "http://127.0.0.1:38888/api/v1/textsecret/messages/tttttt
             \"destinationDeviceId\": 1,
             \"destinationRegistrationId\": 1,
             \"body\": \"11111\",
-            \"content\": \"22222\",
+            \"content\": \"hello world\",
             \"relay\": \"wwww.baidu.com\"
           }
 

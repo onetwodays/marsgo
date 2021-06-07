@@ -2,15 +2,20 @@ package chat
 
 import (
 	"github.com/tal-tech/go-zero/core/logx"
+	"sync"
+)
+
+var (
+	// Registered clients.
+	rwlock sync.RWMutex
+	clients map[string]*Client = make(map[string]*Client)
 )
 
 
 // Hub maintains the set of active clients and broadcasts messages to the
 // clients.
 type Hub struct {
-	// Registered clients.
 
-	clients map[string]*Client
 
 	// Inbound messages from the clients.
 	broadcast chan []byte
@@ -28,31 +33,68 @@ func NewHub() *Hub {
 		broadcast:  make(chan []byte),
 		register:   make(chan *Client),
 		unregister: make(chan *Client),
-		clients:  make(map[string]*Client),
+
 	}
 }
 
 func (h *Hub) Run() {
 	for {
 		select {
-
-		case client := <-h.register:
-			h.clients[client.id]=client
-			logx.Infof("websocket client (%s)  Registed",client.id)
-		case client := <-h.unregister:
-			if _, ok := h.clients[client.id]; ok {
-				delete(h.clients,client.id)
-				logx.Infof("websocket client (%s) left",client.id)
-			}
+		case c := <-h.register:
+			comeOne(c)
+		case c := <-h.unregister:
+			leaveOne(c)
 		case message := <-h.broadcast:
-			for _,c := range h.clients {
-				err:=c.WriteOne(message)
-				if err!=nil{
-					logx.Errorf("send to %s broadcast failed by  ",c.id,err)
-				}
-			}
+			broadcast(message)
 		}
 	}
 }
+
+func HasOne(cname string) (*Client,bool) {
+	rwlock.RLock()
+	defer func() {
+		rwlock.RUnlock()
+	}()
+	c,ok:=clients[cname]
+	return c,ok
+}
+
+
+func comeOne(c *Client){
+	rwlock.Lock()
+	defer func() {
+		rwlock.Unlock()
+	}()
+	clients[c.id]=c
+	logx.Infof("websocket client (%s)  Registed",c.id)
+}
+
+func leaveOne(c *Client){
+	rwlock.Lock()
+	defer func() {
+		rwlock.Unlock()
+	}()
+	if _, ok := clients[c.id]; ok {
+		delete(clients,c.id)
+		logx.Infof("websocket client (%s) left",c.id)
+	}
+}
+
+func broadcast(msg []byte){
+	rwlock.Lock()
+	defer func() {
+		rwlock.Unlock()
+	}()
+	for _,c := range clients {
+		err:=c.WriteOne(msg)
+		if err!=nil{
+			logx.Errorf("send to %s broadcast failed by  ",c.id,err)
+		}
+	}
+}
+
+
+
+
 
 

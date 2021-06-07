@@ -36,8 +36,8 @@ message Envelope {
    uint32 sourceDevice     = 7;
    string relay            = 3;
    uint64 timestamp        = 5;
-   bytes  legacyMessage    = 6; // Contains an encrypted DataMessage XXX -- Remove after 10/01/15
-   bytes  content          = 8; // Contains an encrypted Content
+   string  legacyMessage    = 6; // Contains an encrypted DataMessage XXX -- Remove after 10/01/15
+   string  content          = 8; // Contains an encrypted Content
    string serverGuid       = 9;
    uint64 server_timestamp = 10;
 }

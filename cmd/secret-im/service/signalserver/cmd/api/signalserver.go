@@ -66,13 +66,13 @@ func main() {
 	})
 
 
-    //websocket server
+    //websocket server.调试使用，可以通过网页看到ws结果，生产环境要关闭
     if isStartWss{
 
 		server.AddRoute(rest.Route{
 			Method: http.MethodGet,
 			Path: "/ws",
-			Handler: chat.WsConnectHandler,
+			Handler: chat.WsConnectHandler(ctx),
 		})
 	}
 

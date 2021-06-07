@@ -5,10 +5,8 @@ package svc
 import (
 	"encoding/json"
 	eos "github.com/marsofsnow/eos-go"
-	"github.com/tal-tech/go-zero/core/logx"
 	"github.com/tal-tech/go-zero/core/stores/sqlx"
 	"github.com/tal-tech/go-zero/rest"
-	"secret-im/service/signalserver/cmd/api/chat"
 	"secret-im/service/signalserver/cmd/api/config"
 	"secret-im/service/signalserver/cmd/api/db/redis"
 	"secret-im/service/signalserver/cmd/api/internal/middleware"
@@ -20,7 +18,7 @@ import (
 
 type ServiceContext struct {
 	Config    config.Config
-	Hub       *chat.Hub
+	//Hub       *chat.Hub
 	UserModel model.UserModel //CRUD
 
 
@@ -45,12 +43,15 @@ func NewServiceContext(c config.Config) *ServiceContext {
 
 	mysqlConn := sqlx.NewMysql(c.Mysql.DataSource)
 	um:= model.NewUserModel(mysqlConn)
+	/*
 	hub:=chat.NewHub()
 	go func() {
 		logx.Info("hub run start.....")
 		hub.Run()
 	}()
 	chat.SetHub(hub)
+
+	 */
 
 	eosApi:=eos.New(c.EOSChainUrls[0])
 	eosApi.EnableKeepAlives()
@@ -61,7 +62,7 @@ func NewServiceContext(c config.Config) *ServiceContext {
 
 	return &ServiceContext{
 		Config:    c,
-		Hub: hub,
+		//Hub: hub,
 		UserModel: um,
 
 		PendAccountsModel: model.NewTPendAccountsModel(mysqlConn),
