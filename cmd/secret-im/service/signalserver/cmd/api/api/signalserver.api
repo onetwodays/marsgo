@@ -9,7 +9,7 @@ info(
 import (
 	"user.api"
 	"bookstore.api"
-	"accounts.api"
+	//"accounts.api"
 	"textsecure.api"
 	"messages.api"
 	"keys.api"

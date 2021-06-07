@@ -3,15 +3,11 @@
 package svc
 
 import (
-	"encoding/json"
 	eos "github.com/marsofsnow/eos-go"
 	"github.com/tal-tech/go-zero/core/stores/sqlx"
 	"github.com/tal-tech/go-zero/rest"
 	"secret-im/service/signalserver/cmd/api/config"
-	"secret-im/service/signalserver/cmd/api/db/redis"
 	"secret-im/service/signalserver/cmd/api/internal/middleware"
-	"secret-im/service/signalserver/cmd/api/internal/types"
-	"secret-im/service/signalserver/cmd/api/util"
 	"secret-im/service/signalserver/cmd/model"
 	"secret-im/service/signalserver/cmd/rpc/bookstore/bookstoreclient"
 )
@@ -75,42 +71,6 @@ func NewServiceContext(c config.Config) *ServiceContext {
 		//BookStoreClient: bookstoreclient.NewBookstore(zrpc.MustNewClient(c.BookStore,zrpc.WithUnaryClientInterceptor(interceptor.TimeInterceptor))),
 		EosApi: eosApi,
 	}
-}
-
-func (sc *ServiceContext) GetOneAccountByNumber(number string) (int64,*types.Account,error) {
-	account:=types.Account{}
-	accountModel,err:= sc.AccountsModel.FindOneByNumber(number)
-	if err!=nil {
-		return -1,nil, err
-	}
-	data:=accountModel.Data
-
-	err = json.Unmarshal([]byte(data),&account)
-	if err!=nil{
-		return -1,nil, err
-	}
-	return accountModel.Id,&account, nil
-
-
-}
-
-func (sc *ServiceContext) UpdateDirectory(number string,voice,video bool) error {
-	hs:= util.ContactToken(number)
-	dirToken:=types.GetDirTokenRes{
-		Voice: voice,
-		Video:  video,
-		Relay: "",
-		Token: "",
-	}
-	v,err:=json.Marshal(dirToken)
-	if err!=nil{
-		return  err
-	}
-	_,err = redis.RedisDirectoryManager().HSet("directory",string(hs[:]),string(v)).Result()
-	if err!=nil{
-		return  err
-	}
-	return nil
 }
 
 

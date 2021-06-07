@@ -85,36 +85,47 @@ type Client struct {
 // serveWs handles websocket requests from the peer.
 func WsConnectHandler(ctx *svc.ServiceContext) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
+		if !websocket.IsWebSocketUpgrade(r){
+			err := shared.NewCodeError(shared.ERRCODE_WSCONNECTERR, "is not websocket upfgrade")
+			httpx.Error(w, err)
+		}
 		adxName:= r.Header.Get(shared.HEADADXUSERNAME)
 		if len(adxName)==0 {
 			adxName=util.GenSalt()
 		}
-		if _,exist:=HasOne(adxName);exist{ //已经建立一个连接了，不运行在建立一个
-			err:=shared.NewCodeError(shared.ERRCODE_WSCONNECTDUP,"one account only has one ws connection")
+		if _,exist:=HasOne(adxName);exist { //已经建立一个连接了，不运行在建立一个
+			err := shared.NewCodeError(shared.ERRCODE_WSCONNECTDUP, "one account only has one ws connection")
 			httpx.Error(w, err)
-			return
+
 		}
+
+
 		conn, err := upgrader.Upgrade(w, r, nil)
 		if err != nil {
 			logx.Info(err)
 			err:=shared.NewCodeError(shared.ERRCODE_WSCONNECTERR,err.Error())
 			httpx.Error(w, err)
-			return
+
+		}else{
+			client := &Client{
+				id:adxName,
+				conn: conn,
+				outputQueue: make(chan []byte, maxMessageSize),
+				isClosed: false,
+				hub: xhub,
+				src:ctx,
+
+			}
+			client.hub.register <- client // mutex
+			go client.writePump()
+			go client.readPump()
+
 		}
 
 
-		client := &Client{
-			id:adxName,
-			conn: conn,
-			outputQueue: make(chan []byte, maxMessageSize),
-			isClosed: false,
-			hub: xhub,
-			src:ctx,
 
-		}
-		client.hub.register <- client // mutex
-		go client.writePump()
-		go client.readPump()
+
+
 
 	}
 
