@@ -5,6 +5,8 @@ import (
 	"github.com/tal-tech/go-zero/core/logx"
 	"github.com/tal-tech/go-zero/rest/httpx"
 	"net/http"
+	"os"
+	"path/filepath"
 	"secret-im/common"
 	"secret-im/service/signalserver/cmd/api/chat"
 	"secret-im/service/signalserver/cmd/api/middleware"
@@ -23,8 +25,6 @@ import (
 
 var isStartWss = true
 func main() {
-
-
 	//url 不存在时,个性化提示
 	rt := router.NewRouter()
 	rt.SetNotFoundHandler(http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
@@ -86,10 +86,18 @@ func main() {
 
 func registerDirHandlers(engine *rest.Server, serverCtx *svc.ServiceContext) {
 
+	ex, err := os.Executable()
+	if err != nil {
+		panic(err)
+	}
+	exPath := filepath.Dir(ex)
+	logx.Info("current dir:",exPath)
+
 	//这里注册
 	dirlevel := []string{":1", ":2", ":3", ":4", ":5", ":6", ":7", ":8"}
 	patern := "/deploy/" //url用的
-	dirpath := "./static" //服务所在目录的static目录
+	dirpath := filepath.Join(exPath,"static") //服务所在目录的static目录
+	logx.Info("static file dir:",dirpath)
 	for i := 1; i < len(dirlevel); i++ {
 		path := patern + strings.Join(dirlevel[:i], "/")
 		//最后生成 /asset
