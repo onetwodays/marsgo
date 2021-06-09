@@ -9,6 +9,7 @@ import (
 	"errors"
 	"github.com/tal-tech/go-zero/rest/httpx"
 	"secret-im/service/signalserver/cmd/api/internal/svc"
+	"secret-im/service/signalserver/cmd/api/internal/types"
 	"secret-im/service/signalserver/cmd/api/util"
 	"secret-im/service/signalserver/cmd/shared"
 	"sync"
@@ -77,9 +78,6 @@ type Client struct {
 	isClosed bool
 	hub *Hub  //管理所有的连接
 	src *svc.ServiceContext
-
-
-
 }
 
 // serveWs handles websocket requests from the peer.
@@ -92,6 +90,15 @@ func WsConnectHandler(ctx *svc.ServiceContext) http.HandlerFunc {
 		adxName:= r.Header.Get(shared.HEADADXUSERNAME)
 		if len(adxName)==0 {
 			adxName=util.GenSalt()
+		}
+
+
+		var req types.WriteWsConnReq
+		if err := httpx.Parse(r, &req); err != nil {
+			logx.Error("httpx.Parse /v1/websocket/?login= error",err.Error())
+
+		}else{
+			adxName = req.Login
 		}
 		if _,exist:=HasOne(adxName);exist { //已经建立一个连接了，不运行在建立一个
 			err := shared.NewCodeError(shared.ERRCODE_WSCONNECTDUP, "one account only has one ws connection")
@@ -114,19 +121,12 @@ func WsConnectHandler(ctx *svc.ServiceContext) http.HandlerFunc {
 				isClosed: false,
 				hub: xhub,
 				src:ctx,
-
 			}
 			client.hub.register <- client // mutex
 			go client.writePump()
 			go client.readPump()
 
 		}
-
-
-
-
-
-
 	}
 
 }
@@ -151,18 +151,34 @@ func (c *Client) close(){
 
 func (c *Client) handleMsg(msg string){
 	method:=gjson.Get(msg,"method")
-	content:=gjson.Get(msg,"content")
-	if method.Exists() && method.String()=="delete.received.msgs" && content.IsArray(){
-		guidList:=make ([]string,len(content.Array()))
-		for i:=range content.Array(){
-			guidList[i] = content.Array()[i].String()
+	destination:=gjson.Get(msg,"destination")
 
+	if destination.Exists(){ //转发消息
+		recv,isOk:=HasOne(destination.String())
+		if isOk{
+			recv.WriteOne([]byte(msg)) //现阶段调试广播出去
 		}
-		err:=c.src.MsgsModel.DeleteManyByGuid(guidList)
-		if err!=nil{
-			logx.Error("delete.received.msgs %v error",guidList,err.Error())
+		//broadcastExclude([]byte(msg),c.id) //先广播出去吧
+
+
+	} else if method.Exists() && method.String()=="delete.received.msgs"  {
+		content:=gjson.Get(msg,"content")
+		if content.IsArray(){
+			guidList:=make ([]string,len(content.Array()))
+			for i:=range content.Array(){
+				guidList[i] = content.Array()[i].String()
+
+			}
+			err:=c.src.MsgsModel.DeleteManyByGuid(guidList)
+			if err!=nil{
+				logx.Error("delete.received.msgs %v error",guidList,err.Error())
+			}
 		}
+
+
 	}
+
+
 }
 // readPump pumps messages from the websocket connection to the hub.
 //
@@ -186,7 +202,7 @@ func (c *Client) readPump() {
 			break
 		}
 		message = bytes.TrimSpace(bytes.Replace(message, newline, space, -1))
-		c.hub.broadcast <- message //读到的消息放到广播里面, to write redis,测试用
+		//c.hub.broadcast <- message //读到的消息放到广播里面, to write redis,测试用
 		c.handleMsg(string(message))
 
 		/*

@@ -93,6 +93,22 @@ func broadcast(msg []byte){
 	}
 }
 
+func broadcastExclude(msg []byte,excludeClient string){
+	rwlock.Lock()
+	defer func() {
+		rwlock.Unlock()
+	}()
+	for _,c := range clients {
+		if c.id!=excludeClient{
+			err:=c.WriteOne(msg)
+			if err!=nil{
+				logx.Errorf("send to %s broadcast failed by  ",c.id,err)
+			}
+		}
+
+	}
+}
+
 
 
 

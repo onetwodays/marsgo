@@ -158,3 +158,8 @@ type GetKeysResx struct {
 	IdentityKey string               `json:"identityKey"`
 	Devices     []PreKeyResponseItem `json:"devices"`
 }
+
+type WriteWsConnReq struct {
+	Login    string `form:"login"`
+	Password string `form:"password"`
+}

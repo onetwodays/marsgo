@@ -1,0 +1,30 @@
+syntax = "v2"
+
+info(
+    title: "handle ws connect"
+    desc: "type desc here"
+    author: "type author here"
+    email: "type email here"
+    version: "type version here"
+)
+
+
+type WriteWsConnReq {
+    login string `form:"login"`
+    password string `form:"password"`
+}
+
+
+@server(
+
+    group: textsecret_websocket
+
+)
+
+service signalserver-api {
+    @handler RwsConnectHandler
+    get /v1/websocket () returns ()
+
+    @handler WwsConnectHandler
+    get /v1/websocket/w (WriteWsConnReq) returns ()
+}

@@ -8,6 +8,7 @@ import (
 	textsecret "secret-im/service/signalserver/cmd/api/internal/handler/textsecret"
 	textsecret_keys "secret-im/service/signalserver/cmd/api/internal/handler/textsecret_keys"
 	textsecret_messages "secret-im/service/signalserver/cmd/api/internal/handler/textsecret_messages"
+	textsecret_websocket "secret-im/service/signalserver/cmd/api/internal/handler/textsecret_websocket"
 	website "secret-im/service/signalserver/cmd/api/internal/handler/website"
 	"secret-im/service/signalserver/cmd/api/internal/svc"
 
@@ -129,5 +130,20 @@ func RegisterHandlers(engine *rest.Server, serverCtx *svc.ServiceContext) {
 			}...,
 		),
 		rest.WithJwt(serverCtx.Config.Auth.AccessSecret),
+	)
+
+	engine.AddRoutes(
+		[]rest.Route{
+			{
+				Method:  http.MethodGet,
+				Path:    "/v1/websocket",
+				Handler: textsecret_websocket.RwsConnectHandler(serverCtx),
+			},
+			{
+				Method:  http.MethodGet,
+				Path:    "/v1/websocket/w",
+				Handler: textsecret_websocket.WwsConnectHandler(serverCtx),
+			},
+		},
 	)
 }
