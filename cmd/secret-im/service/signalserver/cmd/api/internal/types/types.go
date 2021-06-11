@@ -65,13 +65,13 @@ type AdxUserLoginRes struct {
 }
 
 type IncomingMessagex struct {
+	Content                   string `json:"content"`
 	Type                      int    `json:"type"`
-	Destination               string `json:"destination"`
 	DestinationDeviceId       int    `json:"destinationDeviceId,default=1"` //发到哪一个设备
 	DestinationRegistrationId int    `json:"destinationRegistrationId"`
-	Body                      string `json:"body"`
-	Content                   string `json:"content"`
-	Relay                     string `json:"relay"`
+	Destination               string `json:"destination,optional"`
+	Body                      string `json:"body,optional"`
+	Relay                     string `json:"relay,optional"`
 }
 
 type PutMessagesReq struct {
@@ -82,7 +82,8 @@ type PutMessagesReq struct {
 }
 
 type PutMessagesRes struct {
-	NeedsSync bool `json:"needsSync"`
+	NeedsSync   bool     `json:"needsSync"`
+	DestContent [][]byte `json:"destContent,optional"`
 }
 
 type OutcomingMessagex struct {

@@ -1,13 +1,13 @@
 syntax = "v2"
 
 type IncomingMessagex {
+    Content string `json:"content"`
     Type int `json:"type"`
-    Destination string  `json:"destination"`
     DestinationDeviceId int `json:"destinationDeviceId,default=1"` //发到哪一个设备
     DestinationRegistrationId int `json:"destinationRegistrationId"`
-    Body   string `json:"body"`
-    Content string `json:"content"`
-    Relay string `json:"relay"`
+    Destination string  `json:"destination,optional"`
+    Body   string `json:"body,optional"`
+    Relay string `json:"relay,optional"`
 }
 
 
@@ -20,6 +20,7 @@ type PutMessagesReq{
 }
 type PutMessagesRes{
     NeedsSync bool `json:"needsSync"`
+    DestContent [][]byte `json:"destContent,optional"`
 }
 
 

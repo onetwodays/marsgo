@@ -88,7 +88,7 @@ func broadcast(msg []byte){
 	for _,c := range clients {
 		err:=c.WriteOne(msg)
 		if err!=nil{
-			logx.Errorf("send to %s broadcast failed by  ",c.id,err)
+			logx.Errorf("send to %s broadcast failed by %s  ",c.id,err.Error())
 		}
 	}
 }
@@ -102,7 +102,7 @@ func broadcastExclude(msg []byte,excludeClient string){
 		if c.id!=excludeClient{
 			err:=c.WriteOne(msg)
 			if err!=nil{
-				logx.Errorf("send to %s broadcast failed by  ",c.id,err)
+				logx.Errorf("send to %s broadcast failed by %s ",c.id,err.Error())
 			}
 		}
 

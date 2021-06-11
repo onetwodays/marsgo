@@ -1,0 +1,38 @@
+/**
+ * Copyright (C) 2014-2016 Open Whisper Systems
+ *
+ * Licensed according to the LICENSE file in this repository.
+ */
+syntax = "proto3";
+package textsecure;
+
+option java_package         = "org.whispersystems.signalservice.internal.websocket";
+option java_outer_classname = "WebSocketProtos";
+
+message WebSocketRequestMessage {
+    string verb    = 1;
+    string path    = 2;
+    bytes  body    = 3;
+    repeated string headers = 5;
+    uint64 id      = 4;
+}
+
+message WebSocketResponseMessage {
+    uint64 id      = 1;
+    uint32 status  = 2;
+    string message = 3;
+    repeated string headers = 5;
+    bytes  body    = 4;
+}
+
+message WebSocketMessage {
+    enum Type {
+        UNKNOWN  = 0;
+        REQUEST  = 1;
+        RESPONSE = 2;
+    }
+
+    Type                     type     = 1;
+    WebSocketRequestMessage  request  = 2;
+    WebSocketResponseMessage response = 3;
+}

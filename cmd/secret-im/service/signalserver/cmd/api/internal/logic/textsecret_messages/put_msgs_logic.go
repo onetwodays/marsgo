@@ -2,8 +2,9 @@ package logic
 
 import (
 	"context"
-	"encoding/json"
-	"secret-im/service/signalserver/cmd/api/chat"
+	"fmt"
+	"github.com/golang/protobuf/proto"
+	"secret-im/service/signalserver/cmd/api/textsecure"
 	"secret-im/service/signalserver/cmd/model"
 	"secret-im/service/signalserver/cmd/shared"
 	"time"
@@ -35,7 +36,8 @@ func (l *PutMsgsLogic) PutMsgs(sender string,req types.PutMessagesReq) (*types.P
 	if req.Timestamp==0{
 		req.Timestamp = now
 	}
-	c,_:=chat.HasOne(req.Destination)
+	var destContent [][]byte
+
 
 	for i,_:=range  req.Messages{
 
@@ -62,6 +64,7 @@ func (l *PutMsgsLogic) PutMsgs(sender string,req types.PutMessagesReq) (*types.P
 		}else{
 			//if isOnline {
 			if true {
+				/*
 				envelope:=&types.Envelope{}
 				envelope.Xtype=types.EnvelopeTypeCiphertext
 				envelope.Source=row.Source
@@ -78,31 +81,43 @@ func (l *PutMsgsLogic) PutMsgs(sender string,req types.PutMessagesReq) (*types.P
 				pubsubMsg.Xtype=types.PubSubTypeDELIVER
 				pubsubMsg.Content=*envelope
 				msg,err:=json.Marshal(pubsubMsg)
-				if err!=nil{
-					logx.Infof("json.Marshal(pubsubMsg) error:",err.Error() )
-				}else {
-					if c!=nil{
-						c.WriteOne(msg)
-					}else{
 
-						chat.Broadcast(msg)
+				 */
+				envelopePf:=&textsecure.Envelope{}
+				envelopePf.Type=textsecure.Envelope_CIPHERTEXT
+				envelopePf.SourceDevice=1
+				envelopePf.Source=sender
+				envelopePf.ServerGuid=row.Guid
+				envelopePf.SourceUuid=row.SourceUuid
+				envelopePf.ServerTimestamp=uint64(now)
+				envelopePf.Relay=row.Relay
+				envelopePf.LegacyMessage=[]byte(row.Message)
+				envelopePf.Content=[]byte(row.Content)
+				contentPf,err:=proto.Marshal(envelopePf)
+				if err!=nil{
+					logx.Error("proto.Marshal(envelopePf):",err)
+				}else{
+					websocketMsg:=&textsecure.WebSocketMessage{}
+					websocketMsg.Type=textsecure.WebSocketMessage_REQUEST
+					websocketReq:=&textsecure.WebSocketRequestMessage{}
+					websocketReq.Id=100
+					websocketReq.Headers=[]string{"X-Signal-Key: false","X-Signal-Timestamp:"+fmt.Sprintf("%s",now)}
+					websocketReq.Path="/api/v1/messages"
+					websocketReq.Verb="PUT"
+					websocketReq.Body=contentPf
+					msg,err:=proto.Marshal(websocketReq)
+					if err!=nil{
+						logx.Infof("proto.Marshal(websocketReq) error:",err.Error() )
+					}else{
+						destContent=append(destContent,msg)
+
 					}
 				}
-
-
-
-
-
-
-
-
-
 			}else{
 				logx.Infof("destination is not online,not need websocket send,test brocast" )
-
 			}
 		}
 	}
 
-	return &types.PutMessagesRes{NeedsSync: true}, nil
+	return &types.PutMessagesRes{NeedsSync: true,DestContent: destContent}, nil
 }

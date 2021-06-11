@@ -5,11 +5,16 @@
 package chat
 
 import (
-	"bytes"
+	"context"
+	"encoding/json"
 	"errors"
+	"github.com/golang/protobuf/proto"
+	"github.com/tal-tech/go-zero/core/mapping"
 	"github.com/tal-tech/go-zero/rest/httpx"
+	logic "secret-im/service/signalserver/cmd/api/internal/logic/textsecret_messages"
 	"secret-im/service/signalserver/cmd/api/internal/svc"
 	"secret-im/service/signalserver/cmd/api/internal/types"
+	"secret-im/service/signalserver/cmd/api/textsecure"
 	"secret-im/service/signalserver/cmd/api/util"
 	"secret-im/service/signalserver/cmd/shared"
 	"sync"
@@ -21,7 +26,6 @@ import (
 	"time"
 
 	"github.com/gorilla/websocket"
-	"github.com/tidwall/gjson"
 )
 
 const (
@@ -95,7 +99,7 @@ func WsConnectHandler(ctx *svc.ServiceContext) http.HandlerFunc {
 
 		var req types.WriteWsConnReq
 		if err := httpx.Parse(r, &req); err != nil {
-			logx.Error("httpx.Parse /v1/websocket/?login= error",err.Error())
+			logx.Error("httpx.Parse /v1/websocket/?login= error",err.Error(),"->匿名建立websocket连接")
 
 		}else{
 			adxName = req.Login
@@ -149,36 +153,68 @@ func (c *Client) close(){
 
 
 
-func (c *Client) handleMsg(msg string){
-	method:=gjson.Get(msg,"method")
-	destination:=gjson.Get(msg,"destination")
+func (c *Client) handleMsg(msg []byte){
+	var req types.PutMessagesReq
+	err:=mapping.UnmarshalJsonBytes(msg,&req)
+	if err!=nil{
+		logx.Error("mapping.UnmarshalJsonBytes error:",err)
+	}
+    reqPf:=&textsecure.WebSocketMessage{}
+	err=proto.Unmarshal(msg,reqPf)
+	if err!=nil{
+		logx.Error("proto.Unmarshal(msg,reqPf) error:",err)
+		return
+	}
+	logx.Info("收到的pf报文是:",reqPf.String())
 
-	if destination.Exists(){ //转发消息
-		recv,isOk:=HasOne(destination.String())
-		if isOk{
-			recv.WriteOne([]byte(msg)) //现阶段调试广播出去
+	if reqPf.Type==textsecure.WebSocketMessage_REQUEST{
+		err=mapping.UnmarshalJsonBytes(reqPf.Request.Body,&req)
+		if err!=nil{
+			logx.Error("mapping.UnmarshalJsonBytes(reqPf.Request.Body) error:",err)
+		}else {
+			logx.Infof("打印json:%#v",req)
 		}
-		//broadcastExclude([]byte(msg),c.id) //先广播出去吧
-
-
-	} else if method.Exists() && method.String()=="delete.received.msgs"  {
-		content:=gjson.Get(msg,"content")
-		if content.IsArray(){
-			guidList:=make ([]string,len(content.Array()))
-			for i:=range content.Array(){
-				guidList[i] = content.Array()[i].String()
-
-			}
-			err:=c.src.MsgsModel.DeleteManyByGuid(guidList)
-			if err!=nil{
-				logx.Error("delete.received.msgs %v error",guidList,err.Error())
-			}
-		}
-
-
 	}
 
 
+
+	// 交给logic处理
+	l := logic.NewPutMsgsLogic(context.Background(), c.src)
+	putMsgRes, err := l.PutMsgs(c.id,req)
+	if err!=nil{
+		logx.Error("logic.NewPutMsgsLogic error:",err)
+	}else {
+		reply:=&textsecure.WebSocketMessage{}
+		reply.Type=textsecure.WebSocketMessage_RESPONSE
+		response:=&textsecure.WebSocketResponseMessage{}
+		response.Id=1111
+		response.Message="OK"
+		response.Status=200
+		response.Headers=[]string{"Content-Type:application/json"}
+		body,err:=json.Marshal(putMsgRes)
+		if err!=nil{
+			logx.Error("json.Marshal(putMsgRes) error:",err)
+		}else{
+			response.Body=body
+		}
+		reply.Response=response
+
+		pf,err:=proto.Marshal(reply)
+		if err!=nil{
+			logx.Error("proto.Marshal(reply) error:",err)
+		}else{
+			c.WriteOne(pf)
+		}
+
+		recv,isOk:=HasOne(req.Destination)
+		if isOk{
+			for i:=range putMsgRes.DestContent{
+				recv.WriteOne(putMsgRes.DestContent[i])
+			}
+		}
+	}
+	// 给发送方发送消息
+	// 给接收方回复消息
 }
 // readPump pumps messages from the websocket connection to the hub.
 //
@@ -194,16 +230,17 @@ func (c *Client) readPump() {
 	c.conn.SetReadDeadline(time.Now().Add(pongWait))
 	c.conn.SetPongHandler(func(string) error { c.conn.SetReadDeadline(time.Now().Add(pongWait)); return nil })
 	for {
-		_, message, err := c.conn.ReadMessage()
+		messageType, message, err := c.conn.ReadMessage()
+		logx.Info("websocket  收到的消息格式是(1:text,2:binary,8:close,9:ping,10:pong):",messageType)
 		if err != nil {
 			if websocket.IsUnexpectedCloseError(err, websocket.CloseGoingAway, websocket.CloseAbnormalClosure) {
 				logx.Errorf("error: %v", err)
 			}
 			break
 		}
-		message = bytes.TrimSpace(bytes.Replace(message, newline, space, -1))
+		//message = bytes.TrimSpace(bytes.Replace(message, newline, space, -1))
 		//c.hub.broadcast <- message //读到的消息放到广播里面, to write redis,测试用
-		c.handleMsg(string(message))
+		c.handleMsg(message)
 
 		/*
 		msg:=new(textsecure.OutMessage)  //通过websocket来发送请求
@@ -275,9 +312,10 @@ func (c *Client) writePump() {
 			}
 			c.conn.SetWriteDeadline(time.Now().Add(writeWait))
 
-			w, err := c.conn.NextWriter(websocket.TextMessage)
+			//w, err := c.conn.NextWriter(websocket.TextMessage)
+			w, err := c.conn.NextWriter(websocket.BinaryMessage)
 			if err != nil {
-				logx.Error("ws sender(%s) get NextWriter error:%s ",c.id,err.Error())
+				logx.Errorf("ws sender(%s) get NextWriter error:%s ",c.id,err.Error())
 				return
 			}
 			w.Write(message)
@@ -285,11 +323,11 @@ func (c *Client) writePump() {
 			// Add queued chat messages to the current websocket message.
 			n := len(c.outputQueue)
 			for i := 0; i < n; i++ {
-				w.Write(newline) //如果是二进制，这行请注释
+				//w.Write(newline) //如果是二进制，这行请注释
 				w.Write(<-c.outputQueue)
 			}
 			if err := w.Close(); err != nil { //写完关闭w，不是关闭连接
-				logx.Error("ws sender(%s) close got NextWriter error:%s ",c.id,err.Error())
+				logx.Errorf("ws sender(%s) close got NextWriter error:%s",c.id,err.Error())
 				return
 			}
 		case <-ticker.C:
