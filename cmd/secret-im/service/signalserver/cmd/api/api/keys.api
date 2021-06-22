@@ -2,24 +2,24 @@ syntax = "v2"
 
 type PreKeyx{
     KeyId int64 `json:"keyId"`
-    PublicKey string `json:"publickey"`
-
+    PublicKey string `json:"publicKey"`
 }
 type SignedPrekeyx{
     Signature string  `json:"signature"`
-    PreKey PreKeyx `json:"prekey"`
+    KeyId int64 `json:"keyId"`
+    PublicKey string `json:"publicKey"`
 }
 
 
 type PutKeysReqx{
     IdentityKey string  `json:"identityKey"`
     SignedPreKey SignedPrekeyx `json:"signedPreKey"`
-    PreKeys []PreKeyx `json:"prekeys"`
+    PreKeys []PreKeyx `json:"preKeys"`
 }
 
 type GetKeysReq{
     Identifier string `path:"identifier"`
-    DeviceId int64 `path:"deviceId"`
+    DeviceId string `path:"deviceId"`
 }
 
 
@@ -35,20 +35,48 @@ type GetKeysResx{
     Devices []PreKeyResponseItem `json:"devices"`
 }
 
+type PreKeyCount {
+    Count int `json:"count"`
+}
+
+type PutProfileKeyReq{
+    accountName string `path:"accountName"`
+    profilekey string `json:"profileKey"`
+}
+
+type GetProfileKeyReq{
+    accountName string `path:"accountName"`
+
+}
+
+type GetProfileKeyRes{
+    profilekey string `json:"profileKey"`
+}
+
 
 
 
 @server(
-    jwt: Auth
-    middleware:UserNameCheck
+    //jwt: Auth
+    //middleware:UserNameCheck
     group: textsecret_keys
 
 )
 service signalserver-api {
     @handler PutKeysHandler
-    put /api/v1/textsecret/keys (PutKeysReqx) returns ()
+    put  /v2/keys (PutKeysReqx) returns ()
 
     @handler GetKeysHandler
-    get /api/v1/textsecret/keys/:identifier/:deviceId (GetKeysReq) returns (GetKeysResx)
+    get /v2/keys/:identifier/:deviceId (GetKeysReq) returns (GetKeysResx)
+
+    @handler GetKeyCountHandler
+    get /v2/keys () returns (PreKeyCount)
+
+    @handler PutProfileKeyHandler
+    put /v1/profile/:accountName (PutProfileKeyReq) returns()
+
+    @handler GetProfileKeyHandler
+    get /v1/profile/:accountName  (GetProfileKeyReq) returns(GetProfileKeyRes)
+
 
 }

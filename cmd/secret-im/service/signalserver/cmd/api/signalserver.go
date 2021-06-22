@@ -19,6 +19,10 @@ import (
 	"secret-im/service/signalserver/cmd/api/config"
 	"secret-im/service/signalserver/cmd/api/internal/handler"
 	"secret-im/service/signalserver/cmd/api/internal/svc"
+
+	//_ "api/user.json"
+	//swaggerFiles "github.com/swaggo/files"
+	//ginSwagger "github.com/swaggo/gin-swagger"
 )
 
 
@@ -29,7 +33,8 @@ func main() {
 	rt := router.NewRouter()
 	rt.SetNotFoundHandler(http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
 		//这里内容可以定制
-		w.Write([]byte("服务器开小差了,这里可定制"))
+		//w.Write([]byte("服务器开小差了,这里可定制"))
+		w.WriteHeader(http.StatusNotFound)
 	}))
 
 
@@ -41,10 +46,10 @@ func main() {
 	server.Use(middleware.GlobalMWLogFunc) //global middleware
 
 	//静态文件服务
-	registerDirHandlers(server,ctx)
+	registerDirHandlers(server)
 
 	// 注册路由组件
-	handler.RegisterHandlers(server, ctx) // handle api
+	handler.RegisterHandlers(server, ctx) // server 用来添加handler ctx用来构造handler
 
 
 
@@ -54,6 +59,7 @@ func main() {
 	• 如果 errorHandler 返回的 interface{} 是 error 类型的话，
 	那么会直接用 err.Error() 的内容以非 json 的格式返回客户端，
 	不是 error 的话，那么会 marshal 成 json 再返回
+	全局变量errorHandler函数
 	*/
 
 	httpx.SetErrorHandler(func(err error) (int, interface{}) {
@@ -76,6 +82,15 @@ func main() {
 		})
 	}
 
+	/*
+	server.AddRoute(rest.Route{
+		Method: http.MethodGet,
+		Path: "/swagger/*any",
+		Handler: ginSwagger.WrapHandler(swaggerFiles.Handler),
+	})
+
+	 */
+
 
 	fmt.Printf("Starting server at %s:%d...\n", config.AppConfig.Host, config.AppConfig.Port)
 	server.Start()
@@ -84,7 +99,7 @@ func main() {
 }
 
 
-func registerDirHandlers(engine *rest.Server, serverCtx *svc.ServiceContext) {
+func registerDirHandlers(engine *rest.Server) {
 
 	ex, err := os.Executable()
 	if err != nil {

@@ -30,7 +30,7 @@ func NewPutMsgsLogic(ctx context.Context, svcCtx *svc.ServiceContext) PutMsgsLog
 	}
 }
 
-func (l *PutMsgsLogic) PutMsgs(sender string,req types.PutMessagesReq) (*types.PutMessagesRes, error) {
+func (l *PutMsgsLogic) PutMsgs(sender string,req types.PutMessagesReq,msgId uint64) (*types.PutMessagesRes, error) {
 	// todo: add your logic here and delete this line
 	now:= time.Now().UnixNano() / 1e6
 	if req.Timestamp==0{
@@ -64,25 +64,7 @@ func (l *PutMsgsLogic) PutMsgs(sender string,req types.PutMessagesReq) (*types.P
 		}else{
 			//if isOnline {
 			if true {
-				/*
-				envelope:=&types.Envelope{}
-				envelope.Xtype=types.EnvelopeTypeCiphertext
-				envelope.Source=row.Source
-				envelope.SourceDevice=1
-				envelope.SourceUuid=row.SourceUuid
-				envelope.Relay=row.Relay
-				envelope.Timestamp=(uint64)(row.Timestamp)
-				envelope.LegacyMessage=row.Message
-				envelope.Content=row.Content
-				envelope.ServerGuid=row.Guid
-				envelope.ServerTimestamp=uint64(now)
 
-				pubsubMsg:=&types.PubsubMessage{}
-				pubsubMsg.Xtype=types.PubSubTypeDELIVER
-				pubsubMsg.Content=*envelope
-				msg,err:=json.Marshal(pubsubMsg)
-
-				 */
 				envelopePf:=&textsecure.Envelope{}
 				envelopePf.Type=textsecure.Envelope_CIPHERTEXT
 				envelopePf.SourceDevice=1
@@ -91,23 +73,36 @@ func (l *PutMsgsLogic) PutMsgs(sender string,req types.PutMessagesReq) (*types.P
 				envelopePf.SourceUuid=row.SourceUuid
 				envelopePf.ServerTimestamp=uint64(now)
 				envelopePf.Relay=row.Relay
-				envelopePf.LegacyMessage=[]byte(row.Message)
+				//envelopePf.LegacyMessage=[]byte(row.Message)
 				envelopePf.Content=[]byte(row.Content)
+				logx.Info("收件人的envelop:",envelopePf.String())
 				contentPf,err:=proto.Marshal(envelopePf)
 				if err!=nil{
 					logx.Error("proto.Marshal(envelopePf):",err)
 				}else{
-					websocketMsg:=&textsecure.WebSocketMessage{}
-					websocketMsg.Type=textsecure.WebSocketMessage_REQUEST
+
 					websocketReq:=&textsecure.WebSocketRequestMessage{}
-					websocketReq.Id=100
-					websocketReq.Headers=[]string{"X-Signal-Key: false","X-Signal-Timestamp:"+fmt.Sprintf("%s",now)}
-					websocketReq.Path="/api/v1/messages"
+					websocketReq.Id=msgId
+					websocketReq.Headers=[]string{"X-Signal-Key: false","X-Signal-Timestamp:"+fmt.Sprintf("%d",now)}
+					websocketReq.Path="/api/v1/message"
 					websocketReq.Verb="PUT"
 					websocketReq.Body=contentPf
-					msg,err:=proto.Marshal(websocketReq)
+
+					websocketMsg:=&textsecure.WebSocketMessage{}
+					websocketMsg.Type=textsecure.WebSocketMessage_REQUEST
+					websocketMsg.Request=websocketReq
+					logx.Info("收件人最外层:",websocketMsg.String())
+					msg,err:=proto.Marshal(websocketMsg)
+
+					//pubsubMsg:=&textsecure.PubSubMessage{}
+					//pubsubMsg.Type=textsecure.PubSubMessage_DELIVER
+					//pubsubMsg.Content=contentPf
+					//logx.Info("收件人最外层:",pubsubMsg.String())
+					//msg,err:=proto.Marshal(pubsubMsg)
+
+
 					if err!=nil{
-						logx.Infof("proto.Marshal(websocketReq) error:",err.Error() )
+						logx.Infof("proto.Marshal(websocketMsg) error:",err.Error() )
 					}else{
 						destContent=append(destContent,msg)
 
@@ -119,5 +114,5 @@ func (l *PutMsgsLogic) PutMsgs(sender string,req types.PutMessagesReq) (*types.P
 		}
 	}
 
-	return &types.PutMessagesRes{NeedsSync: true,DestContent: destContent}, nil
+	return &types.PutMessagesRes{NeedsSync: false,DestContent: destContent}, nil
 }

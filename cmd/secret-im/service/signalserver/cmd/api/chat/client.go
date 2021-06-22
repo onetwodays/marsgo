@@ -5,18 +5,16 @@
 package chat
 
 import (
-	"context"
-	"encoding/json"
 	"errors"
 	"github.com/golang/protobuf/proto"
-	"github.com/tal-tech/go-zero/core/mapping"
+	"github.com/tal-tech/go-zero/core/timex"
 	"github.com/tal-tech/go-zero/rest/httpx"
-	logic "secret-im/service/signalserver/cmd/api/internal/logic/textsecret_messages"
 	"secret-im/service/signalserver/cmd/api/internal/svc"
 	"secret-im/service/signalserver/cmd/api/internal/types"
 	"secret-im/service/signalserver/cmd/api/textsecure"
 	"secret-im/service/signalserver/cmd/api/util"
 	"secret-im/service/signalserver/cmd/shared"
+	"strings"
 	"sync"
 
 	//"github.com/golang/protobuf/proto"
@@ -60,6 +58,10 @@ func SetHub(hub *Hub)  {
 	xhub = hub
 }
 
+func Ts(){
+
+}
+
 func init()  {
 	xhub=NewHub()
 	go xhub.Run()
@@ -82,6 +84,47 @@ type Client struct {
 	isClosed bool
 	hub *Hub  //管理所有的连接
 	src *svc.ServiceContext
+}
+
+func (c *Client) handleMsg(msg []byte){
+	logx.Infof("==========开始处理 [%s] ws消息===============",c.id)
+	startTime:=timex.Now()
+	defer func(){
+		logx.WithDuration(timex.Since(startTime)).Infof("==========完成处理 [%s] ws消息===============",c.id)
+	}()
+
+	reqPf:=&textsecure.WebSocketMessage{}
+	err:=proto.Unmarshal(msg,reqPf)
+	if err!=nil{
+		logx.Error("proto.Unmarshal(msg,reqPf) error:",err)
+		return
+	}
+	if reqPf.Type!=textsecure.WebSocketMessage_REQUEST{
+		logx.Errorf("the websocket msg (%s) is not  WebSocketMessage_REQUEST:",reqPf.String())
+		return
+	}
+
+	logx.Info("收到的websocket请求报文是:",reqPf.String())
+	path:=reqPf.Request.Path
+	var reply *textsecure.WebSocketMessage =nil
+
+	if path=="/v1/keepalive"{
+		reply,err= GetKeepAliveResponse(reqPf)
+	}else if strings.Contains(path,`/v1/messages/`){
+		reply,err= PutMsgHandler(reqPf,c.src,c.id)
+	}
+
+	if reply!=nil {
+		logx.Infof("回复发件人(%s)消息: %s",c.id,reply.String())
+		pf,err:=proto.Marshal(reply)
+		if err!=nil{
+			logx.Error("reply to from ->proto.Marshal(reply) error:",err)
+		}else{
+			c.WriteOne(pf)
+		}
+	}else{
+		logx.Info("server error,get websocket relpy is nil",err)
+	}
 }
 
 // serveWs handles websocket requests from the peer.
@@ -153,69 +196,7 @@ func (c *Client) close(){
 
 
 
-func (c *Client) handleMsg(msg []byte){
-	var req types.PutMessagesReq
-	err:=mapping.UnmarshalJsonBytes(msg,&req)
-	if err!=nil{
-		logx.Error("mapping.UnmarshalJsonBytes error:",err)
-	}
-    reqPf:=&textsecure.WebSocketMessage{}
-	err=proto.Unmarshal(msg,reqPf)
-	if err!=nil{
-		logx.Error("proto.Unmarshal(msg,reqPf) error:",err)
-		return
-	}
-	logx.Info("收到的pf报文是:",reqPf.String())
 
-	if reqPf.Type==textsecure.WebSocketMessage_REQUEST{
-		err=mapping.UnmarshalJsonBytes(reqPf.Request.Body,&req)
-		if err!=nil{
-			logx.Error("mapping.UnmarshalJsonBytes(reqPf.Request.Body) error:",err)
-		}else {
-			logx.Infof("打印json:%#v",req)
-		}
-	}
-
-
-
-	// 交给logic处理
-	l := logic.NewPutMsgsLogic(context.Background(), c.src)
-	putMsgRes, err := l.PutMsgs(c.id,req)
-	if err!=nil{
-		logx.Error("logic.NewPutMsgsLogic error:",err)
-	}else {
-		reply:=&textsecure.WebSocketMessage{}
-		reply.Type=textsecure.WebSocketMessage_RESPONSE
-		response:=&textsecure.WebSocketResponseMessage{}
-		response.Id=1111
-		response.Message="OK"
-		response.Status=200
-		response.Headers=[]string{"Content-Type:application/json"}
-		body,err:=json.Marshal(putMsgRes)
-		if err!=nil{
-			logx.Error("json.Marshal(putMsgRes) error:",err)
-		}else{
-			response.Body=body
-		}
-		reply.Response=response
-
-		pf,err:=proto.Marshal(reply)
-		if err!=nil{
-			logx.Error("proto.Marshal(reply) error:",err)
-		}else{
-			c.WriteOne(pf)
-		}
-
-		recv,isOk:=HasOne(req.Destination)
-		if isOk{
-			for i:=range putMsgRes.DestContent{
-				recv.WriteOne(putMsgRes.DestContent[i])
-			}
-		}
-	}
-	// 给发送方发送消息
-	// 给接收方回复消息
-}
 // readPump pumps messages from the websocket connection to the hub.
 //
 // The application runs readPump in a per-connection goroutine. The application
@@ -271,7 +252,7 @@ func (c *Client) WriteOne(msg []byte) (err error) {
 	}else{
 		select {
 		case c.outputQueue <- msg: //最多缓存1024条消息 ，如果超出1024条消息还没有发出去，关闭
-			logx.Infof("msg(%s) send to %s ok",string(msg),c.id)
+			//logx.Infof("msg send to %s ok",c.id)
 		default:   //发生拥堵时关闭client
 			c.close()
 			err = errors.New("write to ws failed by chan buffer full ")

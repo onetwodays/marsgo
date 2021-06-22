@@ -13,7 +13,7 @@ type IncomingMessagex {
 
 
 type PutMessagesReq{
-    Destination string  `path:"destination"`
+    Destination string  `path:"destination" json:"destination"`
     Online bool `json:"online"`
     Timestamp int64 `json:"timestamp"`
     Messages []IncomingMessagex `json:"messages"`
@@ -75,16 +75,16 @@ type (
 
 
 @server(
-    jwt: Auth
-    middleware:UserNameCheck
+    //jwt: Auth
+    //middleware:UserNameCheck
     group: textsecret_messages
 
 )
 service signalserver-api {
     @handler PutMsgsHandler
-    put /api/v1/textsecret/messages/:destination (PutMessagesReq) returns (PutMessagesRes)
+    put /v1/messages/:destination (PutMessagesReq) returns (PutMessagesRes)
 
     @handler GetMsgsHandler
-    get /api/v1/textsecret/messages () returns (GetPendingMsgsRes)
+    get /v1/messages () returns (GetPendingMsgsRes)
 
 }

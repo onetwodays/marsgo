@@ -6,6 +6,7 @@ import (
 	"secret-im/service/signalserver/cmd/api/internal/svc"
 	"secret-im/service/signalserver/cmd/api/internal/types"
 	"secret-im/service/signalserver/cmd/shared"
+	"strconv"
 
 	"github.com/tal-tech/go-zero/core/logx"
 )
@@ -26,7 +27,17 @@ func NewGetKeysLogic(ctx context.Context, svcCtx *svc.ServiceContext) GetKeysLog
 
 func (l *GetKeysLogic) GetKeys(req types.GetKeysReq) (*types.GetKeysResx, error) {
 	// todo: add your logic here and delete this line
-	keys,err:=l.svcCtx.KeysModel.FindMany(req.Identifier,req.DeviceId)
+	deviceId:=int64(0)
+	if req.DeviceId!="*"{
+		deviceid,err:= strconv.ParseInt(req.DeviceId, 10, 64)
+		if err!=nil{
+			return nil, shared.NewCodeError(shared.ERRCODE_STRTOINT,err.Error())
+
+		}else{
+			deviceId=deviceid
+		}
+	}
+	keys,err:=l.svcCtx.KeysModel.FindMany(req.Identifier,deviceId)
 	if err!=nil{
 		return nil, shared.NewCodeError(shared.ERRCODE_SQLQUERY,err.Error())
 	}

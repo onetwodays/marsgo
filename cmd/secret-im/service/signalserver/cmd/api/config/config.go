@@ -21,7 +21,7 @@ func init()  {
 
 type Config struct {
 	LogConf struct{
-		logx.LogConf
+		logx.LogConf //会自动把logx.LogConf的成员提取到这里
 	}
 	rest.RestConf
 	Auth struct {

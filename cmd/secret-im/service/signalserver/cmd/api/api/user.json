@@ -1,0 +1,1075 @@
+{
+  "swagger": "2.0",
+  "info": {
+    "title": "api api",
+    "description": "websocket server",
+    "version": ""
+  },
+  "schemes": [
+    "http",
+    "https"
+  ],
+  "consumes": [
+    "application/json"
+  ],
+  "produces": [
+    "application/json"
+  ],
+  "paths": {
+    "/add": {
+      "get": {
+        "operationId": "AddHandler",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/AddResp"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "book",
+            "in": "query",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "price",
+            "in": "query",
+            "required": true,
+            "type": "integer",
+            "format": "int64"
+          }
+        ],
+        "tags": [
+          "bookstore"
+        ]
+      }
+    },
+    "/api/v1/textsecret/login": {
+      "post": {
+        "operationId": "AdxUserLoginHandler",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/AdxUserLoginRes"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/AdxUserLoginReq"
+            }
+          }
+        ],
+        "tags": [
+          "textsecret"
+        ]
+      }
+    },
+    "/api/v1/textsecret/ws": {
+      "get": {
+        "operationId": "AdxUserWSHandler",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {}
+          }
+        },
+        "tags": [
+          "textsecret"
+        ]
+      }
+    },
+    "/check": {
+      "get": {
+        "operationId": "CheckHandler",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/CheckResp"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "book",
+            "in": "query",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "bookstore"
+        ]
+      }
+    },
+    "/index": {
+      "get": {
+        "operationId": "IndexHandler",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/IndexReply"
+            }
+          }
+        },
+        "tags": [
+          "signalserver-api"
+        ]
+      }
+    },
+    "/user/info": {
+      "get": {
+        "operationId": "userInfo",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/UserReply"
+            }
+          }
+        },
+        "tags": [
+          "website"
+        ]
+      }
+    },
+    "/user/login": {
+      "post": {
+        "operationId": "login",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/UserReply"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/LoginReq"
+            }
+          }
+        ],
+        "tags": [
+          "website"
+        ]
+      }
+    },
+    "/user/register": {
+      "post": {
+        "operationId": "register",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {}
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/RegisterReq"
+            }
+          }
+        ],
+        "tags": [
+          "website"
+        ]
+      }
+    },
+    "/v1/keepalive": {
+      "get": {
+        "operationId": "GetKeepAliveHandler",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {}
+          }
+        },
+        "tags": [
+          "textsecret_keepalive"
+        ]
+      }
+    },
+    "/v1/messages": {
+      "get": {
+        "operationId": "GetMsgsHandler",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/GetPendingMsgsRes"
+            }
+          }
+        },
+        "tags": [
+          "textsecret_messages"
+        ]
+      }
+    },
+    "/v1/messages/{destination}": {
+      "put": {
+        "operationId": "PutMsgsHandler",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/PutMessagesRes"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "destination",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/PutMessagesReq"
+            }
+          }
+        ],
+        "tags": [
+          "textsecret_messages"
+        ]
+      }
+    },
+    "/v1/profile/{accountName}": {
+      "get": {
+        "operationId": "GetProfileKeyHandler",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/GetProfileKeyRes"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "accountName",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "textsecret_keys"
+        ]
+      },
+      "put": {
+        "operationId": "PutProfileKeyHandler",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {}
+          }
+        },
+        "parameters": [
+          {
+            "name": "accountName",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/PutProfileKeyReq"
+            }
+          }
+        ],
+        "tags": [
+          "textsecret_keys"
+        ]
+      }
+    },
+    "/v1/websocket": {
+      "get": {
+        "operationId": "RwsConnectHandler",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {}
+          }
+        },
+        "tags": [
+          "textsecret_websocket"
+        ]
+      }
+    },
+    "/v1/websocket/w": {
+      "get": {
+        "operationId": "WwsConnectHandler",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {}
+          }
+        },
+        "parameters": [
+          {
+            "name": "login",
+            "in": "query",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "password",
+            "in": "query",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "textsecret_websocket"
+        ]
+      }
+    },
+    "/v2/keys": {
+      "get": {
+        "operationId": "GetKeyCountHandler",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/PreKeyCount"
+            }
+          }
+        },
+        "tags": [
+          "textsecret_keys"
+        ]
+      },
+      "put": {
+        "operationId": "PutKeysHandler",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {}
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/PutKeysReqx"
+            }
+          }
+        ],
+        "tags": [
+          "textsecret_keys"
+        ]
+      }
+    },
+    "/v2/keys/{identifier}/{deviceId}": {
+      "get": {
+        "operationId": "GetKeysHandler",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/GetKeysResx"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "identifier",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "deviceId",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "textsecret_keys"
+        ]
+      }
+    }
+  },
+  "definitions": {
+    "AddReq": {
+      "type": "object",
+      "properties": {
+        "book": {
+          "type": "string"
+        },
+        "price": {
+          "type": "integer",
+          "format": "int64"
+        }
+      },
+      "title": "AddReq",
+      "required": [
+        "book",
+        "price"
+      ]
+    },
+    "AddResp": {
+      "type": "object",
+      "properties": {
+        "ok": {
+          "type": "boolean",
+          "format": "boolean"
+        }
+      },
+      "title": "AddResp",
+      "required": [
+        "ok"
+      ]
+    },
+    "AdxUserLoginReq": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string",
+          "description": "eos chain username,保证unique"
+        },
+        "sign": {
+          "type": "string",
+          "description": "  eos 用户用自己的私钥对name的签名"
+        }
+      },
+      "title": "AdxUserLoginReq",
+      "required": [
+        "name",
+        "sign"
+      ]
+    },
+    "AdxUserLoginRes": {
+      "type": "object",
+      "properties": {
+        "": {
+          "$ref": "#/definitions/JwtTokenAdx"
+        }
+      },
+      "title": "AdxUserLoginRes"
+    },
+    "CheckReq": {
+      "type": "object",
+      "properties": {
+        "book": {
+          "type": "string"
+        }
+      },
+      "title": "CheckReq",
+      "required": [
+        "book"
+      ]
+    },
+    "CheckResp": {
+      "type": "object",
+      "properties": {
+        "found": {
+          "type": "boolean",
+          "format": "boolean"
+        },
+        "price": {
+          "type": "integer",
+          "format": "int64"
+        }
+      },
+      "title": "CheckResp",
+      "required": [
+        "found",
+        "price"
+      ]
+    },
+    "Envelope": {
+      "type": "object",
+      "properties": {
+        "type": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "source": {
+          "type": "string"
+        },
+        "sourceUuid": {
+          "type": "string"
+        },
+        "sourceDevice": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "relay": {
+          "type": "string"
+        },
+        "timestamp": {
+          "type": "integer",
+          "format": "int64"
+        },
+        "legacyMessage": {
+          "type": "string"
+        },
+        "content": {
+          "type": "string"
+        },
+        "guid": {
+          "type": "string"
+        },
+        "serverTimestamp": {
+          "type": "integer",
+          "format": "int64"
+        }
+      },
+      "title": "Envelope",
+      "required": [
+        "type",
+        "source",
+        "sourceUuid",
+        "sourceDevice",
+        "relay",
+        "timestamp",
+        "legacyMessage",
+        "content",
+        "guid",
+        "serverTimestamp"
+      ]
+    },
+    "GetKeysReq": {
+      "type": "object",
+      "properties": {
+        "identifier": {
+          "type": "string"
+        },
+        "deviceId": {
+          "type": "string"
+        }
+      },
+      "title": "GetKeysReq",
+      "required": [
+        "identifier",
+        "deviceId"
+      ]
+    },
+    "GetKeysResx": {
+      "type": "object",
+      "properties": {
+        "identityKey": {
+          "type": "string"
+        },
+        "devices": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/PreKeyResponseItem"
+          }
+        }
+      },
+      "title": "GetKeysResx",
+      "required": [
+        "identityKey",
+        "devices"
+      ]
+    },
+    "GetPendingMsgsReq": {
+      "type": "object",
+      "title": "GetPendingMsgsReq"
+    },
+    "GetPendingMsgsRes": {
+      "type": "object",
+      "properties": {
+        "list": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/OutcomingMessagex"
+          }
+        },
+        "more": {
+          "type": "boolean",
+          "format": "boolean"
+        }
+      },
+      "title": "GetPendingMsgsRes",
+      "required": [
+        "list",
+        "more"
+      ]
+    },
+    "GetProfileKeyReq": {
+      "type": "object",
+      "properties": {
+        "accountName": {
+          "type": "string"
+        }
+      },
+      "title": "GetProfileKeyReq",
+      "required": [
+        "accountName"
+      ]
+    },
+    "GetProfileKeyRes": {
+      "type": "object",
+      "properties": {
+        "profileKey": {
+          "type": "string"
+        }
+      },
+      "title": "GetProfileKeyRes",
+      "required": [
+        "profileKey"
+      ]
+    },
+    "IncomingMessagex": {
+      "type": "object",
+      "properties": {
+        "content": {
+          "type": "string"
+        },
+        "type": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "destinationDeviceId": {
+          "type": "integer",
+          "format": "int32",
+          "default": "1",
+          "description": "发到哪一个设备"
+        },
+        "destinationRegistrationId": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "destination": {
+          "type": "string"
+        },
+        "body": {
+          "type": "string"
+        },
+        "relay": {
+          "type": "string"
+        }
+      },
+      "title": "IncomingMessagex",
+      "required": [
+        "content",
+        "type",
+        "destinationDeviceId",
+        "destinationRegistrationId"
+      ]
+    },
+    "IndexReply": {
+      "type": "object",
+      "properties": {
+        "resp": {
+          "type": "string"
+        }
+      },
+      "title": "IndexReply",
+      "required": [
+        "resp"
+      ]
+    },
+    "JwtToken": {
+      "type": "object",
+      "properties": {
+        "accessToken": {
+          "type": "string"
+        },
+        "accessExpire": {
+          "type": "integer",
+          "format": "int64"
+        },
+        "refreshAfter": {
+          "type": "integer",
+          "format": "int64"
+        }
+      },
+      "title": "JwtToken",
+      "required": [
+        "accessToken",
+        "accessExpire",
+        "refreshAfter"
+      ]
+    },
+    "JwtTokenAdx": {
+      "type": "object",
+      "properties": {
+        "accessToken": {
+          "type": "string"
+        },
+        "accessExpire": {
+          "type": "integer",
+          "format": "int64"
+        },
+        "refreshAfter": {
+          "type": "integer",
+          "format": "int64"
+        }
+      },
+      "title": "JwtTokenAdx",
+      "required": [
+        "accessToken",
+        "accessExpire",
+        "refreshAfter"
+      ]
+    },
+    "LoginReq": {
+      "type": "object",
+      "properties": {
+        "username": {
+          "type": "string"
+        },
+        "password": {
+          "type": "string"
+        }
+      },
+      "title": "LoginReq",
+      "required": [
+        "username",
+        "password"
+      ]
+    },
+    "OutcomingMessagex": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "integer",
+          "format": "int64"
+        },
+        "cached": {
+          "type": "boolean",
+          "format": "boolean"
+        },
+        "guid": {
+          "type": "string"
+        },
+        "type": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "relay": {
+          "type": "string"
+        },
+        "timestamp": {
+          "type": "integer",
+          "format": "int64"
+        },
+        "source": {
+          "type": "string"
+        },
+        "sourceUuid": {
+          "type": "string"
+        },
+        "sourceDevice": {
+          "type": "integer",
+          "format": "int64"
+        },
+        "message": {
+          "type": "string"
+        },
+        "content": {
+          "type": "string"
+        },
+        "serverTimestamp": {
+          "type": "integer",
+          "format": "int64"
+        }
+      },
+      "title": "OutcomingMessagex",
+      "required": [
+        "id",
+        "cached",
+        "guid",
+        "type",
+        "relay",
+        "timestamp",
+        "source",
+        "sourceUuid",
+        "sourceDevice",
+        "message",
+        "content",
+        "serverTimestamp"
+      ]
+    },
+    "PreKeyCount": {
+      "type": "object",
+      "properties": {
+        "count": {
+          "type": "integer",
+          "format": "int32"
+        }
+      },
+      "title": "PreKeyCount",
+      "required": [
+        "count"
+      ]
+    },
+    "PreKeyResponseItem": {
+      "type": "object",
+      "properties": {
+        "deviceId": {
+          "type": "integer",
+          "format": "int64"
+        },
+        "registrationId": {
+          "type": "integer",
+          "format": "int64"
+        },
+        "preKey": {
+          "$ref": "#/definitions/PreKeyx"
+        },
+        "signedPreKey": {
+          "$ref": "#/definitions/SignedPrekeyx"
+        }
+      },
+      "title": "PreKeyResponseItem",
+      "required": [
+        "deviceId",
+        "registrationId",
+        "preKey",
+        "signedPreKey"
+      ]
+    },
+    "PreKeyx": {
+      "type": "object",
+      "properties": {
+        "keyId": {
+          "type": "integer",
+          "format": "int64"
+        },
+        "publicKey": {
+          "type": "string"
+        }
+      },
+      "title": "PreKeyx",
+      "required": [
+        "keyId",
+        "publicKey"
+      ]
+    },
+    "PubsubMessage": {
+      "type": "object",
+      "properties": {
+        "type": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "envelop": {
+          "$ref": "#/definitions/Envelope"
+        }
+      },
+      "title": "PubsubMessage",
+      "required": [
+        "type",
+        "envelop"
+      ]
+    },
+    "PutKeysReqx": {
+      "type": "object",
+      "properties": {
+        "identityKey": {
+          "type": "string"
+        },
+        "signedPreKey": {
+          "$ref": "#/definitions/SignedPrekeyx"
+        },
+        "preKeys": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/PreKeyx"
+          }
+        }
+      },
+      "title": "PutKeysReqx",
+      "required": [
+        "identityKey",
+        "signedPreKey",
+        "preKeys"
+      ]
+    },
+    "PutMessagesReq": {
+      "type": "object",
+      "properties": {
+        "destination": {
+          "type": "string"
+        },
+        "online": {
+          "type": "boolean",
+          "format": "boolean"
+        },
+        "timestamp": {
+          "type": "integer",
+          "format": "int64"
+        },
+        "messages": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/IncomingMessagex"
+          }
+        }
+      },
+      "title": "PutMessagesReq",
+      "required": [
+        "destination",
+        "destination",
+        "online",
+        "timestamp",
+        "messages"
+      ]
+    },
+    "PutMessagesRes": {
+      "type": "object",
+      "properties": {
+        "needsSync": {
+          "type": "boolean",
+          "format": "boolean"
+        },
+        "destContent": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/[]byte"
+          }
+        }
+      },
+      "title": "PutMessagesRes",
+      "required": [
+        "needsSync"
+      ]
+    },
+    "PutProfileKeyReq": {
+      "type": "object",
+      "properties": {
+        "accountName": {
+          "type": "string"
+        },
+        "profileKey": {
+          "type": "string"
+        }
+      },
+      "title": "PutProfileKeyReq",
+      "required": [
+        "accountName",
+        "profileKey"
+      ]
+    },
+    "RegisterReq": {
+      "type": "object",
+      "properties": {
+        "username": {
+          "type": "string"
+        },
+        "mobile": {
+          "type": "string"
+        },
+        "password": {
+          "type": "string"
+        }
+      },
+      "title": "RegisterReq",
+      "required": [
+        "username",
+        "mobile",
+        "password"
+      ]
+    },
+    "SignedPrekeyx": {
+      "type": "object",
+      "properties": {
+        "signature": {
+          "type": "string"
+        },
+        "keyId": {
+          "type": "integer",
+          "format": "int64"
+        },
+        "publicKey": {
+          "type": "string"
+        }
+      },
+      "title": "SignedPrekeyx",
+      "required": [
+        "signature",
+        "keyId",
+        "publicKey"
+      ]
+    },
+    "UserReply": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "integer",
+          "format": "int64"
+        },
+        "username": {
+          "type": "string"
+        },
+        "mobile": {
+          "type": "string"
+        },
+        "nickname": {
+          "type": "string"
+        },
+        "gender": {
+          "type": "string"
+        },
+        "": {
+          "$ref": "#/definitions/JwtToken"
+        }
+      },
+      "title": "UserReply",
+      "required": [
+        "id",
+        "username",
+        "mobile",
+        "nickname",
+        "gender"
+      ]
+    },
+    "WriteWsConnReq": {
+      "type": "object",
+      "properties": {
+        "login": {
+          "type": "string"
+        },
+        "password": {
+          "type": "string"
+        }
+      },
+      "title": "WriteWsConnReq",
+      "required": [
+        "login",
+        "password"
+      ]
+    }
+  },
+  "securityDefinitions": {
+    "apiKey": {
+      "type": "apiKey",
+      "description": "Enter JWT Bearer token **_only_**",
+      "name": "Authorization",
+      "in": "header"
+    }
+  }
+}

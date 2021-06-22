@@ -55,8 +55,15 @@ Content-Type: application/json
 "sign":"SIG_K1_Jz4KTq5v3dhcRKYehza6NRF5SxZaEzdPiVohRhX5SqoDCjmjf6hh3vyqfFHzEUagWZHC3L6G6SaJvKdH3UWEVwJRLWc6jL"
 
 }
+
 ###
-GET http://127.0.0.1:38888/api/v1/textsecret/keys/otcexchange/1
+GET http://127.0.0.1:38888/v2/keys/
+Content-Type: application/json
+x-user-name: otcexchange
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE2MjEzMjQ1MDAsImlhdCI6MTYyMTIzODEwMCwibmFtZSI6Im90Y2V4Y2hhbmdlIn0.wGlrSPtsAkChPSMLF6j1hi3VmzWM49GMXYztzTtB_2U
+
+###
+GET http://127.0.0.1:38888/v2/keys/otcexchange/1
 Content-Type: application/json
 x-user-name: otcexchange
 Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE2MjEzMjQ1MDAsImlhdCI6MTYyMTIzODEwMCwibmFtZSI6Im90Y2V4Y2hhbmdlIn0.wGlrSPtsAkChPSMLF6j1hi3VmzWM49GMXYztzTtB_2U
@@ -66,7 +73,7 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE2MjEzMjQ1M
 
 ###
 
-PUT http://127.0.0.1:38888/api/v1/textsecret/keys
+PUT http://127.0.0.1:38888/v2/keys
 Content-Type: application/json
 x-user-name: otcexchange
 Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE2MjEzMjQ1MDAsImlhdCI6MTYyMTIzODEwMCwibmFtZSI6Im90Y2V4Y2hhbmdlIn0.wGlrSPtsAkChPSMLF6j1hi3VmzWM49GMXYztzTtB_2U
@@ -75,26 +82,47 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE2MjEzMjQ1M
   "identityKey":"identityKey",
   "signedPreKey":{
       "signature": "signature",
-      "prekey": {
-        "keyId": 1,
-        "publickey": "54"
-      }
+      "keyId": 1,
+      "publicKey": "54"
     },
 
-  "prekeys":[
+  "preKeys":[
     {
       "keyId": 0,
-      "publickey": "pk1"
+      "publicKey": "pk1"
     },
     {
       "keyId": 1,
-      "publickey": "pk2"
+      "publicKey": "pk2"
     }
   ]
 
 }
 
+
 ###
+
+PUT http://127.0.0.1:38888/v1/profile/otcexchange
+Content-Type: application/json
+x-user-name: otcexchange
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE2MjEzMjQ1MDAsImlhdCI6MTYyMTIzODEwMCwibmFtZSI6Im90Y2V4Y2hhbmdlIn0.wGlrSPtsAkChPSMLF6j1hi3VmzWM49GMXYztzTtB_2U
+
+{
+
+  "profileKey":"12223"
+
+}
+
+
+###
+
+
+GET http://127.0.0.1:38888/v1/profile/otcexchange
+Content-Type: application/json
+x-user-name: otcexchange
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE2MjEzMjQ1MDAsImlhdCI6MTYyMTIzODEwMCwibmFtZSI6Im90Y2V4Y2hhbmdlIn0.wGlrSPtsAkChPSMLF6j1hi3VmzWM49GMXYztzTtB_2U
+
+####
 
 
 PUT http://127.0.0.1:38888/api/v1/textsecret/messages/otcexchange
@@ -127,6 +155,9 @@ Content-Type: application/json
 x-user-name: otcexchange
 Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE2MjEzMjQ1MDAsImlhdCI6MTYyMTIzODEwMCwibmFtZSI6Im90Y2V4Y2hhbmdlIn0.wGlrSPtsAkChPSMLF6j1hi3VmzWM49GMXYztzTtB_2U
 
+
+###
+GET http://192.168.0.202:8080/v1/accounts/sms/code/+8618588250437
 
 
 

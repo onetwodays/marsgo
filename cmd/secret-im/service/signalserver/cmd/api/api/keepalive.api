@@ -1,0 +1,15 @@
+
+syntax = "v2"
+
+@server(
+    //jwt: Auth
+    //middleware:UserNameCheck
+    group: textsecret_keepalive
+
+)
+service signalserver-api {
+    @handler GetKeepAliveHandler
+    get /v1/keepalive () returns ()
+
+
+}

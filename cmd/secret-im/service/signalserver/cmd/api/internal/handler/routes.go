@@ -6,6 +6,7 @@ import (
 
 	bookstore "secret-im/service/signalserver/cmd/api/internal/handler/bookstore"
 	textsecret "secret-im/service/signalserver/cmd/api/internal/handler/textsecret"
+	textsecret_keepalive "secret-im/service/signalserver/cmd/api/internal/handler/textsecret_keepalive"
 	textsecret_keys "secret-im/service/signalserver/cmd/api/internal/handler/textsecret_keys"
 	textsecret_messages "secret-im/service/signalserver/cmd/api/internal/handler/textsecret_messages"
 	textsecret_websocket "secret-im/service/signalserver/cmd/api/internal/handler/textsecret_websocket"
@@ -95,41 +96,48 @@ func RegisterHandlers(engine *rest.Server, serverCtx *svc.ServiceContext) {
 	)
 
 	engine.AddRoutes(
-		rest.WithMiddlewares(
-			[]rest.Middleware{serverCtx.UserNameCheck},
-			[]rest.Route{
-				{
-					Method:  http.MethodPut,
-					Path:    "/api/v1/textsecret/messages/:destination",
-					Handler: textsecret_messages.PutMsgsHandler(serverCtx),
-				},
-				{
-					Method:  http.MethodGet,
-					Path:    "/api/v1/textsecret/messages",
-					Handler: textsecret_messages.GetMsgsHandler(serverCtx),
-				},
-			}...,
-		),
-		rest.WithJwt(serverCtx.Config.Auth.AccessSecret),
+		[]rest.Route{
+			{
+				Method:  http.MethodPut,
+				Path:    "/v1/messages/:destination",
+				Handler: textsecret_messages.PutMsgsHandler(serverCtx),
+			},
+			{
+				Method:  http.MethodGet,
+				Path:    "/v1/messages",
+				Handler: textsecret_messages.GetMsgsHandler(serverCtx),
+			},
+		},
 	)
 
 	engine.AddRoutes(
-		rest.WithMiddlewares(
-			[]rest.Middleware{serverCtx.UserNameCheck},
-			[]rest.Route{
-				{
-					Method:  http.MethodPut,
-					Path:    "/api/v1/textsecret/keys",
-					Handler: textsecret_keys.PutKeysHandler(serverCtx),
-				},
-				{
-					Method:  http.MethodGet,
-					Path:    "/api/v1/textsecret/keys/:identifier/:deviceId",
-					Handler: textsecret_keys.GetKeysHandler(serverCtx),
-				},
-			}...,
-		),
-		rest.WithJwt(serverCtx.Config.Auth.AccessSecret),
+		[]rest.Route{
+			{
+				Method:  http.MethodPut,
+				Path:    "/v2/keys",
+				Handler: textsecret_keys.PutKeysHandler(serverCtx),
+			},
+			{
+				Method:  http.MethodGet,
+				Path:    "/v2/keys/:identifier/:deviceId",
+				Handler: textsecret_keys.GetKeysHandler(serverCtx),
+			},
+			{
+				Method:  http.MethodGet,
+				Path:    "/v2/keys",
+				Handler: textsecret_keys.GetKeyCountHandler(serverCtx),
+			},
+			{
+				Method:  http.MethodPut,
+				Path:    "/v1/profile/:accountName",
+				Handler: textsecret_keys.PutProfileKeyHandler(serverCtx),
+			},
+			{
+				Method:  http.MethodGet,
+				Path:    "/v1/profile/:accountName",
+				Handler: textsecret_keys.GetProfileKeyHandler(serverCtx),
+			},
+		},
 	)
 
 	engine.AddRoutes(
@@ -143,6 +151,16 @@ func RegisterHandlers(engine *rest.Server, serverCtx *svc.ServiceContext) {
 				Method:  http.MethodGet,
 				Path:    "/v1/websocket/w",
 				Handler: textsecret_websocket.WwsConnectHandler(serverCtx),
+			},
+		},
+	)
+
+	engine.AddRoutes(
+		[]rest.Route{
+			{
+				Method:  http.MethodGet,
+				Path:    "/v1/keepalive",
+				Handler: textsecret_keepalive.GetKeepAliveHandler(serverCtx),
 			},
 		},
 	)

@@ -75,7 +75,7 @@ type IncomingMessagex struct {
 }
 
 type PutMessagesReq struct {
-	Destination string             `path:"destination"`
+	Destination string             `path:"destination" json:"destination"`
 	Online      bool               `json:"online"`
 	Timestamp   int64              `json:"timestamp"`
 	Messages    []IncomingMessagex `json:"messages"`
@@ -129,23 +129,24 @@ type PubsubMessage struct {
 
 type PreKeyx struct {
 	KeyId     int64  `json:"keyId"`
-	PublicKey string `json:"publickey"`
+	PublicKey string `json:"publicKey"`
 }
 
 type SignedPrekeyx struct {
-	Signature string  `json:"signature"`
-	PreKey    PreKeyx `json:"prekey"`
+	Signature string `json:"signature"`
+	KeyId     int64  `json:"keyId"`
+	PublicKey string `json:"publicKey"`
 }
 
 type PutKeysReqx struct {
 	IdentityKey  string        `json:"identityKey"`
 	SignedPreKey SignedPrekeyx `json:"signedPreKey"`
-	PreKeys      []PreKeyx     `json:"prekeys"`
+	PreKeys      []PreKeyx     `json:"preKeys"`
 }
 
 type GetKeysReq struct {
 	Identifier string `path:"identifier"`
-	DeviceId   int64  `path:"deviceId"`
+	DeviceId   string `path:"deviceId"`
 }
 
 type PreKeyResponseItem struct {
@@ -158,6 +159,23 @@ type PreKeyResponseItem struct {
 type GetKeysResx struct {
 	IdentityKey string               `json:"identityKey"`
 	Devices     []PreKeyResponseItem `json:"devices"`
+}
+
+type PreKeyCount struct {
+	Count int `json:"count"`
+}
+
+type PutProfileKeyReq struct {
+	AccountName string `path:"accountName"`
+	Profilekey  string `json:"profileKey"`
+}
+
+type GetProfileKeyReq struct {
+	AccountName string `path:"accountName"`
+}
+
+type GetProfileKeyRes struct {
+	Profilekey string `json:"profileKey"`
 }
 
 type WriteWsConnReq struct {

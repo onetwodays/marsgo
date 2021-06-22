@@ -24,6 +24,7 @@ type (
 		Insert(data TKeys) (sql.Result, error)
 		FindOne(id int64) (*TKeys, error)
 		FindMany(number string, deviceId int64) ([]TKeys, error)
+		CountKey(number string, deviceId int64) (*int64,error)
 		Update(data TKeys) error
 		Delete(id int64) error
 	}
@@ -72,11 +73,36 @@ func (m *defaultTKeysModel) FindOne(id int64) (*TKeys, error) {
 		return nil, err
 	}
 }
+func  (m * defaultTKeysModel) CountKey(number string,deviceId int64) (*int64,error) {
+	query := fmt.Sprintf("select count(1) from %s where `number` = ? and `device_id`=? ",  m.table)
+	var count int64
+	err := m.conn.QueryRow(&count, query, number,deviceId)
 
+	switch err {
+	case nil:
+
+		return &count, nil
+	case sqlc.ErrNotFound:
+		return nil, ErrNotFound
+	default:
+		return nil, err
+	}
+
+
+}
 func (m * defaultTKeysModel) FindMany(number string, deviceId int64) ([]TKeys, error){
-	query := fmt.Sprintf("select %s from %s where `number` = ? and `device_id`=? ", tKeysRows, m.table)
+
 	var resp []TKeys
-	err := m.conn.QueryRows(&resp, query, number,deviceId)
+	var err error
+	var query string
+
+	if deviceId!=0{
+		query = fmt.Sprintf("select %s from %s where `number` = ? and `device_id`=? ", tKeysRows, m.table)
+		err = m.conn.QueryRows(&resp, query, number,deviceId)
+	}else{
+		query = fmt.Sprintf("select %s from %s where `number` = ?  ", tKeysRows, m.table)
+		err = m.conn.QueryRows(&resp, query, number)
+	}
 	switch err {
 	case nil:
 		return resp, nil

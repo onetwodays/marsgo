@@ -1,6 +1,7 @@
 package handler
 
 import (
+	"github.com/tal-tech/go-zero/core/logx"
 	"net/http"
 	"secret-im/service/signalserver/cmd/shared"
 
@@ -23,6 +24,7 @@ func PutKeysHandler(ctx *svc.ServiceContext) http.HandlerFunc {
 		l := logic.NewPutKeysLogic(r.Context(), ctx)
 		err := l.PutKeys(adxName,req)
 		if err != nil {
+			logx.Error("l.PutKeys(adxName,req) error:",err)
 			httpx.Error(w, err)
 		} else {
 			httpx.OkJson(w,shared.NewOkResponse(nil))

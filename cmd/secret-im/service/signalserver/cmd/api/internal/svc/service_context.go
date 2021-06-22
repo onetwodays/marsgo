@@ -23,6 +23,7 @@ type ServiceContext struct {
 	AccountsModel model.TAccountsModel
 	KeysModel model.TKeysModel
 	MsgsModel model.TMessagesModel
+	ProfileKeyModel model.TProfilekeyModel
 	// --------------------
 	UserCheck rest.Middleware // jwt
 	CheckBasicAuth rest.Middleware //basic auth
@@ -31,6 +32,8 @@ type ServiceContext struct {
 	//---------------------
 	BookStoreClient bookstoreclient.Bookstore //这个是rpc客户端，发起rpc请求的
 	EosApi *eos.API
+
+	ProfileKeyMap  map[string]string
 
 
 }
@@ -49,6 +52,8 @@ func NewServiceContext(c config.Config) *ServiceContext {
 
 	 */
 
+
+
 	eosApi:=eos.New(c.EOSChainUrls[0])
 	eosApi.EnableKeepAlives()
 	eosApi.Debug=true
@@ -65,11 +70,14 @@ func NewServiceContext(c config.Config) *ServiceContext {
 		AccountsModel: model.NewTAccountsModel(mysqlConn),
 		KeysModel: model.NewTKeysModel(mysqlConn),
 		MsgsModel: model.NewTMessagesModel(mysqlConn),
+		ProfileKeyModel: model.NewTProfilekeyModel(mysqlConn),
+
 		UserCheck: middleware.NewUsercheckMiddleware().Handle,
 		CheckBasicAuth: middleware.NewCheckBasicAuthMiddleware().Handle,
 		UserNameCheck: middleware.NewUserNameCheckMiddleware().Handle,
 		//BookStoreClient: bookstoreclient.NewBookstore(zrpc.MustNewClient(c.BookStore,zrpc.WithUnaryClientInterceptor(interceptor.TimeInterceptor))),
 		EosApi: eosApi,
+		ProfileKeyMap:make(map[string]string),
 	}
 }
 

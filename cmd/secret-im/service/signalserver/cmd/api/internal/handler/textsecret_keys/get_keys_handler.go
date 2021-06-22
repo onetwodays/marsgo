@@ -1,13 +1,11 @@
 package handler
 
 import (
-	"net/http"
-	"secret-im/service/signalserver/cmd/api/internal/types"
-	"secret-im/service/signalserver/cmd/shared"
-
 	"github.com/tal-tech/go-zero/rest/httpx"
+	"net/http"
 	"secret-im/service/signalserver/cmd/api/internal/logic/textsecret_keys"
 	"secret-im/service/signalserver/cmd/api/internal/svc"
+	"secret-im/service/signalserver/cmd/api/internal/types"
 )
 
 func GetKeysHandler(ctx *svc.ServiceContext) http.HandlerFunc {
@@ -24,7 +22,8 @@ func GetKeysHandler(ctx *svc.ServiceContext) http.HandlerFunc {
 		if err != nil {
 			httpx.Error(w, err)
 		} else {
-			httpx.OkJson(w, shared.NewOkResponse(resp))
+			httpx.OkJson(w, resp)
+			//httpx.OkJson(w, shared.NewOkResponse(resp))
 		}
 	}
 }
