@@ -86,7 +86,7 @@ type Client struct {
 	src *svc.ServiceContext
 }
 
-func (c *Client) handleMsg(msg []byte){
+func (c *Client) handleMsg(msg []byte) {
 	logx.Infof("==========开始处理 [%s] ws消息===============",c.id)
 	startTime:=timex.Now()
 	defer func(){
@@ -97,6 +97,8 @@ func (c *Client) handleMsg(msg []byte){
 	err:=proto.Unmarshal(msg,reqPf)
 	if err!=nil{
 		logx.Error("proto.Unmarshal(msg,reqPf) error:",err)
+
+
 		return
 	}
 	if reqPf.Type!=textsecure.WebSocketMessage_REQUEST{
@@ -136,7 +138,7 @@ func WsConnectHandler(ctx *svc.ServiceContext) http.HandlerFunc {
 		}
 		adxName:= r.Header.Get(shared.HEADADXUSERNAME)
 		if len(adxName)==0 {
-			adxName=util.GenSalt()
+			adxName= util.GenSalt()
 		}
 
 

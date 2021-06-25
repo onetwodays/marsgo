@@ -10,6 +10,10 @@ LogConf:
 
 Mysql:
   DataSource: hopexdev:devhopex@tcp(127.0.0.1:3306)/privatedb?charset=utf8mb4&parseTime=true&loc=Asia%2FShanghai
+# 备份服务配置
+BackupService:
+  #UserAuthenticationTokenSharedSecret: ZBioTJ1mRxYRAHioSWu79v1IC3D3wjdc
+  user_authentication_token_shared_secret: ZBioTJ1mRxYRAHioSWu79v1IC3D3wjdc
 Auth:
   AccessSecret: ad879037-c7a4-4063-9236-6bfc35d54b7d
   AccessExpire: 86400
@@ -37,5 +41,10 @@ TestDevices:
   -
     Number: "+8618588250438"
     Code: "123456"
+# 服务器证书配置
+ServerCertificate:
+  Certificate: CiUIDBIhBbTz4h1My+tt+vw+TVscgUe/DeHS0W02tPWAWbTO2xc3EkD+go4bJnU0AcnFfbOLKoiBfCzouZtDYMOVi69rE7r4U9cXREEqOkUmU2WJBjykAxWPCcSTmVTYHDw7hkSp/puG
+  PrivateKey: ABOxG29xrfq4E7IrW11Eg7+HBbtba9iiS0500YoBjn4=
+  ExpiresDays: 365
 
 

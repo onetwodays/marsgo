@@ -2,6 +2,7 @@ package logic
 
 import (
 	"context"
+	"encoding/base64"
 	"time"
 
 	"secret-im/service/signalserver/cmd/api/internal/svc"
@@ -27,5 +28,6 @@ func NewIndexLogic(ctx context.Context, svcCtx *svc.ServiceContext) IndexLogic {
 func (l *IndexLogic) Index() (*types.IndexReply, error) {
 	// todo: add your logic here and delete this line
 
-	return &types.IndexReply{Resp: time.Now().Local().Format(`2006-01-02 15:04:05`)}, nil
+
+	return &types.IndexReply{Resp: time.Now().Local().Format(`2006-01-02 15:04:05`)+" auth:"+base64.StdEncoding.EncodeToString([]byte("otcexchange:123"))}, nil
 }

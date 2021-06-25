@@ -1,0 +1,68 @@
+syntax = "v2"
+
+
+type PreKey{
+    KeyId int64 `json:"keyId"`
+    PublicKey string `json:"publicKey"`
+}
+type SignedPrekey{
+    Signature string  `json:"signature"`
+    KeyId int64       `json:"keyId"`
+    PublicKey string  `json:"publicKey"`
+}
+
+
+type PutKeysReq{
+    IdentityKey string        `json:"identityKey"`
+    SignedPreKey SignedPrekey `json:"signedPreKey"`
+    PreKeys []PreKey          `json:"preKeys"`
+}
+
+type GetKeysReqx{
+    Identifier string `path:"identifier"`
+    DeviceId string `path:"deviceId"`
+}
+
+
+type PreKeyResponseItemx{
+    DeviceId int64 `json:"deviceId"`
+    RegistrationId int64 `json:"registrationId"`
+    PreKey PreKey `json:"preKey"`
+    SignedPrekey SignedPrekey `json:"signedPreKey"`
+
+}
+type GetKeysRes{
+    IdentityKey string `json:"identityKey"`
+    Devices []PreKeyResponseItemx `json:"devices"`
+}
+
+type PreKeyCountx {
+    Count int `json:"count"`
+}
+
+
+
+
+
+
+
+@server(
+    //jwt: Auth
+    middleware : CheckBasicAuth
+    group: keys
+
+)
+service signalserver-api {
+    @handler PutKeysHandler
+    put  /v3/keys (PutKeysReq) returns ()
+
+    @handler GetKeysHandler
+    get /v3/keys/:identifier/:deviceId (GetKeysReq) returns (GetKeysResx)
+
+    @handler GetKeyCountHandler
+    get /v3/keys () returns (PreKeyCountx)
+
+
+
+}
+

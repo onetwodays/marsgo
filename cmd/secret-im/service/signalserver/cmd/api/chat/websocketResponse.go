@@ -21,10 +21,13 @@ func newWebSocketMessage(req *textsecure.WebSocketMessage,code uint32,body inter
 	webres.Id=req.Request.Id
 	webres.Headers=[]string{"Content-Type:application/json"}
 	webres.Status=code
-	webres.Message=http.StatusText(int(webres.Status))
+	message:= http.StatusText(int(code))
+	webres.Message=message
+
+
 
 	wsMsg:=&textsecure.WebSocketMessage{}
-	wsMsg.Type=textsecure.WebSocketMessage_RESPONSE
+	wsMsg.Type= textsecure.WebSocketMessage_RESPONSE
 	wsMsg.Response=webres
 
 

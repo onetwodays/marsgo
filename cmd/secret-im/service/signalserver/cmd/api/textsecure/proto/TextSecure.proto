@@ -46,26 +46,17 @@ message ProvisioningUuid {   //供应
    string uuid = 1;
 }
 
-message ServerCertificate {
-    message Certificate {
-         uint32 id  = 1;
-         bytes  key = 2;
-    }
 
-     bytes certificate = 1;
-     bytes signature   = 2;
+message ServerCertificate {
+  bytes certificate = 1;
+  bytes signature   = 2;
 }
 
-message SenderCertificate {
-    message Certificate {
-         string            sender        = 1;
-         string            senderUuid    = 6;
-         uint32            senderDevice  = 2;
-         fixed64           expires       = 3;
-         bytes             identityKey   = 4;
-         ServerCertificate signer        = 5;
-    }
-
-     bytes certificate = 1;
-     bytes signature   = 2;
+message SenderCertificateMessage {
+  string            sender        = 1;
+  string            senderUuid    = 6;
+  uint32            senderDevice  = 2;
+  fixed64           expires       = 3;
+  bytes             identityKey   = 4;
+  ServerCertificate signer        = 5;
 }

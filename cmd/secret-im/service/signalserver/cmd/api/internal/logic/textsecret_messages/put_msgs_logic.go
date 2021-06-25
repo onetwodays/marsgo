@@ -2,6 +2,7 @@ package logic
 
 import (
 	"context"
+	"encoding/base64"
 	"fmt"
 	"github.com/golang/protobuf/proto"
 	"secret-im/service/signalserver/cmd/api/textsecure"
@@ -32,6 +33,13 @@ func NewPutMsgsLogic(ctx context.Context, svcCtx *svc.ServiceContext) PutMsgsLog
 
 func (l *PutMsgsLogic) PutMsgs(sender string,req types.PutMessagesReq,msgId uint64) (*types.PutMessagesRes, error) {
 	// todo: add your logic here and delete this line
+
+
+	account,err:=l.svcCtx.AccountsModel.FindOneByNumber(sender)
+	if err!=nil{
+		return nil, err
+	}
+
 	now:= time.Now().UnixNano() / 1e6
 	if req.Timestamp==0{
 		req.Timestamp = now
@@ -47,7 +55,7 @@ func (l *PutMsgsLogic) PutMsgs(sender string,req types.PutMessagesReq,msgId uint
 		row:=&model.TMessages{}
 		row.Type=int64(msg.Type)
 		row.Source= sender
-		row.SourceUuid=""
+		row.SourceUuid=account.Uuid
 		row.SourceDevice=1
 		row.Destination=msg.Destination
 		row.DestinationDevice=int64(msg.DestinationDeviceId)
@@ -65,22 +73,25 @@ func (l *PutMsgsLogic) PutMsgs(sender string,req types.PutMessagesReq,msgId uint
 			//if isOnline {
 			if true {
 
+				content,_ :=base64.StdEncoding.DecodeString(msg.Content)
+
+
 				envelopePf:=&textsecure.Envelope{}
-				envelopePf.Type=textsecure.Envelope_CIPHERTEXT
+				envelopePf.Type=textsecure.GetEnvelopeType(msg.Type)
 				envelopePf.SourceDevice=1
 				envelopePf.Source=sender
 				envelopePf.ServerGuid=row.Guid
-				envelopePf.SourceUuid=row.SourceUuid
+				envelopePf.SourceUuid=account.Uuid
 				envelopePf.ServerTimestamp=uint64(now)
+				envelopePf.Timestamp=uint64(req.Timestamp)
 				envelopePf.Relay=row.Relay
 				//envelopePf.LegacyMessage=[]byte(row.Message)
-				envelopePf.Content=[]byte(row.Content)
+				envelopePf.Content=content
 				logx.Info("收件人的envelop:",envelopePf.String())
 				contentPf,err:=proto.Marshal(envelopePf)
 				if err!=nil{
 					logx.Error("proto.Marshal(envelopePf):",err)
 				}else{
-
 					websocketReq:=&textsecure.WebSocketRequestMessage{}
 					websocketReq.Id=msgId
 					websocketReq.Headers=[]string{"X-Signal-Key: false","X-Signal-Timestamp:"+fmt.Sprintf("%d",now)}
@@ -89,6 +100,7 @@ func (l *PutMsgsLogic) PutMsgs(sender string,req types.PutMessagesReq,msgId uint
 					websocketReq.Body=contentPf
 
 					websocketMsg:=&textsecure.WebSocketMessage{}
+
 					websocketMsg.Type=textsecure.WebSocketMessage_REQUEST
 					websocketMsg.Request=websocketReq
 					logx.Info("收件人最外层:",websocketMsg.String())

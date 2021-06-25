@@ -4,7 +4,10 @@ package handler
 import (
 	"net/http"
 
+	accounts "secret-im/service/signalserver/cmd/api/internal/handler/accounts"
 	bookstore "secret-im/service/signalserver/cmd/api/internal/handler/bookstore"
+	certificate "secret-im/service/signalserver/cmd/api/internal/handler/certificate"
+	keys "secret-im/service/signalserver/cmd/api/internal/handler/keys"
 	textsecret "secret-im/service/signalserver/cmd/api/internal/handler/textsecret"
 	textsecret_keepalive "secret-im/service/signalserver/cmd/api/internal/handler/textsecret_keepalive"
 	textsecret_keys "secret-im/service/signalserver/cmd/api/internal/handler/textsecret_keys"
@@ -69,6 +72,34 @@ func RegisterHandlers(engine *rest.Server, serverCtx *svc.ServiceContext) {
 				Handler: bookstore.CheckHandler(serverCtx),
 			},
 		},
+	)
+
+	engine.AddRoutes(
+		[]rest.Route{
+			{
+				Method:  http.MethodGet,
+				Path:    "/v1/accounts/:transport/code/:number",
+				Handler: accounts.GetCodeReqHandler(serverCtx),
+			},
+			{
+				Method:  http.MethodPut,
+				Path:    "/v1/accounts/code/:verificationCode",
+				Handler: accounts.VerifyAccountHandler(serverCtx),
+			},
+		},
+	)
+
+	engine.AddRoutes(
+		rest.WithMiddlewares(
+			[]rest.Middleware{serverCtx.CheckBasicAuth},
+			[]rest.Route{
+				{
+					Method:  http.MethodGet,
+					Path:    "/v2/accounts/:transport/code/:number",
+					Handler: accounts.TestHandler(serverCtx),
+				},
+			}...,
+		),
 	)
 
 	engine.AddRoutes(
@@ -163,5 +194,41 @@ func RegisterHandlers(engine *rest.Server, serverCtx *svc.ServiceContext) {
 				Handler: textsecret_keepalive.GetKeepAliveHandler(serverCtx),
 			},
 		},
+	)
+
+	engine.AddRoutes(
+		rest.WithMiddlewares(
+			[]rest.Middleware{serverCtx.CheckBasicAuth},
+			[]rest.Route{
+				{
+					Method:  http.MethodGet,
+					Path:    "/v1/certificate/delivery",
+					Handler: certificate.DeliveryHandler(serverCtx),
+				},
+			}...,
+		),
+	)
+
+	engine.AddRoutes(
+		rest.WithMiddlewares(
+			[]rest.Middleware{serverCtx.CheckBasicAuth},
+			[]rest.Route{
+				{
+					Method:  http.MethodPut,
+					Path:    "/v3/keys",
+					Handler: keys.PutKeysHandler(serverCtx),
+				},
+				{
+					Method:  http.MethodGet,
+					Path:    "/v3/keys/:identifier/:deviceId",
+					Handler: keys.GetKeysHandler(serverCtx),
+				},
+				{
+					Method:  http.MethodGet,
+					Path:    "/v3/keys",
+					Handler: keys.GetKeyCountHandler(serverCtx),
+				},
+			}...,
+		),
 	)
 }

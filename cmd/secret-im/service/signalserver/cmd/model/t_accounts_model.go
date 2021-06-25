@@ -4,6 +4,7 @@ import (
 	"database/sql"
 	"fmt"
 	"strings"
+	"time"
 
 	"github.com/tal-tech/go-zero/core/stores/sqlc"
 	"github.com/tal-tech/go-zero/core/stores/sqlx"
@@ -12,10 +13,11 @@ import (
 )
 
 var (
-	tAccountsFieldNames          = builderx.RawFieldNames(&TAccounts{})
-	tAccountsRows                = strings.Join(tAccountsFieldNames, ",")
-	tAccountsRowsExpectAutoSet   = strings.Join(stringx.Remove(tAccountsFieldNames, "`id`", "`create_time`", "`update_time`"), ",")
-	tAccountsRowsWithPlaceHolder = strings.Join(stringx.Remove(tAccountsFieldNames, "`id`", "`create_time`", "`update_time`"), "=?,") + "=?"
+	tAccountsFieldNames             = builderx.RawFieldNames(&TAccounts{})
+	tAccountsRows                   = strings.Join(tAccountsFieldNames, ",")
+	tAccountsRowsExpectAutoSet      = strings.Join(stringx.Remove(tAccountsFieldNames, "`id`", "`create_time`", "`update_time`"), ",")
+	tAccountsRowsWithPlaceHolder    = strings.Join(stringx.Remove(tAccountsFieldNames, "`id`", "`create_time`", "`update_time`"), "=?,") + "=?"
+	//tAccountsRowsWithPlaceHolderNew = strings.Join(stringx.Remove(tAccountsFieldNames, "`id`", "`create_time`", "`delete_time`"), "=?,") + "=?"
 )
 
 type (
@@ -23,9 +25,10 @@ type (
 		Insert(data TAccounts) (sql.Result, error)
 		FindOne(id int64) (*TAccounts, error)
 		FindOneByNumber(number string) (*TAccounts, error)
+		FindOneByUuid(uuid string) (*TAccounts, error)
 		Update(data TAccounts) error
+		UpdateDataByUuid(data sql.NullString,uuid string) error
 		Delete(id int64) error
-		DeleteByNumber(number string) error
 	}
 
 	defaultTAccountsModel struct {
@@ -34,9 +37,13 @@ type (
 	}
 
 	TAccounts struct {
-		Data   string `db:"data"` // account json byte
-		Id     int64  `db:"id"`
-		Number string `db:"number"` // phonenumber
+		Id         int64          `db:"id"` // pk
+		Number     string         `db:"number"`
+		Uuid       string         `db:"uuid"`
+		Data       sql.NullString `db:"data"`
+		CreateTime time.Time      `db:"create_time"`
+		UpdateTime time.Time      `db:"update_time"`
+		DeleteTime sql.NullTime   `db:"delete_time"`
 	}
 )
 
@@ -48,8 +55,8 @@ func NewTAccountsModel(conn sqlx.SqlConn) TAccountsModel {
 }
 
 func (m *defaultTAccountsModel) Insert(data TAccounts) (sql.Result, error) {
-	query := fmt.Sprintf("insert into %s (%s) values (?, ?)", m.table, tAccountsRowsExpectAutoSet)
-	ret, err := m.conn.Exec(query, data.Data, data.Number)
+	query := fmt.Sprintf("insert into %s (%s) values (?, ?, ?, ?)", m.table, tAccountsRowsExpectAutoSet)
+	ret, err := m.conn.Exec(query, data.Number, data.Uuid, data.Data, data.DeleteTime)
 	return ret, err
 }
 
@@ -81,20 +88,37 @@ func (m *defaultTAccountsModel) FindOneByNumber(number string) (*TAccounts, erro
 	}
 }
 
+func (m *defaultTAccountsModel) FindOneByUuid(uuid string) (*TAccounts, error) {
+	var resp TAccounts
+	query := fmt.Sprintf("select %s from %s where `uuid` = ? limit 1", tAccountsRows, m.table)
+	err := m.conn.QueryRow(&resp, query, uuid)
+	switch err {
+	case nil:
+		return &resp, nil
+	case sqlc.ErrNotFound:
+		return nil, ErrNotFound
+	default:
+		return nil, err
+	}
+}
+
 func (m *defaultTAccountsModel) Update(data TAccounts) error {
-	query := fmt.Sprintf("update %s set %s where `id` = ?", m.table, tAccountsRowsWithPlaceHolder)
-	_, err := m.conn.Exec(query, data.Data, data.Number, data.Id)
+	query := fmt.Sprintf("update %s set %s,update_time=%s where `id` = ?", m.table, tAccountsRowsWithPlaceHolder,"CURRENT_TIMESTAMP")
+	_, err := m.conn.Exec(query, data.Number, data.Uuid, data.Data, data.DeleteTime, data.Id)
 	return err
 }
+
+func (m *defaultTAccountsModel) UpdateDataByUuid(data sql.NullString,uuid string) error  {
+	query := fmt.Sprintf("update %s set data=?,update_time=CURRENT_TIMESTAMP where `uuid` = ?", m.table)
+	_, err := m.conn.Exec(query, data,uuid)
+	return err
+
+}
+
+
 
 func (m *defaultTAccountsModel) Delete(id int64) error {
 	query := fmt.Sprintf("delete from %s where `id` = ?", m.table)
 	_, err := m.conn.Exec(query, id)
-	return err
-}
-
-func (m *defaultTAccountsModel) DeleteByNumber(number string) error {
-	query := fmt.Sprintf("delete from %s where `number` = '?'", m.table)
-	_, err := m.conn.Exec(query, number)
 	return err
 }

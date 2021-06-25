@@ -2,6 +2,7 @@ package handler
 
 import (
 	"net/http"
+	"secret-im/service/signalserver/cmd/api/internal/entities"
 	"secret-im/service/signalserver/cmd/shared"
 
 	"secret-im/service/signalserver/cmd/api/internal/logic/textsecret_messages"
@@ -25,7 +26,7 @@ func PutMsgsHandler(ctx *svc.ServiceContext) http.HandlerFunc {
 		if err != nil {
 			httpx.Error(w, err)
 		} else {
-			httpx.OkJson(w, types.SendMessageResponse{
+			httpx.OkJson(w, entities.SendMessageResponse{
 				NeedsSync: resp.NeedsSync,
 			})
 		}

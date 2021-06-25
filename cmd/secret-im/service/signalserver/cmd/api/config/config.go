@@ -42,6 +42,10 @@ type Config struct {
 	Mysql struct{
 		DataSource string
 	}
+	// 备份服务配置
+	BackupService struct  {
+		UserAuthenticationTokenSharedSecret string `yaml:"user_authentication_token_shared_secret"`
+	}
 	BookStore zrpc.RpcClientConf
 
 	TestDevices []struct{
@@ -49,5 +53,11 @@ type Config struct {
 		Code string
 	}
 	EOSChainUrls []string
+
+	ServerCertificate struct {
+		Certificate string
+		PrivateKey  string
+		ExpiresDays int
+	}
 
 }

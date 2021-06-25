@@ -16,6 +16,8 @@ type AdxUserLoginReq {
 type AdxUserLoginRes {
     // TODO: add members here and delete this comment
     JwtTokenAdx
+    Uuid string `json:"uuid"`
+    IsNew bool `json:"isNew"`
 }
 
 

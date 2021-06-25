@@ -3,6 +3,7 @@ package model
 import (
 	"database/sql"
 	"fmt"
+	"strconv"
 	"strings"
 	"time"
 
@@ -27,6 +28,7 @@ type (
 		CountKey(number string, deviceId int64) (*int64,error)
 		Update(data TKeys) error
 		Delete(id int64) error
+		DeleteMany(ids []int64) error
 	}
 
 	defaultTKeysModel struct {
@@ -122,5 +124,17 @@ func (m *defaultTKeysModel) Update(data TKeys) error {
 func (m *defaultTKeysModel) Delete(id int64) error {
 	query := fmt.Sprintf("delete from %s where `id` = ?", m.table)
 	_, err := m.conn.Exec(query, id)
+	return err
+}
+
+func (m *defaultTKeysModel) DeleteMany(ids []int64) error{
+	idList:=make([]string,len(ids))
+	for i:=range ids{
+		idList[i] = strconv.FormatInt(ids[i],10)
+	}
+	in:=fmt.Sprintf("(%s)",strings.Join(idList,`,`))
+
+	query := fmt.Sprintf("delete from %s where `id` in %s", m.table,in)
+	_, err := m.conn.Exec(query)
 	return err
 }

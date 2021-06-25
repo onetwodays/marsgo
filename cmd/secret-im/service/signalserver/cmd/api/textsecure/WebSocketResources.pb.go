@@ -158,10 +158,7 @@ func (x *WebSocketRequestMessage) GetId() uint64 {
 	return 0
 }
 
-type
-
-
-WebSocketResponseMessage struct {
+type WebSocketResponseMessage struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields

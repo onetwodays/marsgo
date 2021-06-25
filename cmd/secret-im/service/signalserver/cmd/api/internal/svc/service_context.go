@@ -3,10 +3,14 @@
 package svc
 
 import (
+	"encoding/base64"
 	eos "github.com/marsofsnow/eos-go"
+	"github.com/tal-tech/go-zero/core/logx"
 	"github.com/tal-tech/go-zero/core/stores/sqlx"
 	"github.com/tal-tech/go-zero/rest"
 	"secret-im/service/signalserver/cmd/api/config"
+	"secret-im/service/signalserver/cmd/api/internal/auth"
+	"secret-im/service/signalserver/cmd/api/internal/crypto"
 	"secret-im/service/signalserver/cmd/api/internal/middleware"
 	"secret-im/service/signalserver/cmd/model"
 	"secret-im/service/signalserver/cmd/rpc/bookstore/bookstoreclient"
@@ -19,11 +23,12 @@ type ServiceContext struct {
 
 
 	//-----------------
-	PendAccountsModel model.TPendAccountsModel
+	PendAccountsModel model.TPendingAccountsModel
 	AccountsModel model.TAccountsModel
 	KeysModel model.TKeysModel
 	MsgsModel model.TMessagesModel
 	ProfileKeyModel model.TProfilekeyModel
+
 	// --------------------
 	UserCheck rest.Middleware // jwt
 	CheckBasicAuth rest.Middleware //basic auth
@@ -34,6 +39,10 @@ type ServiceContext struct {
 	EosApi *eos.API
 
 	ProfileKeyMap  map[string]string
+
+	BackupCredentialsGenerator *auth.ExternalServiceCredentialGenerator
+
+	CertificateGenerator    *auth.CertificateGenerator
 
 
 }
@@ -59,6 +68,28 @@ func NewServiceContext(c config.Config) *ServiceContext {
 	eosApi.Debug=true
 
 
+	logx.Infof("%+v",config.AppConfig.ServerCertificate)
+
+	//创建证书生成器
+	var key [32]byte
+	cert := config.AppConfig.ServerCertificate
+	privateKey,err:= base64.StdEncoding.DecodeString(cert.PrivateKey)
+	if err!=nil{
+		logx.Errorf("base64.StdEncoding.DecodeString(cert.PrivateKey):%s",err)
+	}
+	certificate,err:= base64.StdEncoding.DecodeString(cert.Certificate)
+	if err!=nil{
+		logx.Errorf("base64.StdEncoding.DecodeString(cert.Certificate):%s",err)
+	}
+	copy(key[:],privateKey)
+
+	certificateGenerator, err := auth.NewCertificateGenerator(
+		certificate, crypto.NewDjbECPrivateKey(key), cert.ExpiresDays)
+	if err!=nil{
+		logx.Error("auth.NewCertificateGenerator error:",err.Error())
+	}
+
+
 
 
 	return &ServiceContext{
@@ -66,18 +97,21 @@ func NewServiceContext(c config.Config) *ServiceContext {
 		//Hub: hub,
 		UserModel: um,
 
-		PendAccountsModel: model.NewTPendAccountsModel(mysqlConn),
+		PendAccountsModel: model.NewTPendingAccountsModel(mysqlConn),
 		AccountsModel: model.NewTAccountsModel(mysqlConn),
 		KeysModel: model.NewTKeysModel(mysqlConn),
 		MsgsModel: model.NewTMessagesModel(mysqlConn),
 		ProfileKeyModel: model.NewTProfilekeyModel(mysqlConn),
 
 		UserCheck: middleware.NewUsercheckMiddleware().Handle,
-		CheckBasicAuth: middleware.NewCheckBasicAuthMiddleware().Handle,
+		CheckBasicAuth: middleware.NewCheckBasicAuthMiddleware(model.NewTAccountsModel(mysqlConn)).Handle,
 		UserNameCheck: middleware.NewUserNameCheckMiddleware().Handle,
 		//BookStoreClient: bookstoreclient.NewBookstore(zrpc.MustNewClient(c.BookStore,zrpc.WithUnaryClientInterceptor(interceptor.TimeInterceptor))),
 		EosApi: eosApi,
 		ProfileKeyMap:make(map[string]string),
+
+		BackupCredentialsGenerator: auth.NewExternalServiceCredentialGenerator([]byte(c.BackupService.UserAuthenticationTokenSharedSecret),nil,false),
+		CertificateGenerator: certificateGenerator,
 	}
 }
 

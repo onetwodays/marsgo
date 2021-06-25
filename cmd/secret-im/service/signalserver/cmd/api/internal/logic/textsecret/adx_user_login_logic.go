@@ -2,11 +2,17 @@ package logic
 
 import (
 	"context"
+	"database/sql"
 	"errors"
 	"github.com/dgrijalva/jwt-go"
 	eos "github.com/marsofsnow/eos-go"
 	ecc "github.com/marsofsnow/eos-go/ecc"
+	"github.com/tal-tech/go-zero/core/stores/sqlx"
+	"github.com/tal-tech/go-zero/core/utils"
 	"secret-im/service/signalserver/cmd/api/util"
+
+	//"secret-im/service/signalserver/cmd/api/util"
+	"secret-im/service/signalserver/cmd/model"
 	"secret-im/service/signalserver/cmd/shared"
 	"time"
 
@@ -52,7 +58,7 @@ func (l *AdxUserLoginLogic) AdxUserLogin(req types.AdxUserLoginReq) (*types.AdxU
 	}
 
 	logx.Info("activePublicKey=%s,ownwerPublicKey=%s",activePublicKey,ownwerPublicKey)
-	digest:=util.Sha256Str(req.Name)
+	digest:= util.Sha256Str(req.Name)
 	s,_err:=ecc.NewSignature(req.Sign)
 	if _err!=nil{
 		return nil, _err
@@ -87,12 +93,42 @@ func (l *AdxUserLoginLogic) AdxUserLogin(req types.AdxUserLoginReq) (*types.AdxU
 		return nil, err
 	}
 
+
+	//新用户的话，创建一个，不是新用户的话，返回已经存在的uuid
+	account,err:=l.svcCtx.AccountsModel.FindOneByNumber(req.Name)
+	if err!=nil && err!=sqlx.ErrNotFound{
+		return nil,err
+	}
+
+	uuid:= ""
+	isNew:=false
+	if err!=nil && err==sqlx.ErrNotFound{
+		uuid = utils.NewUuid()
+		account:=&model.TAccounts{
+			Number: req.Name,
+			Uuid:uuid,
+			Data: sql.NullString{String: "",Valid: false},
+			DeleteTime: sql.NullTime{Time: time.Time{},Valid: false},
+		}
+		_,err:=l.svcCtx.AccountsModel.Insert(*account)
+		if err!=nil{
+			return nil, err
+		}
+		isNew=true
+
+	}else{
+		uuid = account.Uuid
+	}
+
+
 	return &types.AdxUserLoginRes{
 		JwtTokenAdx: types.JwtTokenAdx{
 			AccessToken: jwtToken,
 			AccessExpire: now+accessExpire,
 			RefreshAfter: now+accessExpire/2,
 		},
+		Uuid: uuid,
+		IsNew: isNew,
 	}, nil
 }
 func (l *AdxUserLoginLogic) getJwtToken(secretKey string, now, seconds int64, name string) (string, error) {

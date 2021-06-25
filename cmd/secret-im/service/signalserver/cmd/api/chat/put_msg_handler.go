@@ -5,6 +5,7 @@ import (
 	"github.com/tal-tech/go-zero/core/logx"
 	"github.com/tal-tech/go-zero/core/mapping"
 	"net/http"
+	"secret-im/service/signalserver/cmd/api/internal/entities"
 	"strings"
 
 	logic "secret-im/service/signalserver/cmd/api/internal/logic/textsecret_messages"
@@ -45,7 +46,7 @@ func PutMsgHandler(req *textsecure.WebSocketMessage,svc *svc.ServiceContext,send
 			logx.Infof("msg from %s send to %s ok ", sender, putMesReq.Destination)
 		}
 	}
-	body:=&types.SendMessageResponse{
+	body:=&entities.SendMessageResponse{
 		NeedsSync: putMsgRes.NeedsSync,
 	}
 	return newWebSocketMessage(req,http.StatusOK,body),nil

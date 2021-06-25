@@ -51,6 +51,8 @@ type GetProfileKeyReq{
 
 type GetProfileKeyRes{
     profilekey string `json:"profileKey"`
+    Uuid string `json:"uuid"`
+    accountName string `path:"accountName"`
 }
 
 

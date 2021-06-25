@@ -49,6 +49,47 @@ type CheckResp struct {
 	Price int64 `json:"price"`
 }
 
+type GetCodeReq struct {
+	Transport string `path:"transport"`
+	Number    string `path:"number"`
+	Client    string `form:"client,optional"`
+	Captcha   string `form:"captcha,optional"`
+	Challenge string `form:"challenge,optional"`
+}
+
+type DeviceCapabilities struct {
+	UUID bool `json:"uuid,optional"`
+}
+
+type AccountAttributes struct {
+	SignalingKey                   string             `json:"signalingKey,optional"`
+	FetchesMessages                bool               `json:"fetchesMessages"`
+	RegistrationID                 int                `json:"registrationId"`
+	Name                           string             `json:"name,optional"`
+	Pin                            string             `json:"pin,optional"`
+	RegistrationLock               string             `json:"registrationLock,optional"`
+	UnidentifiedAccessKey          string             `json:"unidentifiedAccessKey,optional"`
+	UnrestrictedUnidentifiedAccess bool               `json:"unrestrictedUnidentifiedAccess,optional"`
+	Capabilities                   DeviceCapabilities `json:"capabilities,optional"`
+}
+
+type VerifyAccountReq struct {
+	VerificationCode               string             `path:"verificationCode"`
+	SignalingKey                   string             `json:"signalingKey,optional"`
+	FetchesMessages                bool               `json:"fetchesMessages"`
+	RegistrationID                 int                `json:"registrationId"`
+	Name                           string             `json:"name,optional"`
+	Pin                            string             `json:"pin,optional"`
+	RegistrationLock               string             `json:"registrationLock,optional"`
+	UnidentifiedAccessKey          string             `json:"unidentifiedAccessKey,optional"`
+	UnrestrictedUnidentifiedAccess bool               `json:"unrestrictedUnidentifiedAccess,optional"`
+	Capabilities                   DeviceCapabilities `json:"capabilities,optional"`
+}
+
+type VerifyAccountRes struct {
+	UUID string `json:"uuid"`
+}
+
 type JwtTokenAdx struct {
 	AccessToken  string `json:"accessToken,omitempty"`
 	AccessExpire int64  `json:"accessExpire,omitempty"`
@@ -62,6 +103,8 @@ type AdxUserLoginReq struct {
 
 type AdxUserLoginRes struct {
 	JwtTokenAdx
+	Uuid  string `json:"uuid"`
+	IsNew bool   `json:"isNew"`
 }
 
 type IncomingMessagex struct {
@@ -175,10 +218,57 @@ type GetProfileKeyReq struct {
 }
 
 type GetProfileKeyRes struct {
-	Profilekey string `json:"profileKey"`
+	Profilekey  string `json:"profileKey"`
+	Uuid        string `json:"uuid"`
+	AccountName string `path:"accountName"`
 }
 
 type WriteWsConnReq struct {
 	Login    string `form:"login"`
 	Password string `form:"password"`
+}
+
+type DeliveryReq struct {
+}
+
+type DeliveryRes struct {
+	Certificate string `json:"certificate"`
+}
+
+type PreKey struct {
+	KeyId     int64  `json:"keyId"`
+	PublicKey string `json:"publicKey"`
+}
+
+type SignedPrekey struct {
+	Signature string `json:"signature"`
+	KeyId     int64  `json:"keyId"`
+	PublicKey string `json:"publicKey"`
+}
+
+type PutKeysReq struct {
+	IdentityKey  string       `json:"identityKey"`
+	SignedPreKey SignedPrekey `json:"signedPreKey"`
+	PreKeys      []PreKey     `json:"preKeys"`
+}
+
+type GetKeysReqx struct {
+	Identifier string `path:"identifier"`
+	DeviceId   string `path:"deviceId"`
+}
+
+type PreKeyResponseItemx struct {
+	DeviceId       int64        `json:"deviceId"`
+	RegistrationId int64        `json:"registrationId"`
+	PreKey         PreKey       `json:"preKey"`
+	SignedPrekey   SignedPrekey `json:"signedPreKey"`
+}
+
+type GetKeysRes struct {
+	IdentityKey string                `json:"identityKey"`
+	Devices     []PreKeyResponseItemx `json:"devices"`
+}
+
+type PreKeyCountx struct {
+	Count int `json:"count"`
 }

@@ -30,6 +30,7 @@ func (l *GetMsgsLogic) GetMsgs(who string,deviceId int64 ) (*types.GetPendingMsg
 	if err!=nil{
 		return nil,shared.NewCodeError(shared.ERRCODE_SQLQUERY,err.Error())
 	}
+
 	list:=make([]types.OutcomingMessagex,len(resp))
 	for i:=range resp{
 		row:=&resp[i]

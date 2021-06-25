@@ -1,0 +1,20 @@
+
+
+PUT  http://127.0.0.1:38888/v1/accounts/code/305673
+Content-Type: application/json
+x-user-name: otcexchange
+Authorization: Basic b3RjZXhjaGFuZ2U6MTIz
+
+{
+  "signalingKey": "",
+  "fetchesMessages": true,
+  "registrationId": 1,
+  "name":"111",
+  "pin": "11111",
+  "registrationLock": "11111",
+  "unidentifiedAccessKey": "1111",
+  "unrestrictedUnidentifiedAccess": false,
+  "capabilities": {
+    "uuid": false
+  }
+}

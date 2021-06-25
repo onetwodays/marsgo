@@ -25,13 +25,20 @@ func NewGetProfileKeyLogic(ctx context.Context, svcCtx *svc.ServiceContext) GetP
 
 func (l *GetProfileKeyLogic) GetProfileKey(req types.GetProfileKeyReq) (*types.GetProfileKeyRes, error) {
 	// todo: add your logic here and delete this line
-	logx.Info("%+v",req)
+
 	res,err:=l.svcCtx.ProfileKeyModel.FindOneByAccountName(req.AccountName)
-	if err!=nil{
+	if err!=nil {
 		return nil, err
+	}
+
+	dbAccount,err:=l.svcCtx.AccountsModel.FindOneByNumber(req.AccountName)
+	if err!=nil{
+		return nil,err
 	}
 
 	return &types.GetProfileKeyRes{
 		Profilekey: res.ProfileKey,
+		AccountName: req.AccountName,
+		Uuid: dbAccount.Uuid,
 	}, nil
 }

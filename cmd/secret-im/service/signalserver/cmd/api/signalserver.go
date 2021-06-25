@@ -60,12 +60,18 @@ func main() {
 	那么会直接用 err.Error() 的内容以非 json 的格式返回客户端，
 	不是 error 的话，那么会 marshal 成 json 再返回
 	全局变量errorHandler函数
+	返回值int http状态码
+	interface{}  如果是error类型就把err.Error()作为body内容
+	或则就json化为body内容
+
 	*/
 
 	httpx.SetErrorHandler(func(err error) (int, interface{}) {
 		switch e:=err.(type) {
 		case *shared.CodeError:
-			return http.StatusOK,e.Data()
+			return http.StatusOK,e.Data() //一律返回200,具体有没有错误，要看报文体的body里的code
+		case *shared.ResponseStatus:  //根据具体的情况，返回不同的http状态码
+			return e.Code,e
 		default:
 			return http.StatusInternalServerError,err
 		}

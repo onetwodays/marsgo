@@ -1,0 +1,27 @@
+syntax = "v2"
+
+info(
+    title: "type title here"
+    desc: "type desc here"
+    author: "type author here"
+    email: "type email here"
+    version: "type version here"
+)
+
+
+type DeliveryReq {
+    // TODO: add members here and delete this comment
+}
+
+type  DeliveryRes {
+    Certificate string `json:"certificate"`
+}
+
+@server(
+    middleware : CheckBasicAuth
+    group: certificate
+)
+service signalserver-api {
+    @handler DeliveryHandler // TODO: replace handler name and delete this comment
+    get  /v1/certificate/delivery () returns (DeliveryRes)
+}

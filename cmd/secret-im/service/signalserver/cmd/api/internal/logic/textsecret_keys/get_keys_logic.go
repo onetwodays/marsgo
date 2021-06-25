@@ -41,9 +41,13 @@ func (l *GetKeysLogic) GetKeys(req types.GetKeysReq) (*types.GetKeysResx, error)
 	if err!=nil{
 		return nil, shared.NewCodeError(shared.ERRCODE_SQLQUERY,err.Error())
 	}
+
 	if len(keys)>0{
-		devices:=make([]types.PreKeyResponseItem,len(keys))
+
+		deleteIds := make([]int64,len(keys))
+		devices   := make([]types.PreKeyResponseItem,len(keys))
 		for i:=range keys{
+			deleteIds[i] = keys[i].Id
 			devices[i].DeviceId=1
 			devices[i].RegistrationId=1
 			devices[i].PreKey=types.PreKeyx{
@@ -51,13 +55,19 @@ func (l *GetKeysLogic) GetKeys(req types.GetKeysReq) (*types.GetKeysResx, error)
 				PublicKey: keys[i].PublicKey,
 			}
 
-
 			err=json.Unmarshal([]byte(keys[i].SignedPrekey),&devices[i].SignedPrekey) // 为什么这里要传指针呢？
 			if err!=nil{
 				return nil, shared.NewCodeError(shared.ERRCODE_JSONUNMARSHAL,err.Error())
 			}
 
 		}
+		//删除已经查到的数据
+		err = l.svcCtx.KeysModel.DeleteMany(deleteIds)
+		if err != nil{
+			return nil, shared.NewCodeError(shared.ERRCODE_SQLQUERY,err.Error())
+		}
+
+
 		return &types.GetKeysResx{
 			IdentityKey: keys[0].IdentityKey,
 			Devices: devices,
