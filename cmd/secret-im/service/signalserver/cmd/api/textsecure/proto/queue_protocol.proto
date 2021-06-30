@@ -1,0 +1,46 @@
+
+syntax = "proto3";
+
+package textsecure;
+
+message SendSMS {
+  string destination = 1;
+  string code        = 2;
+}
+
+message SendVoiceSMS {
+  string destination = 1;
+  string code        = 2;
+  string locale      = 3;
+}
+
+message DeleteObject {
+  string key    = 1;
+  string bucket = 2;
+}
+
+message SendApnMessage {
+  string apn_id         = 1;
+  string topic          = 2;
+  string number         = 3;
+  int64  deviceId       = 4;
+  bool   isVoip         = 5;
+  string message        = 6;
+  int64  expirationTime = 7;
+}
+
+message Device {
+  int64  id   = 1;
+  string uuid = 2;
+}
+
+message SendMessageToDevice {
+  enum Type {
+    UNKNOWN          = 0;
+    CHANNEL_MESSAGE  = 1;
+  }
+
+  Type   type    = 1;
+  bytes  content = 2;
+  repeated Device devices = 3;
+}

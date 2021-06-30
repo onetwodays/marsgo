@@ -15,15 +15,17 @@ import (
 func PutKeysHandler(ctx *svc.ServiceContext) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 
-		appAccount :=r.Context().Value(shared.HttpReqContextAccountKey)
-		if appAccount==nil{
-			httpx.Error(w, shared.Status(http.StatusUnauthorized,"check basic auth fail ,may by the handler not use middle"))
-			return
-		}
+
 
 		var req types.PutKeysReq
 		if err := httpx.Parse(r, &req); err != nil {
 			httpx.Error(w, err)
+			return
+		}
+
+		appAccount :=r.Context().Value(shared.HttpReqContextAccountKey)
+		if appAccount==nil{
+			httpx.Error(w, shared.Status(http.StatusUnauthorized,"check basic auth fail ,may by the handler not use middle"))
 			return
 		}
 

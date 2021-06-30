@@ -77,7 +77,7 @@ func main() {
 		}
 	})
 
-
+	var authSessionManager *chat.SessionManager
     //websocket server.调试使用，可以通过网页看到ws结果，生产环境要关闭
     if isStartWss{
 
@@ -86,6 +86,13 @@ func main() {
 			Path: "/ws",
 			Handler: chat.WsConnectHandler(ctx),
 		})
+		//authSessionManager = chat.NewSessionManager(ctx,rt,)
+		server.AddRoute(rest.Route{
+			Method: http.MethodGet,
+			Path: "/v3/websocket",
+			Handler: authSessionManager.HandleAccept,
+		})
+
 	}
 
 	/*

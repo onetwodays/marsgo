@@ -9,9 +9,10 @@ info(
 )
 
 
-type WriteWsConnReq {
-    login string `form:"login"`
-    password string `form:"password"`
+
+type WsConnReq {
+    Login string `form:"login,optional"`
+    Password string `form:"password,optional"`
 }
 
 
@@ -22,9 +23,6 @@ type WriteWsConnReq {
 )
 
 service signalserver-api {
-    @handler RwsConnectHandler
-    get /v1/websocket () returns ()
-
-    @handler WwsConnectHandler
-    get /v1/websocket/w (WriteWsConnReq) returns ()
+    @handler WSConnectHandler
+    get /v1/websocket (WsConnReq) returns ()
 }

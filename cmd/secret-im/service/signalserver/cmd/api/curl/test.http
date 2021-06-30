@@ -150,9 +150,9 @@ Authorization: Bearer ey1JhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE2MjEwNjkz
 }
 
 ###
-GET http://127.0.0.1:38888/api/v1/textsecret/messages
+GET http://127.0.0.1:38888/v1/messages
 Content-Type: application/json
-x-user-name: otcexchange
+x-user-name: tt1tttt31332
 Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE2MjEzMjQ1MDAsImlhdCI6MTYyMTIzODEwMCwibmFtZSI6Im90Y2V4Y2hhbmdlIn0.wGlrSPtsAkChPSMLF6j1hi3VmzWM49GMXYztzTtB_2U
 
 

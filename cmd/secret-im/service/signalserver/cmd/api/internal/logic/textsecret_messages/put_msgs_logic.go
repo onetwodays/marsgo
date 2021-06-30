@@ -57,11 +57,11 @@ func (l *PutMsgsLogic) PutMsgs(sender string,req types.PutMessagesReq,msgId uint
 		row.Source= sender
 		row.SourceUuid=account.Uuid
 		row.SourceDevice=1
-		row.Destination=msg.Destination
+		row.Destination=req.Destination
 		row.DestinationDevice=int64(msg.DestinationDeviceId)
 		row.Timestamp=req.Timestamp
 		row.Message=msg.Body
-		row.Content=msg.Content
+		row.Content=msg.Content  //
 		row.Relay=msg.Relay
 		row.Guid=utils.NewUuid() //消息的全局uuid
 		row.Ctime=time.Now()

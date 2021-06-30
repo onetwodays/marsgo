@@ -148,7 +148,7 @@ type GetPendingMsgsReq struct {
 }
 
 type GetPendingMsgsRes struct {
-	List []OutcomingMessagex `json:"list"`
+	List []OutcomingMessagex `json:"messages"`
 	More bool                `json:"more"`
 }
 
@@ -223,9 +223,9 @@ type GetProfileKeyRes struct {
 	AccountName string `path:"accountName"`
 }
 
-type WriteWsConnReq struct {
-	Login    string `form:"login"`
-	Password string `form:"password"`
+type WsConnReq struct {
+	Login    string `form:"login,optional"`
+	Password string `form:"password,optional"`
 }
 
 type DeliveryReq struct {

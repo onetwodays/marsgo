@@ -3,6 +3,7 @@
 package svc
 
 import (
+	"database/sql"
 	"encoding/base64"
 	eos "github.com/marsofsnow/eos-go"
 	"github.com/tal-tech/go-zero/core/logx"
@@ -16,10 +17,17 @@ import (
 	"secret-im/service/signalserver/cmd/rpc/bookstore/bookstoreclient"
 )
 
+var preKeysInsertStmt string = `insert into t_keys (number,device_id,key_id,public_key) values(?,?,?,?) `
+
 type ServiceContext struct {
 	Config    config.Config
 	//Hub       *chat.Hub
+
+
 	UserModel model.UserModel //CRUD
+
+	//preKey insertor
+	PreKeysInsertor *sqlx.BulkInserter
 
 
 	//-----------------
@@ -50,6 +58,7 @@ type ServiceContext struct {
 func NewServiceContext(c config.Config) *ServiceContext {
 
 	mysqlConn := sqlx.NewMysql(c.Mysql.DataSource)
+
 	um:= model.NewUserModel(mysqlConn)
 	/*
 	hub:=chat.NewHub()
@@ -89,11 +98,22 @@ func NewServiceContext(c config.Config) *ServiceContext {
 		logx.Error("auth.NewCertificateGenerator error:",err.Error())
 	}
 
+	preKeysInsertor,err:=sqlx.NewBulkInserter(mysqlConn,preKeysInsertStmt)
+	if err!=nil {
+		logx.Error("sqlx.NewBulkInserter(mysqlConn,preKeysInsertStmt) error:",err)
+	}
+	preKeysInsertor.SetResultHandler(func (result sql.Result,err error){
+		if err!=nil{
+			logx.Error("bulk insert prekeys error:",err)
+		}
 
+	})
 
 
 	return &ServiceContext{
 		Config:    c,
+		PreKeysInsertor: preKeysInsertor,
+
 		//Hub: hub,
 		UserModel: um,
 

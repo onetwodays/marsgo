@@ -142,7 +142,7 @@ func WsConnectHandler(ctx *svc.ServiceContext) http.HandlerFunc {
 		}
 
 
-		var req types.WriteWsConnReq
+		var req types.WsConnReq
 		if err := httpx.Parse(r, &req); err != nil {
 			logx.Error("httpx.Parse /v1/websocket/?login= error",err.Error(),"->匿名建立websocket连接")
 

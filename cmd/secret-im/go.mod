@@ -14,6 +14,7 @@ require (
 	github.com/grpc-ecosystem/go-grpc-middleware v1.2.0 // indirect
 	github.com/kr/text v0.2.0 // indirect
 	github.com/marsofsnow/eos-go v0.11.7
+	github.com/nats-io/nats.go v1.11.0 // indirect
 	github.com/niemeyer/pretty v0.0.0-20200227124842-a10e7caefd8e // indirect
 	github.com/nyaruka/phonenumbers v1.0.70
 	github.com/onsi/ginkgo v1.15.0 // indirect
@@ -23,6 +24,7 @@ require (
 	github.com/prometheus/procfs v0.0.11 // indirect
 	github.com/satori/go.uuid v1.2.0
 	github.com/shopspring/decimal v1.2.0
+	github.com/sideshow/apns2 v0.20.0 // indirect
 	github.com/sirupsen/logrus v1.5.0 // indirect
 	github.com/spf13/pflag v1.0.5 // indirect
 	github.com/stretchr/testify v1.6.1
@@ -39,4 +41,5 @@ require (
 	google.golang.org/grpc v1.29.1
 	google.golang.org/protobuf v1.25.0
 	gopkg.in/check.v1 v1.0.0-20200227125254-8fa46927fb4f // indirect
+	gopkg.in/eapache/queue.v1 v1.1.0 // indirect
 )

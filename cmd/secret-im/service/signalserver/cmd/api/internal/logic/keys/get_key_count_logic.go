@@ -2,6 +2,9 @@ package logic
 
 import (
 	"context"
+	"net/http"
+	"secret-im/service/signalserver/cmd/api/internal/entities"
+	"secret-im/service/signalserver/cmd/shared"
 
 	"secret-im/service/signalserver/cmd/api/internal/svc"
 	"secret-im/service/signalserver/cmd/api/internal/types"
@@ -23,8 +26,11 @@ func NewGetKeyCountLogic(ctx context.Context, svcCtx *svc.ServiceContext) GetKey
 	}
 }
 
-func (l *GetKeyCountLogic) GetKeyCount() (*types.PreKeyCountx, error) {
+func (l *GetKeyCountLogic) GetKeyCount(appAccount *entities.Account) (*types.PreKeyCountx, error) {
 	// todo: add your logic here and delete this line
-
-	return &types.PreKeyCountx{}, nil
+	count,err:=l.svcCtx.KeysModel.CountKey(appAccount.Number,appAccount.AuthenticatedDevice.ID)
+	if err!=nil{
+		return nil, shared.Status(http.StatusInternalServerError,err.Error())
+	}
+	return &types.PreKeyCountx{Count: int(*count)}, nil
 }

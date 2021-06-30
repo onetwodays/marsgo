@@ -10,16 +10,16 @@ import (
 	"github.com/tal-tech/go-zero/rest/httpx"
 )
 
-func GetKeysHandler(ctx *svc.ServiceContext) http.HandlerFunc {
+func GetDeviceKeysHandler(ctx *svc.ServiceContext) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		var req types.GetKeysReq
+		var req types.GetKeysReqx
 		if err := httpx.Parse(r, &req); err != nil {
 			httpx.Error(w, err)
 			return
 		}
 
-		l := logic.NewGetKeysLogic(r.Context(), ctx)
-		resp, err := l.GetKeys(req)
+		l := logic.NewGetDeviceKeysLogic(r.Context(), ctx)
+		resp, err := l.GetDeviceKeys(req,r )
 		if err != nil {
 			httpx.Error(w, err)
 		} else {

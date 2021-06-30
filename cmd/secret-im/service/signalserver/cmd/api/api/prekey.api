@@ -46,6 +46,7 @@ type PreKeyCountx {
 
 
 
+
 @server(
     //jwt: Auth
     middleware : CheckBasicAuth
@@ -56,13 +57,25 @@ service signalserver-api {
     @handler PutKeysHandler
     put  /v3/keys (PutKeysReq) returns ()
 
-    @handler GetKeysHandler
-    get /v3/keys/:identifier/:deviceId (GetKeysReq) returns (GetKeysResx)
-
     @handler GetKeyCountHandler
     get /v3/keys () returns (PreKeyCountx)
 
+    @handler SetSignedKeyHandler
+    put /v3/keys/signed (SignedPrekey) returns ()
 
-
+    @handler GetSignedKeyHandler
+    get /v3/keys/signed () returns (SignedPrekey)
 }
 
+@server(
+    //jwt: Auth
+
+    group: keys
+
+)
+service signalserver-api {
+
+    @handler GetDeviceKeysHandler
+    get /v3/keys/:identifier/:deviceId (GetKeysReqx) returns (GetKeysRes)
+
+}

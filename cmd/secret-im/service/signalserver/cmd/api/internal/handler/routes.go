@@ -176,12 +176,7 @@ func RegisterHandlers(engine *rest.Server, serverCtx *svc.ServiceContext) {
 			{
 				Method:  http.MethodGet,
 				Path:    "/v1/websocket",
-				Handler: textsecret_websocket.RwsConnectHandler(serverCtx),
-			},
-			{
-				Method:  http.MethodGet,
-				Path:    "/v1/websocket/w",
-				Handler: textsecret_websocket.WwsConnectHandler(serverCtx),
+				Handler: textsecret_websocket.WSConnectHandler(serverCtx),
 			},
 		},
 	)
@@ -220,15 +215,30 @@ func RegisterHandlers(engine *rest.Server, serverCtx *svc.ServiceContext) {
 				},
 				{
 					Method:  http.MethodGet,
-					Path:    "/v3/keys/:identifier/:deviceId",
-					Handler: keys.GetKeysHandler(serverCtx),
-				},
-				{
-					Method:  http.MethodGet,
 					Path:    "/v3/keys",
 					Handler: keys.GetKeyCountHandler(serverCtx),
 				},
+				{
+					Method:  http.MethodPut,
+					Path:    "/v3/keys/signed",
+					Handler: keys.SetSignedKeyHandler(serverCtx),
+				},
+				{
+					Method:  http.MethodGet,
+					Path:    "/v3/keys/signed",
+					Handler: keys.GetSignedKeyHandler(serverCtx),
+				},
 			}...,
 		),
+	)
+
+	engine.AddRoutes(
+		[]rest.Route{
+			{
+				Method:  http.MethodGet,
+				Path:    "/v3/keys/:identifier/:deviceId",
+				Handler: keys.GetDeviceKeysHandler(serverCtx),
+			},
+		},
 	)
 }

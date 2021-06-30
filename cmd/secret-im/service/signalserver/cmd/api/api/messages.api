@@ -44,7 +44,7 @@ type GetPendingMsgsReq{
 }
 
 type GetPendingMsgsRes{
-    List []OutcomingMessagex `json:"list"`
+    List []OutcomingMessagex `json:"messages"`
     More bool `json:"more"`
 }
 

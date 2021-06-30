@@ -54,11 +54,12 @@ func (l *PutKeysLogic) PutKeys(req types.PutKeysReq,appAccount *entities.Account
 		}
 	}
 
+	//todo 先删除数据库已经存在的prekey
 
-
-
-
-
+	// 把prekeys批量插入数据库
+	for i:=range req.PreKeys{
+		l.svcCtx.PreKeysInsertor.Insert(appAccount.Number,device.ID,req.PreKeys[i].KeyId,req.PreKeys[i].PublicKey)
+	}
 
 	return nil
 }
