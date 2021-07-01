@@ -3,6 +3,8 @@ package model
 import (
 	"database/sql"
 	"fmt"
+	"github.com/tal-tech/go-zero/core/logx"
+	"strconv"
 	"strings"
 	"time"
 
@@ -23,10 +25,13 @@ type (
 	TMessagesModel interface {
 		Insert(data TMessages) (sql.Result, error)
 		FindOne(id int64) (*TMessages, error)
-		FindManyByDst(device string,deviceId int64) ([]TMessages,error)
+		FindManyByDst(device string, deviceId int64, limit ...int) ([]TMessages, error)
 		Update(data TMessages) error
 		Delete(id int64) error
 		DeleteManyByGuid(guids []string) error
+		DeleteManyByDestination(destination string) error
+		DeleteManyByDestinationDeviceId(destination string, deviceId int64) error
+
 	}
 
 	defaultTMessagesModel struct {
@@ -79,13 +84,17 @@ func (m *defaultTMessagesModel) FindOne(id int64) (*TMessages, error) {
 	}
 }
 
-func(m *defaultTMessagesModel) FindManyByDst(device string,deviceId int64) ([]TMessages,error){
+func (m *defaultTMessagesModel) FindManyByDst(device string, deviceId int64, limit ...int) ([]TMessages, error) {
 	//query := fmt.Sprintf("select %s from %s where destination='%s' and destination_device=%d ", tMessagesRows, m.table,device,deviceId)
-	query := fmt.Sprintf("select %s from %s where destination='%s' ", tMessagesRows, m.table,device)
+	query := fmt.Sprintf("select %s from %s where destination='%s' and destination_device=%d order by id ASC  ", tMessagesRows, m.table, device, deviceId)
 
-	query+=" order by id ASC limit 10 "
+	if len(limit) > 0 {
+		query += "  limit  "
+		query += strconv.Itoa(limit[0])
+	}
+
 	var resp []TMessages
-	fmt.Println("=====xxx=====",query)
+	logx.Info(query)
 	err := m.conn.QueryRows(&resp, query)
 	switch err {
 	case nil:
@@ -109,12 +118,23 @@ func (m *defaultTMessagesModel) Delete(id int64) error {
 	return err
 }
 
-
-func (m *defaultTMessagesModel) DeleteManyByGuid(guids []string) error{
-	guidList:=strings.Join(guids,",")
-	guidList="("+guidList+")"
+func (m *defaultTMessagesModel) DeleteManyByGuid(guids []string) error {
+	guidList := strings.Join(guids, ",")
+	guidList = "(" + guidList + ")"
 	query := fmt.Sprintf("delete from %s where `id` in  ?", m.table)
 	_, err := m.conn.Exec(query, guidList)
 	return err
 }
 
+func (m *defaultTMessagesModel)  DeleteManyByDestination(destination string) error{
+	query := fmt.Sprintf("delete from %s where `destination=` ?", m.table)
+	_, err := m.conn.Exec(query, destination)
+	return err
+}
+
+
+func (m *defaultTMessagesModel) DeleteManyByDestinationDeviceId(destination string, deviceId int64) error{
+	query := fmt.Sprintf("delete from %s where `destination=` ? and `destination_device`=?", m.table)
+	_, err := m.conn.Exec(query, destination,deviceId)
+	return err
+}

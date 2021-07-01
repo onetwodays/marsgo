@@ -14,7 +14,7 @@ import (
 	"secret-im/service/signalserver/cmd/api/internal/auth"
 	"secret-im/service/signalserver/cmd/api/internal/crypto"
 	"secret-im/service/signalserver/cmd/api/internal/middleware"
-	"secret-im/service/signalserver/cmd/model"
+	"secret-im/service/signalserver/cmd/api/internal/model"
 	"secret-im/service/signalserver/cmd/rpc/bookstore/bookstoreclient"
 )
 

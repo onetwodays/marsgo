@@ -75,7 +75,7 @@ func (m *defaultTKeysModel) FindOne(id int64) (*TKeys, error) {
 		return nil, err
 	}
 }
-func  (m * defaultTKeysModel) CountKey(number string,deviceId int64) (*int64,error) {
+func  (m *defaultTKeysModel) CountKey(number string,deviceId int64) (*int64,error) {
 	query := fmt.Sprintf("select count(1) from %s where `number` = ? and `device_id`=? ",  m.table)
 	var count int64
 	err := m.conn.QueryRow(&count, query, number,deviceId)
@@ -92,7 +92,7 @@ func  (m * defaultTKeysModel) CountKey(number string,deviceId int64) (*int64,err
 
 
 }
-func (m * defaultTKeysModel) FindMany(number string, deviceId int64) ([]TKeys, error){
+func (m *defaultTKeysModel) FindMany(number string, deviceId int64) ([]TKeys, error){
 
 	var resp []TKeys
 	var err error

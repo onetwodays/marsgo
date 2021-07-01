@@ -14,7 +14,8 @@ require (
 	github.com/grpc-ecosystem/go-grpc-middleware v1.2.0 // indirect
 	github.com/kr/text v0.2.0 // indirect
 	github.com/marsofsnow/eos-go v0.11.7
-	github.com/nats-io/nats.go v1.11.0
+	github.com/nats-io/nats-server/v2 v2.3.1 // indirect
+	github.com/nats-io/nats.go v1.11.1-0.20210623165838-4b75fc59ae30
 	github.com/niemeyer/pretty v0.0.0-20200227124842-a10e7caefd8e // indirect
 	github.com/nyaruka/phonenumbers v1.0.70
 	github.com/onsi/ginkgo v1.15.0 // indirect
@@ -35,9 +36,9 @@ require (
 	go.uber.org/automaxprocs v1.4.0 // indirect
 	go.uber.org/multierr v1.6.0 // indirect
 	go.uber.org/zap v1.16.0 // indirect
-	golang.org/x/crypto v0.0.0-20210322153248-0c34fe9e7dc2
+	golang.org/x/crypto v0.0.0-20210616213533-5ff15b29337e
 	golang.org/x/sys v0.0.0-20210616094352-59db8d763f22 // indirect
-	golang.org/x/time v0.0.0-20191024005414-555d28b269f0
+	golang.org/x/time v0.0.0-20200416051211-89c76fbcd5d1
 	google.golang.org/grpc v1.29.1
 	google.golang.org/protobuf v1.25.0
 	gopkg.in/check.v1 v1.0.0-20200227125254-8fa46927fb4f // indirect

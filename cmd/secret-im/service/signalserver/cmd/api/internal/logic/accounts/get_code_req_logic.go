@@ -7,8 +7,8 @@ import (
 	"math/big"
 	"net/http"
 	"secret-im/service/signalserver/cmd/api/internal/auth"
+	"secret-im/service/signalserver/cmd/api/internal/model"
 	"secret-im/service/signalserver/cmd/api/util"
-	"secret-im/service/signalserver/cmd/model"
 	"secret-im/service/signalserver/cmd/shared"
 	"time"
 
@@ -16,7 +16,7 @@ import (
 	"secret-im/service/signalserver/cmd/api/internal/types"
 
 	"github.com/tal-tech/go-zero/core/logx"
-     pkgUtils  "secret-im/pkg/utils-tools"
+	pkgUtils "secret-im/pkg/utils-tools"
 )
 
 type GetCodeReqLogic struct {

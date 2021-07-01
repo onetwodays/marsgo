@@ -3,9 +3,9 @@ package logic
 import (
 	"context"
 
+	"secret-im/service/signalserver/cmd/api/internal/model"
 	"secret-im/service/signalserver/cmd/api/internal/svc"
 	"secret-im/service/signalserver/cmd/api/internal/types"
-	"secret-im/service/signalserver/cmd/model"
 	"secret-im/service/signalserver/cmd/shared"
 
 	"github.com/tal-tech/go-zero/core/logx"

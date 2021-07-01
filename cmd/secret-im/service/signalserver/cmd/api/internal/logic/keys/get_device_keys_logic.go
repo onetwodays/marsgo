@@ -5,8 +5,8 @@ import (
 	"net/http"
 	"secret-im/service/signalserver/cmd/api/internal/auth"
 	"secret-im/service/signalserver/cmd/api/internal/auth/helper"
-	"secret-im/service/signalserver/cmd/api/internal/logic/storage"
 	"secret-im/service/signalserver/cmd/api/internal/middleware"
+	"secret-im/service/signalserver/cmd/api/internal/storage"
 	"secret-im/service/signalserver/cmd/shared"
 	"strconv"
 

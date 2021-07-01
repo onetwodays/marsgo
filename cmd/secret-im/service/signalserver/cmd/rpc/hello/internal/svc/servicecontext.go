@@ -2,7 +2,7 @@ package svc
 
 import (
 	"github.com/tal-tech/go-zero/core/stores/sqlx"
-	"secret-im/service/signalserver/cmd/model"
+	"secret-im/service/signalserver/cmd/api/internal/model"
 	"secret-im/service/signalserver/cmd/rpc/hello/internal/config"
 )
 

@@ -2,7 +2,7 @@ package logic
 
 import (
 	"context"
-	"secret-im/service/signalserver/cmd/model"
+	"secret-im/service/signalserver/cmd/api/internal/model"
 
 	"secret-im/service/signalserver/cmd/rpc/bookstore/bookstore"
 	"secret-im/service/signalserver/cmd/rpc/bookstore/internal/svc"
