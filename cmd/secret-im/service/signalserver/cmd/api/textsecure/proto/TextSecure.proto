@@ -60,3 +60,48 @@ message SenderCertificateMessage {
   bytes             identityKey   = 4;
   ServerCertificate signer        = 5;
 }
+
+
+
+
+message MessageAction {
+  enum Action {
+    UNKNOWN                   = 0;
+    ChannelCreate             = 1;
+    ChannelEditTitle          = 2;
+    ChannelEditPhoto          = 3;
+    ChannelDeletePhoto        = 4;
+    ChannelAddParticipant     = 5;
+    ChannelDeleteParticipant  = 6;
+    ChannelEditMessage        = 7;
+    ChannelDeleteMessage      = 8;
+  }
+
+  Action action        = 1;
+  string title         = 2;
+  string photo         = 3;
+  repeated string participants  = 4;
+  int64  message_id    = 5;
+  string operator      = 6;
+}
+
+
+message ChannelEnvelope {
+  enum Type {
+    UNKNOWN         = 0;
+    MESSAGE         = 1;
+    MESSAGE_SERVICE = 2;
+  }
+
+  Type          type             = 1;
+  int64         id               = 2;
+  string        channelId        = 3;
+  string        sourceUuid       = 4;
+  uint32        sourceDevice     = 5;
+  string        relay            = 6;
+  bytes         content          = 7; // Contains an encrypted Content
+  MessageAction action           = 8;
+  bool          deleted          = 9;
+  uint64        timestamp        = 10;
+  uint64        server_timestamp = 11;
+}

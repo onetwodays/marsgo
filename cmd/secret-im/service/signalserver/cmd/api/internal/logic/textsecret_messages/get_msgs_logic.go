@@ -2,9 +2,6 @@ package logic
 
 import (
 	"context"
-	"encoding/base64"
-	"github.com/golang/protobuf/proto"
-	"secret-im/service/signalserver/cmd/api/textsecure"
 	"secret-im/service/signalserver/cmd/shared"
 
 	"secret-im/service/signalserver/cmd/api/internal/svc"
@@ -37,28 +34,38 @@ func (l *GetMsgsLogic) GetMsgs(who string, deviceId int64) (*types.GetPendingMsg
 	list := make([]types.OutcomingMessagex, len(resp))
 	for i := range resp {
 
-
 		row := &resp[i]
 
-		envelop :=&textsecure.Envelope{
-			Type  :textsecure.GetEnvelopeType(int(row.Type)),
-			Source :row.Source,
-			SourceUuid:row.SourceUuid,
-			SourceDevice:uint32(row.SourceDevice),
-			Relay:row.Relay,
-			Timestamp:uint64(row.Timestamp),
-			//LegacyMessage:   []byte        `protobuf:"bytes,6,opt,name=legacyMessage,proto3" json:"legacyMessage,omitempty"` // Contains an encrypted DataMessage XXX -- Remove after 10/01/15
-			//Content         []byte        `protobuf:"bytes,8,opt,name=content,proto3" json:"content,omitempty"`             // Contains an encrypted Content
-			ServerGuid:row.Guid,
-			ServerTimestamp:uint64(row.Timestamp),
-		}
-		b,_:=base64.StdEncoding.DecodeString(row.Content)  //解码放在proto里面
-		envelop.Content=b
-		jsb,_:=proto.Marshal(envelop)
+		/*
+
+			envelop := &textsecure.Envelope{
+				Type:         textsecure.GetEnvelopeType(int(row.Type)),
+				Source:       row.Source,
+				SourceUuid:   row.SourceUuid,
+				SourceDevice: uint32(row.SourceDevice),
+				Relay:        row.Relay,
+				Timestamp:    uint64(row.Timestamp),
+
+				//LegacyMessage:   []byte        `protobuf:"bytes,6,opt,name=legacyMessage,proto3" json:"legacyMessage,omitempty"` // Contains an encrypted DataMessage XXX -- Remove after 10/01/15
+				//Content         []byte        `protobuf:"bytes,8,opt,name=content,proto3" json:"content,omitempty"`             // Contains an encrypted Content
+				ServerGuid:      row.Guid,
+				ServerTimestamp: uint64(row.Timestamp),
+			}
+
+			lb, _ := base64.StdEncoding.DecodeString(row.Message)
+			b, _ := base64.StdEncoding.DecodeString(row.Content) //解码放在proto里面
+			envelop.LegacyMessage = lb
+			envelop.Content = b
+			jsb, _ := proto.Marshal(envelop)
+
+		*/
+
 		item := types.OutcomingMessagex{}
+		item.Id = row.Id
 		item.Relay = row.Relay
-		item.Content = string(jsb)//row.Content //string(b)
-		item.Message = row.Message
+		//在用base64编码一下
+		item.Content = row.Content //string(b)
+		item.Message = ""          //row.Message
 		item.Type = int(row.Type)
 		item.Relay = row.Relay
 		item.SourceDevice = row.SourceDevice
@@ -70,6 +77,9 @@ func (l *GetMsgsLogic) GetMsgs(who string, deviceId int64) (*types.GetPendingMsg
 		item.Timestamp = row.Timestamp
 		list[i] = item
 	}
+
+	//删除已经发送的消息
+
 	return &types.GetPendingMsgsRes{
 		List: list,
 		More: false,

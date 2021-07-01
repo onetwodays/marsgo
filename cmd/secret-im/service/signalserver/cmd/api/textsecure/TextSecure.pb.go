@@ -99,6 +99,122 @@ func (Envelope_Type) EnumDescriptor() ([]byte, []int) {
 	return file_proto_TextSecure_proto_rawDescGZIP(), []int{0, 0}
 }
 
+type MessageAction_Action int32
+
+const (
+	MessageAction_UNKNOWN                  MessageAction_Action = 0
+	MessageAction_ChannelCreate            MessageAction_Action = 1
+	MessageAction_ChannelEditTitle         MessageAction_Action = 2
+	MessageAction_ChannelEditPhoto         MessageAction_Action = 3
+	MessageAction_ChannelDeletePhoto       MessageAction_Action = 4
+	MessageAction_ChannelAddParticipant    MessageAction_Action = 5
+	MessageAction_ChannelDeleteParticipant MessageAction_Action = 6
+	MessageAction_ChannelEditMessage       MessageAction_Action = 7
+	MessageAction_ChannelDeleteMessage     MessageAction_Action = 8
+)
+
+// Enum value maps for MessageAction_Action.
+var (
+	MessageAction_Action_name = map[int32]string{
+		0: "UNKNOWN",
+		1: "ChannelCreate",
+		2: "ChannelEditTitle",
+		3: "ChannelEditPhoto",
+		4: "ChannelDeletePhoto",
+		5: "ChannelAddParticipant",
+		6: "ChannelDeleteParticipant",
+		7: "ChannelEditMessage",
+		8: "ChannelDeleteMessage",
+	}
+	MessageAction_Action_value = map[string]int32{
+		"UNKNOWN":                  0,
+		"ChannelCreate":            1,
+		"ChannelEditTitle":         2,
+		"ChannelEditPhoto":         3,
+		"ChannelDeletePhoto":       4,
+		"ChannelAddParticipant":    5,
+		"ChannelDeleteParticipant": 6,
+		"ChannelEditMessage":       7,
+		"ChannelDeleteMessage":     8,
+	}
+)
+
+func (x MessageAction_Action) Enum() *MessageAction_Action {
+	p := new(MessageAction_Action)
+	*p = x
+	return p
+}
+
+func (x MessageAction_Action) String() string {
+	return protoimpl.X.EnumStringOf(x.Descriptor(), protoreflect.EnumNumber(x))
+}
+
+func (MessageAction_Action) Descriptor() protoreflect.EnumDescriptor {
+	return file_proto_TextSecure_proto_enumTypes[1].Descriptor()
+}
+
+func (MessageAction_Action) Type() protoreflect.EnumType {
+	return &file_proto_TextSecure_proto_enumTypes[1]
+}
+
+func (x MessageAction_Action) Number() protoreflect.EnumNumber {
+	return protoreflect.EnumNumber(x)
+}
+
+// Deprecated: Use MessageAction_Action.Descriptor instead.
+func (MessageAction_Action) EnumDescriptor() ([]byte, []int) {
+	return file_proto_TextSecure_proto_rawDescGZIP(), []int{4, 0}
+}
+
+type ChannelEnvelope_Type int32
+
+const (
+	ChannelEnvelope_UNKNOWN         ChannelEnvelope_Type = 0
+	ChannelEnvelope_MESSAGE         ChannelEnvelope_Type = 1
+	ChannelEnvelope_MESSAGE_SERVICE ChannelEnvelope_Type = 2
+)
+
+// Enum value maps for ChannelEnvelope_Type.
+var (
+	ChannelEnvelope_Type_name = map[int32]string{
+		0: "UNKNOWN",
+		1: "MESSAGE",
+		2: "MESSAGE_SERVICE",
+	}
+	ChannelEnvelope_Type_value = map[string]int32{
+		"UNKNOWN":         0,
+		"MESSAGE":         1,
+		"MESSAGE_SERVICE": 2,
+	}
+)
+
+func (x ChannelEnvelope_Type) Enum() *ChannelEnvelope_Type {
+	p := new(ChannelEnvelope_Type)
+	*p = x
+	return p
+}
+
+func (x ChannelEnvelope_Type) String() string {
+	return protoimpl.X.EnumStringOf(x.Descriptor(), protoreflect.EnumNumber(x))
+}
+
+func (ChannelEnvelope_Type) Descriptor() protoreflect.EnumDescriptor {
+	return file_proto_TextSecure_proto_enumTypes[2].Descriptor()
+}
+
+func (ChannelEnvelope_Type) Type() protoreflect.EnumType {
+	return &file_proto_TextSecure_proto_enumTypes[2]
+}
+
+func (x ChannelEnvelope_Type) Number() protoreflect.EnumNumber {
+	return protoreflect.EnumNumber(x)
+}
+
+// Deprecated: Use ChannelEnvelope_Type.Descriptor instead.
+func (ChannelEnvelope_Type) EnumDescriptor() ([]byte, []int) {
+	return file_proto_TextSecure_proto_rawDescGZIP(), []int{5, 0}
+}
+
 type Envelope struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
@@ -407,6 +523,220 @@ func (x *SenderCertificateMessage) GetSigner() *ServerCertificate {
 	return nil
 }
 
+type MessageAction struct {
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+
+	Action       MessageAction_Action `protobuf:"varint,1,opt,name=action,proto3,enum=textsecure.MessageAction_Action" json:"action,omitempty"`
+	Title        string               `protobuf:"bytes,2,opt,name=title,proto3" json:"title,omitempty"`
+	Photo        string               `protobuf:"bytes,3,opt,name=photo,proto3" json:"photo,omitempty"`
+	Participants []string             `protobuf:"bytes,4,rep,name=participants,proto3" json:"participants,omitempty"`
+	MessageId    int64                `protobuf:"varint,5,opt,name=message_id,json=messageId,proto3" json:"message_id,omitempty"`
+	Operator     string               `protobuf:"bytes,6,opt,name=operator,proto3" json:"operator,omitempty"`
+}
+
+func (x *MessageAction) Reset() {
+	*x = MessageAction{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_proto_TextSecure_proto_msgTypes[4]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *MessageAction) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*MessageAction) ProtoMessage() {}
+
+func (x *MessageAction) ProtoReflect() protoreflect.Message {
+	mi := &file_proto_TextSecure_proto_msgTypes[4]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use MessageAction.ProtoReflect.Descriptor instead.
+func (*MessageAction) Descriptor() ([]byte, []int) {
+	return file_proto_TextSecure_proto_rawDescGZIP(), []int{4}
+}
+
+func (x *MessageAction) GetAction() MessageAction_Action {
+	if x != nil {
+		return x.Action
+	}
+	return MessageAction_UNKNOWN
+}
+
+func (x *MessageAction) GetTitle() string {
+	if x != nil {
+		return x.Title
+	}
+	return ""
+}
+
+func (x *MessageAction) GetPhoto() string {
+	if x != nil {
+		return x.Photo
+	}
+	return ""
+}
+
+func (x *MessageAction) GetParticipants() []string {
+	if x != nil {
+		return x.Participants
+	}
+	return nil
+}
+
+func (x *MessageAction) GetMessageId() int64 {
+	if x != nil {
+		return x.MessageId
+	}
+	return 0
+}
+
+func (x *MessageAction) GetOperator() string {
+	if x != nil {
+		return x.Operator
+	}
+	return ""
+}
+
+type ChannelEnvelope struct {
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+
+	Type            ChannelEnvelope_Type `protobuf:"varint,1,opt,name=type,proto3,enum=textsecure.ChannelEnvelope_Type" json:"type,omitempty"`
+	Id              int64                `protobuf:"varint,2,opt,name=id,proto3" json:"id,omitempty"`
+	ChannelId       string               `protobuf:"bytes,3,opt,name=channelId,proto3" json:"channelId,omitempty"`
+	SourceUuid      string               `protobuf:"bytes,4,opt,name=sourceUuid,proto3" json:"sourceUuid,omitempty"`
+	SourceDevice    uint32               `protobuf:"varint,5,opt,name=sourceDevice,proto3" json:"sourceDevice,omitempty"`
+	Relay           string               `protobuf:"bytes,6,opt,name=relay,proto3" json:"relay,omitempty"`
+	Content         []byte               `protobuf:"bytes,7,opt,name=content,proto3" json:"content,omitempty"` // Contains an encrypted Content
+	Action          *MessageAction       `protobuf:"bytes,8,opt,name=action,proto3" json:"action,omitempty"`
+	Deleted         bool                 `protobuf:"varint,9,opt,name=deleted,proto3" json:"deleted,omitempty"`
+	Timestamp       uint64               `protobuf:"varint,10,opt,name=timestamp,proto3" json:"timestamp,omitempty"`
+	ServerTimestamp uint64               `protobuf:"varint,11,opt,name=server_timestamp,json=serverTimestamp,proto3" json:"server_timestamp,omitempty"`
+}
+
+func (x *ChannelEnvelope) Reset() {
+	*x = ChannelEnvelope{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_proto_TextSecure_proto_msgTypes[5]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *ChannelEnvelope) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*ChannelEnvelope) ProtoMessage() {}
+
+func (x *ChannelEnvelope) ProtoReflect() protoreflect.Message {
+	mi := &file_proto_TextSecure_proto_msgTypes[5]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use ChannelEnvelope.ProtoReflect.Descriptor instead.
+func (*ChannelEnvelope) Descriptor() ([]byte, []int) {
+	return file_proto_TextSecure_proto_rawDescGZIP(), []int{5}
+}
+
+func (x *ChannelEnvelope) GetType() ChannelEnvelope_Type {
+	if x != nil {
+		return x.Type
+	}
+	return ChannelEnvelope_UNKNOWN
+}
+
+func (x *ChannelEnvelope) GetId() int64 {
+	if x != nil {
+		return x.Id
+	}
+	return 0
+}
+
+func (x *ChannelEnvelope) GetChannelId() string {
+	if x != nil {
+		return x.ChannelId
+	}
+	return ""
+}
+
+func (x *ChannelEnvelope) GetSourceUuid() string {
+	if x != nil {
+		return x.SourceUuid
+	}
+	return ""
+}
+
+func (x *ChannelEnvelope) GetSourceDevice() uint32 {
+	if x != nil {
+		return x.SourceDevice
+	}
+	return 0
+}
+
+func (x *ChannelEnvelope) GetRelay() string {
+	if x != nil {
+		return x.Relay
+	}
+	return ""
+}
+
+func (x *ChannelEnvelope) GetContent() []byte {
+	if x != nil {
+		return x.Content
+	}
+	return nil
+}
+
+func (x *ChannelEnvelope) GetAction() *MessageAction {
+	if x != nil {
+		return x.Action
+	}
+	return nil
+}
+
+func (x *ChannelEnvelope) GetDeleted() bool {
+	if x != nil {
+		return x.Deleted
+	}
+	return false
+}
+
+func (x *ChannelEnvelope) GetTimestamp() uint64 {
+	if x != nil {
+		return x.Timestamp
+	}
+	return 0
+}
+
+func (x *ChannelEnvelope) GetServerTimestamp() uint64 {
+	if x != nil {
+		return x.ServerTimestamp
+	}
+	return 0
+}
+
 var File_proto_TextSecure_proto protoreflect.FileDescriptor
 
 var file_proto_TextSecure_proto_rawDesc = []byte{
@@ -463,7 +793,62 @@ var file_proto_TextSecure_proto_rawDesc = []byte{
 	0x06, 0x73, 0x69, 0x67, 0x6e, 0x65, 0x72, 0x18, 0x05, 0x20, 0x01, 0x28, 0x0b, 0x32, 0x1d, 0x2e,
 	0x74, 0x65, 0x78, 0x74, 0x73, 0x65, 0x63, 0x75, 0x72, 0x65, 0x2e, 0x53, 0x65, 0x72, 0x76, 0x65,
 	0x72, 0x43, 0x65, 0x72, 0x74, 0x69, 0x66, 0x69, 0x63, 0x61, 0x74, 0x65, 0x52, 0x06, 0x73, 0x69,
-	0x67, 0x6e, 0x65, 0x72, 0x62, 0x06, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x33,
+	0x67, 0x6e, 0x65, 0x72, 0x22, 0xae, 0x03, 0x0a, 0x0d, 0x4d, 0x65, 0x73, 0x73, 0x61, 0x67, 0x65,
+	0x41, 0x63, 0x74, 0x69, 0x6f, 0x6e, 0x12, 0x38, 0x0a, 0x06, 0x61, 0x63, 0x74, 0x69, 0x6f, 0x6e,
+	0x18, 0x01, 0x20, 0x01, 0x28, 0x0e, 0x32, 0x20, 0x2e, 0x74, 0x65, 0x78, 0x74, 0x73, 0x65, 0x63,
+	0x75, 0x72, 0x65, 0x2e, 0x4d, 0x65, 0x73, 0x73, 0x61, 0x67, 0x65, 0x41, 0x63, 0x74, 0x69, 0x6f,
+	0x6e, 0x2e, 0x41, 0x63, 0x74, 0x69, 0x6f, 0x6e, 0x52, 0x06, 0x61, 0x63, 0x74, 0x69, 0x6f, 0x6e,
+	0x12, 0x14, 0x0a, 0x05, 0x74, 0x69, 0x74, 0x6c, 0x65, 0x18, 0x02, 0x20, 0x01, 0x28, 0x09, 0x52,
+	0x05, 0x74, 0x69, 0x74, 0x6c, 0x65, 0x12, 0x14, 0x0a, 0x05, 0x70, 0x68, 0x6f, 0x74, 0x6f, 0x18,
+	0x03, 0x20, 0x01, 0x28, 0x09, 0x52, 0x05, 0x70, 0x68, 0x6f, 0x74, 0x6f, 0x12, 0x22, 0x0a, 0x0c,
+	0x70, 0x61, 0x72, 0x74, 0x69, 0x63, 0x69, 0x70, 0x61, 0x6e, 0x74, 0x73, 0x18, 0x04, 0x20, 0x03,
+	0x28, 0x09, 0x52, 0x0c, 0x70, 0x61, 0x72, 0x74, 0x69, 0x63, 0x69, 0x70, 0x61, 0x6e, 0x74, 0x73,
+	0x12, 0x1d, 0x0a, 0x0a, 0x6d, 0x65, 0x73, 0x73, 0x61, 0x67, 0x65, 0x5f, 0x69, 0x64, 0x18, 0x05,
+	0x20, 0x01, 0x28, 0x03, 0x52, 0x09, 0x6d, 0x65, 0x73, 0x73, 0x61, 0x67, 0x65, 0x49, 0x64, 0x12,
+	0x1a, 0x0a, 0x08, 0x6f, 0x70, 0x65, 0x72, 0x61, 0x74, 0x6f, 0x72, 0x18, 0x06, 0x20, 0x01, 0x28,
+	0x09, 0x52, 0x08, 0x6f, 0x70, 0x65, 0x72, 0x61, 0x74, 0x6f, 0x72, 0x22, 0xd7, 0x01, 0x0a, 0x06,
+	0x41, 0x63, 0x74, 0x69, 0x6f, 0x6e, 0x12, 0x0b, 0x0a, 0x07, 0x55, 0x4e, 0x4b, 0x4e, 0x4f, 0x57,
+	0x4e, 0x10, 0x00, 0x12, 0x11, 0x0a, 0x0d, 0x43, 0x68, 0x61, 0x6e, 0x6e, 0x65, 0x6c, 0x43, 0x72,
+	0x65, 0x61, 0x74, 0x65, 0x10, 0x01, 0x12, 0x14, 0x0a, 0x10, 0x43, 0x68, 0x61, 0x6e, 0x6e, 0x65,
+	0x6c, 0x45, 0x64, 0x69, 0x74, 0x54, 0x69, 0x74, 0x6c, 0x65, 0x10, 0x02, 0x12, 0x14, 0x0a, 0x10,
+	0x43, 0x68, 0x61, 0x6e, 0x6e, 0x65, 0x6c, 0x45, 0x64, 0x69, 0x74, 0x50, 0x68, 0x6f, 0x74, 0x6f,
+	0x10, 0x03, 0x12, 0x16, 0x0a, 0x12, 0x43, 0x68, 0x61, 0x6e, 0x6e, 0x65, 0x6c, 0x44, 0x65, 0x6c,
+	0x65, 0x74, 0x65, 0x50, 0x68, 0x6f, 0x74, 0x6f, 0x10, 0x04, 0x12, 0x19, 0x0a, 0x15, 0x43, 0x68,
+	0x61, 0x6e, 0x6e, 0x65, 0x6c, 0x41, 0x64, 0x64, 0x50, 0x61, 0x72, 0x74, 0x69, 0x63, 0x69, 0x70,
+	0x61, 0x6e, 0x74, 0x10, 0x05, 0x12, 0x1c, 0x0a, 0x18, 0x43, 0x68, 0x61, 0x6e, 0x6e, 0x65, 0x6c,
+	0x44, 0x65, 0x6c, 0x65, 0x74, 0x65, 0x50, 0x61, 0x72, 0x74, 0x69, 0x63, 0x69, 0x70, 0x61, 0x6e,
+	0x74, 0x10, 0x06, 0x12, 0x16, 0x0a, 0x12, 0x43, 0x68, 0x61, 0x6e, 0x6e, 0x65, 0x6c, 0x45, 0x64,
+	0x69, 0x74, 0x4d, 0x65, 0x73, 0x73, 0x61, 0x67, 0x65, 0x10, 0x07, 0x12, 0x18, 0x0a, 0x14, 0x43,
+	0x68, 0x61, 0x6e, 0x6e, 0x65, 0x6c, 0x44, 0x65, 0x6c, 0x65, 0x74, 0x65, 0x4d, 0x65, 0x73, 0x73,
+	0x61, 0x67, 0x65, 0x10, 0x08, 0x22, 0xb6, 0x03, 0x0a, 0x0f, 0x43, 0x68, 0x61, 0x6e, 0x6e, 0x65,
+	0x6c, 0x45, 0x6e, 0x76, 0x65, 0x6c, 0x6f, 0x70, 0x65, 0x12, 0x34, 0x0a, 0x04, 0x74, 0x79, 0x70,
+	0x65, 0x18, 0x01, 0x20, 0x01, 0x28, 0x0e, 0x32, 0x20, 0x2e, 0x74, 0x65, 0x78, 0x74, 0x73, 0x65,
+	0x63, 0x75, 0x72, 0x65, 0x2e, 0x43, 0x68, 0x61, 0x6e, 0x6e, 0x65, 0x6c, 0x45, 0x6e, 0x76, 0x65,
+	0x6c, 0x6f, 0x70, 0x65, 0x2e, 0x54, 0x79, 0x70, 0x65, 0x52, 0x04, 0x74, 0x79, 0x70, 0x65, 0x12,
+	0x0e, 0x0a, 0x02, 0x69, 0x64, 0x18, 0x02, 0x20, 0x01, 0x28, 0x03, 0x52, 0x02, 0x69, 0x64, 0x12,
+	0x1c, 0x0a, 0x09, 0x63, 0x68, 0x61, 0x6e, 0x6e, 0x65, 0x6c, 0x49, 0x64, 0x18, 0x03, 0x20, 0x01,
+	0x28, 0x09, 0x52, 0x09, 0x63, 0x68, 0x61, 0x6e, 0x6e, 0x65, 0x6c, 0x49, 0x64, 0x12, 0x1e, 0x0a,
+	0x0a, 0x73, 0x6f, 0x75, 0x72, 0x63, 0x65, 0x55, 0x75, 0x69, 0x64, 0x18, 0x04, 0x20, 0x01, 0x28,
+	0x09, 0x52, 0x0a, 0x73, 0x6f, 0x75, 0x72, 0x63, 0x65, 0x55, 0x75, 0x69, 0x64, 0x12, 0x22, 0x0a,
+	0x0c, 0x73, 0x6f, 0x75, 0x72, 0x63, 0x65, 0x44, 0x65, 0x76, 0x69, 0x63, 0x65, 0x18, 0x05, 0x20,
+	0x01, 0x28, 0x0d, 0x52, 0x0c, 0x73, 0x6f, 0x75, 0x72, 0x63, 0x65, 0x44, 0x65, 0x76, 0x69, 0x63,
+	0x65, 0x12, 0x14, 0x0a, 0x05, 0x72, 0x65, 0x6c, 0x61, 0x79, 0x18, 0x06, 0x20, 0x01, 0x28, 0x09,
+	0x52, 0x05, 0x72, 0x65, 0x6c, 0x61, 0x79, 0x12, 0x18, 0x0a, 0x07, 0x63, 0x6f, 0x6e, 0x74, 0x65,
+	0x6e, 0x74, 0x18, 0x07, 0x20, 0x01, 0x28, 0x0c, 0x52, 0x07, 0x63, 0x6f, 0x6e, 0x74, 0x65, 0x6e,
+	0x74, 0x12, 0x31, 0x0a, 0x06, 0x61, 0x63, 0x74, 0x69, 0x6f, 0x6e, 0x18, 0x08, 0x20, 0x01, 0x28,
+	0x0b, 0x32, 0x19, 0x2e, 0x74, 0x65, 0x78, 0x74, 0x73, 0x65, 0x63, 0x75, 0x72, 0x65, 0x2e, 0x4d,
+	0x65, 0x73, 0x73, 0x61, 0x67, 0x65, 0x41, 0x63, 0x74, 0x69, 0x6f, 0x6e, 0x52, 0x06, 0x61, 0x63,
+	0x74, 0x69, 0x6f, 0x6e, 0x12, 0x18, 0x0a, 0x07, 0x64, 0x65, 0x6c, 0x65, 0x74, 0x65, 0x64, 0x18,
+	0x09, 0x20, 0x01, 0x28, 0x08, 0x52, 0x07, 0x64, 0x65, 0x6c, 0x65, 0x74, 0x65, 0x64, 0x12, 0x1c,
+	0x0a, 0x09, 0x74, 0x69, 0x6d, 0x65, 0x73, 0x74, 0x61, 0x6d, 0x70, 0x18, 0x0a, 0x20, 0x01, 0x28,
+	0x04, 0x52, 0x09, 0x74, 0x69, 0x6d, 0x65, 0x73, 0x74, 0x61, 0x6d, 0x70, 0x12, 0x29, 0x0a, 0x10,
+	0x73, 0x65, 0x72, 0x76, 0x65, 0x72, 0x5f, 0x74, 0x69, 0x6d, 0x65, 0x73, 0x74, 0x61, 0x6d, 0x70,
+	0x18, 0x0b, 0x20, 0x01, 0x28, 0x04, 0x52, 0x0f, 0x73, 0x65, 0x72, 0x76, 0x65, 0x72, 0x54, 0x69,
+	0x6d, 0x65, 0x73, 0x74, 0x61, 0x6d, 0x70, 0x22, 0x35, 0x0a, 0x04, 0x54, 0x79, 0x70, 0x65, 0x12,
+	0x0b, 0x0a, 0x07, 0x55, 0x4e, 0x4b, 0x4e, 0x4f, 0x57, 0x4e, 0x10, 0x00, 0x12, 0x0b, 0x0a, 0x07,
+	0x4d, 0x45, 0x53, 0x53, 0x41, 0x47, 0x45, 0x10, 0x01, 0x12, 0x13, 0x0a, 0x0f, 0x4d, 0x45, 0x53,
+	0x53, 0x41, 0x47, 0x45, 0x5f, 0x53, 0x45, 0x52, 0x56, 0x49, 0x43, 0x45, 0x10, 0x02, 0x62, 0x06,
+	0x70, 0x72, 0x6f, 0x74, 0x6f, 0x33,
 }
 
 var (
@@ -478,23 +863,30 @@ func file_proto_TextSecure_proto_rawDescGZIP() []byte {
 	return file_proto_TextSecure_proto_rawDescData
 }
 
-var file_proto_TextSecure_proto_enumTypes = make([]protoimpl.EnumInfo, 1)
-var file_proto_TextSecure_proto_msgTypes = make([]protoimpl.MessageInfo, 4)
+var file_proto_TextSecure_proto_enumTypes = make([]protoimpl.EnumInfo, 3)
+var file_proto_TextSecure_proto_msgTypes = make([]protoimpl.MessageInfo, 6)
 var file_proto_TextSecure_proto_goTypes = []interface{}{
 	(Envelope_Type)(0),               // 0: textsecure.Envelope.Type
-	(*Envelope)(nil),                 // 1: textsecure.Envelope
-	(*ProvisioningUuid)(nil),         // 2: textsecure.ProvisioningUuid
-	(*ServerCertificate)(nil),        // 3: textsecure.ServerCertificate
-	(*SenderCertificateMessage)(nil), // 4: textsecure.SenderCertificateMessage
+	(MessageAction_Action)(0),        // 1: textsecure.MessageAction.Action
+	(ChannelEnvelope_Type)(0),        // 2: textsecure.ChannelEnvelope.Type
+	(*Envelope)(nil),                 // 3: textsecure.Envelope
+	(*ProvisioningUuid)(nil),         // 4: textsecure.ProvisioningUuid
+	(*ServerCertificate)(nil),        // 5: textsecure.ServerCertificate
+	(*SenderCertificateMessage)(nil), // 6: textsecure.SenderCertificateMessage
+	(*MessageAction)(nil),            // 7: textsecure.MessageAction
+	(*ChannelEnvelope)(nil),          // 8: textsecure.ChannelEnvelope
 }
 var file_proto_TextSecure_proto_depIdxs = []int32{
 	0, // 0: textsecure.Envelope.type:type_name -> textsecure.Envelope.Type
-	3, // 1: textsecure.SenderCertificateMessage.signer:type_name -> textsecure.ServerCertificate
-	2, // [2:2] is the sub-list for method output_type
-	2, // [2:2] is the sub-list for method input_type
-	2, // [2:2] is the sub-list for extension type_name
-	2, // [2:2] is the sub-list for extension extendee
-	0, // [0:2] is the sub-list for field type_name
+	5, // 1: textsecure.SenderCertificateMessage.signer:type_name -> textsecure.ServerCertificate
+	1, // 2: textsecure.MessageAction.action:type_name -> textsecure.MessageAction.Action
+	2, // 3: textsecure.ChannelEnvelope.type:type_name -> textsecure.ChannelEnvelope.Type
+	7, // 4: textsecure.ChannelEnvelope.action:type_name -> textsecure.MessageAction
+	5, // [5:5] is the sub-list for method output_type
+	5, // [5:5] is the sub-list for method input_type
+	5, // [5:5] is the sub-list for extension type_name
+	5, // [5:5] is the sub-list for extension extendee
+	0, // [0:5] is the sub-list for field type_name
 }
 
 func init() { file_proto_TextSecure_proto_init() }
@@ -551,14 +943,38 @@ func file_proto_TextSecure_proto_init() {
 				return nil
 			}
 		}
+		file_proto_TextSecure_proto_msgTypes[4].Exporter = func(v interface{}, i int) interface{} {
+			switch v := v.(*MessageAction); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
+		file_proto_TextSecure_proto_msgTypes[5].Exporter = func(v interface{}, i int) interface{} {
+			switch v := v.(*ChannelEnvelope); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
 	}
 	type x struct{}
 	out := protoimpl.TypeBuilder{
 		File: protoimpl.DescBuilder{
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: file_proto_TextSecure_proto_rawDesc,
-			NumEnums:      1,
-			NumMessages:   4,
+			NumEnums:      3,
+			NumMessages:   6,
 			NumExtensions: 0,
 			NumServices:   0,
 		},

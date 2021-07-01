@@ -22,7 +22,7 @@ func PutMsgsHandler(ctx *svc.ServiceContext) http.HandlerFunc {
 		adxName:= r.Header.Get(shared.HEADADXUSERNAME)
 
 		l := logic.NewPutMsgsLogic(r.Context(), ctx)
-		resp, err := l.PutMsgs(adxName,req,0)
+		resp, err := l.PutMsgs(adxName,req,0,false)
 		if err != nil {
 			httpx.Error(w, err)
 		} else {

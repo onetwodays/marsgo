@@ -9,6 +9,7 @@ import (
 	"path/filepath"
 	"secret-im/common"
 	"secret-im/service/signalserver/cmd/api/chat"
+	"secret-im/service/signalserver/cmd/api/internal/signal"
 	"secret-im/service/signalserver/cmd/api/middleware"
 	"secret-im/service/signalserver/cmd/shared"
 	"strings"
@@ -39,6 +40,9 @@ func main() {
 
 
 	ctx := svc.NewServiceContext(config.AppConfig)
+	if ctx ==nil{
+		fmt.Println("new service context error ")
+	}
 	server := rest.MustNewServer(config.AppConfig.RestConf, rest.WithRouter(rt)) //url 不存在时会报 服务器开小差了,这里可定制
 	//server := rest.MustNewServer(c.RestConf) //url 不存在时默认会报 404 page not found
 	defer server.Stop()
@@ -77,7 +81,8 @@ func main() {
 		}
 	})
 
-	var authSessionManager *chat.SessionManager
+
+
     //websocket server.调试使用，可以通过网页看到ws结果，生产环境要关闭
     if isStartWss{
 
@@ -86,11 +91,11 @@ func main() {
 			Path: "/ws",
 			Handler: chat.WsConnectHandler(ctx),
 		})
-		//authSessionManager = chat.NewSessionManager(ctx,rt,)
+		signal.SC = signal.NewSignalContext(ctx,rt)
 		server.AddRoute(rest.Route{
 			Method: http.MethodGet,
 			Path: "/v3/websocket",
-			Handler: authSessionManager.HandleAccept,
+			Handler:signal.SC.SM.HandleAccept,
 		})
 
 	}

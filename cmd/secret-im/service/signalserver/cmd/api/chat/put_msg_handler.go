@@ -35,11 +35,12 @@ func PutMsgHandler(req *textsecure.WebSocketMessage,svc *svc.ServiceContext,send
 
 	// 交给logic处理
 	l := logic.NewPutMsgsLogic(context.Background(), svc)
-	putMsgRes, err := l.PutMsgs(sender, putMesReq,req.Request.Id)
+	recv, isOk := HasOne(putMesReq.Destination)
+	putMsgRes, err := l.PutMsgs(sender, putMesReq,req.Request.Id,isOk)
 	if err != nil {
 		return nil, err
 	}
-	recv, isOk := HasOne(putMesReq.Destination)
+
 	if isOk {
 		for i := range putMsgRes.DestContent {
 			recv.WriteOne(putMsgRes.DestContent[i])
