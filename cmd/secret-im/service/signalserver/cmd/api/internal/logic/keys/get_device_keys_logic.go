@@ -45,8 +45,8 @@ func (l *GetDeviceKeysLogic) GetDeviceKeys(req types.GetKeysReqx,r *http.Request
 		return nil, shared.Status(http.StatusUnauthorized,err.Error())
 	}
 	// 获取目标用户
-	target,err := storage.AccountManager{}.Get(targetName,l.svcCtx.AccountsModel)
-	if target == nil {
+	target,err := storage.AccountManager{}.Get(targetName)
+	if target == nil || err!=nil {
 		return nil, shared.Status(http.StatusNotFound,err.Error())
 	}
 	code,ok :=helper.OptionalAccess{}.VerifyDevices(appAccount,accessKey,target,req.DeviceId)

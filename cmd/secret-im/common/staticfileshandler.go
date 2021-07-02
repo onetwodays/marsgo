@@ -4,7 +4,7 @@ import (
 
 )
 
-//处理函数,传入文件地址
+// StaticFileHandler 处理函数,传入文件地址
 func StaticFileHandler(filepath string) http.HandlerFunc {
 	return func(w http.ResponseWriter, req *http.Request) {
 		http.ServeFile(w, req, filepath)

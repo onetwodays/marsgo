@@ -15,6 +15,9 @@ import (
 	"secret-im/service/signalserver/cmd/api/internal/crypto"
 	"secret-im/service/signalserver/cmd/api/internal/middleware"
 	"secret-im/service/signalserver/cmd/api/internal/model"
+	"secret-im/service/signalserver/cmd/api/internal/svc/pubsub"
+	"secret-im/service/signalserver/cmd/api/internal/svc/pubsub/dispatch"
+	"secret-im/service/signalserver/cmd/api/internal/svc/push"
 	"secret-im/service/signalserver/cmd/rpc/bookstore/bookstoreclient"
 )
 
@@ -52,6 +55,11 @@ type ServiceContext struct {
 	CertificateGenerator *auth.CertificateGenerator
 
 	RedisClient *redis.Client
+
+	RedisOperation   *push.RedisOperation
+	Dispatcher       *dispatch.RedisDispatchManager
+	PubSubManager    *pubsub.Manager
+	PushSender       *push.Sender
 }
 
 func NewServiceContext(c config.Config) *ServiceContext {
@@ -64,6 +72,22 @@ func NewServiceContext(c config.Config) *ServiceContext {
 		// PoolSize: 0,
 		//MinIdleConns: 32,
 	})
+
+
+	redisOperation, err := push.NewRedisOperation(redisClient)
+	if err != nil {
+		logx.Errorf("NewRedisOperation fail,reason:%s", err.Error())
+		return nil
+	}
+
+	dispatcher := dispatch.NewRedisDispatchManager(redisClient, 128, new(DeadLetterHandler))
+	pubSubManager := pubsub.NewManager(dispatcher)
+	pushSender := push.NewPushSender(pubSubManager, redisOperation)
+
+
+
+
+
 
 	if err := redisClient.Ping().Err(); err != nil {
 		logx.Errorf("ping redis fail,reason:%s", err.Error())
@@ -134,5 +158,9 @@ func NewServiceContext(c config.Config) *ServiceContext {
 		BackupCredentialsGenerator: auth.NewExternalServiceCredentialGenerator([]byte(c.BackupService.UserAuthenticationTokenSharedSecret), nil, false),
 		CertificateGenerator:       certificateGenerator,
 		RedisClient:                redisClient,
+		RedisOperation:   redisOperation,
+		Dispatcher:       dispatcher,
+		PubSubManager:    pubSubManager,
+		PushSender:       pushSender,
 	}
 }

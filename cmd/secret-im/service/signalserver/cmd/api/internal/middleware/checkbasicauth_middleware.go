@@ -70,7 +70,7 @@ func (m *CheckBasicAuthMiddleware) updateLastSeen(dbAccount *model.TAccounts,
 // 标头基本身份验证
 func (m *CheckBasicAuthMiddleware) BasicAuthForHeader(r *http.Request,
 	enabledRequired bool, ignorePassword ...bool) ( *entities.Account,error, bool) {
-	authorizationHeader := r.Header.Get(shared.AuthorizationHeader)
+	authorizationHeader := r.Header.Get(shared.AuthorizationHeader) //
 	header, err := new(auth.AuthorizationHeader).FromFullHeader(authorizationHeader)
 	//如果不是basic auth，现在放行，去http找头，密码保持为空。
 	if err != nil {

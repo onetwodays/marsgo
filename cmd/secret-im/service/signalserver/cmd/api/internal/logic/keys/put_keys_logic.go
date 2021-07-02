@@ -46,7 +46,7 @@ func (l *PutKeysLogic) PutKeys(req types.PutKeysReq,appAccount *entities.Account
 	}
 
 	if updateAccount {
-		if err:= new(storage.AccountManager).Update(appAccount,l.svcCtx.AccountsModel);err!=nil{
+		if err:= new(storage.AccountManager).Update(appAccount);err!=nil{
 			return shared.Status(http.StatusInternalServerError,err.Error())
 		}
 

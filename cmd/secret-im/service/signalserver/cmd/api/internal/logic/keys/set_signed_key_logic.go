@@ -35,7 +35,7 @@ func (l *SetSignedKeyLogic) SetSignedKey(req types.SignedPrekey,appAccount *enti
 		Signature: req.Signature,
 		KeyId: req.KeyId,
 	}
-	err := storage.AccountManager{}.Update(appAccount,l.svcCtx.AccountsModel)
+	err := storage.AccountManager{}.Update(appAccount)
 	if err !=nil{
 		return shared.Status(http.StatusInternalServerError,err.Error())
 	}

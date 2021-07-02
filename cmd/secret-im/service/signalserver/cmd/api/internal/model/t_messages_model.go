@@ -31,6 +31,9 @@ type (
 		DeleteManyByGuid(guids []string) error
 		DeleteManyByDestination(destination string) error
 		DeleteManyByDestinationDeviceId(destination string, deviceId int64) error
+		Remove(destination string,id int64) error
+		RemoveByGUID(destination, guid string) (*TMessages, error)
+		RemoveBySender(destination string, destinationDevice int64, source string, timestamp int64) (*TMessages, error)
 
 	}
 
@@ -82,6 +85,41 @@ func (m *defaultTMessagesModel) FindOne(id int64) (*TMessages, error) {
 	default:
 		return nil, err
 	}
+}
+
+func (m *defaultTMessagesModel) RemoveByGUID(destination, guid string) (*TMessages, error)  {
+	query := fmt.Sprintf("select %s from %s where `guid` = ? AND `destination` = ? ORDER BY id LIMIT 1", tMessagesRows, m.table)
+	var resp TMessages
+	err := m.conn.QueryRow(&resp, query, guid,destination)
+	if err!=nil{
+		return nil, err
+	}
+	err = m.Delete(resp.Id)
+	if err!=nil{
+		return nil, err
+	}
+
+	return &resp,nil
+
+}
+
+func (m *defaultTMessagesModel) RemoveBySender(
+	destination string, destinationDevice int64,
+	source string, timestamp int64) (*TMessages, error){
+
+	query := fmt.Sprintf("select %s from %s where `destination` = ? AND `destination_device` = ? AND `source` = ? AND `timestamp` = ? ORDER BY id LIMIT 1", tMessagesRows, m.table)
+	var resp TMessages
+	err := m.conn.QueryRow(&resp, query,destination,destinationDevice,source,timestamp )
+	if err!=nil{
+		return nil, err
+	}
+	err = m.Delete(resp.Id)
+	if err!=nil{
+		return nil, err
+	}
+
+	return &resp,nil
+
 }
 
 func (m *defaultTMessagesModel) FindManyByDst(device string, deviceId int64, limit ...int) ([]TMessages, error) {
@@ -136,5 +174,12 @@ func (m *defaultTMessagesModel)  DeleteManyByDestination(destination string) err
 func (m *defaultTMessagesModel) DeleteManyByDestinationDeviceId(destination string, deviceId int64) error{
 	query := fmt.Sprintf("delete from %s where `destination=` ? and `destination_device`=?", m.table)
 	_, err := m.conn.Exec(query, destination,deviceId)
+	return err
+}
+
+
+func (m *defaultTMessagesModel) Remove(destination string,id int64) error {
+	query := fmt.Sprintf("delete from %s where  `id`=?  and `destination=` ? ", m.table)
+	_, err := m.conn.Exec(query, destination,id)
 	return err
 }

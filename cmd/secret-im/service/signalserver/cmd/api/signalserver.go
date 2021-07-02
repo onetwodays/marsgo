@@ -9,8 +9,9 @@ import (
 	"path/filepath"
 	"secret-im/common"
 	"secret-im/service/signalserver/cmd/api/chat"
-	"secret-im/service/signalserver/cmd/api/internal/signal"
+	"secret-im/service/signalserver/cmd/api/internal/storage"
 	"secret-im/service/signalserver/cmd/api/middleware"
+	"secret-im/service/signalserver/cmd/api/websocket"
 	"secret-im/service/signalserver/cmd/shared"
 	"strings"
 
@@ -43,6 +44,9 @@ func main() {
 	if ctx ==nil{
 		fmt.Println("new service context error ")
 	}
+
+	storage.InitStorage(ctx.RedisClient,ctx.AccountsModel,ctx.MsgsModel)
+
 	server := rest.MustNewServer(config.AppConfig.RestConf, rest.WithRouter(rt)) //url 不存在时会报 服务器开小差了,这里可定制
 	//server := rest.MustNewServer(c.RestConf) //url 不存在时默认会报 404 page not found
 	defer server.Stop()
@@ -83,6 +87,8 @@ func main() {
 
 
 
+
+
     //websocket server.调试使用，可以通过网页看到ws结果，生产环境要关闭
     if isStartWss{
 
@@ -91,11 +97,12 @@ func main() {
 			Path: "/ws",
 			Handler: chat.WsConnectHandler(ctx),
 		})
-		signal.SC = signal.NewSignalContext(ctx,rt)
+		websocket.InitWebsocketEnv(ctx,rt)
+
 		server.AddRoute(rest.Route{
-			Method: http.MethodGet,
-			Path: "/v3/websocket",
-			Handler:signal.SC.SM.HandleAccept,
+			Method:  http.MethodGet,
+			Path:    "/v3/websocket",
+			Handler: websocket.WsAcceptHandler,
 		})
 
 	}
