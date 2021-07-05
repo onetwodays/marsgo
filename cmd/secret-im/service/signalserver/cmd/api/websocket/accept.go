@@ -2,6 +2,7 @@ package websocket
 
 import (
 	"github.com/gorilla/websocket"
+	"github.com/tal-tech/go-zero/core/logx"
 	"github.com/tal-tech/go-zero/rest/httpx"
 	"net/http"
 	"secret-im/service/signalserver/cmd/api/internal/entities"
@@ -9,8 +10,6 @@ import (
 	"secret-im/service/signalserver/cmd/api/internal/svc"
 	"strings"
 )
-
-
 
 // 连接升级
 var upgrader = websocket.Upgrader{
@@ -22,42 +21,38 @@ var upgrader = websocket.Upgrader{
 }
 
 type WsConnReq struct {
-
-	Login string `form:"login,optional"`
+	Login    string `form:"login,optional"`
 	Password string `form:"password,optional"`
 }
 
-func authenticate(r *http.Request,ctx *svc.ServiceContext) (*entities.Account,bool){
+func authenticate(r *http.Request, ctx *svc.ServiceContext) (*entities.Account, bool) {
 
 	var ba WsConnReq
 	if err := httpx.Parse(r, &ba); err != nil {
-		return nil,true
+		return nil, true
 	}
-	if len(ba.Login)==0 && len(ba.Password)==0{
-		return nil,true
+	if len(ba.Login) == 0 && len(ba.Password) == 0 {
+		return nil, true
 	}
 
-	ba.Login = strings.ReplaceAll(ba.Login," ","+")
-	ba.Password = strings.ReplaceAll(ba.Password," ","+")
+	ba.Login = strings.ReplaceAll(ba.Login, " ", "+")
+	ba.Password = strings.ReplaceAll(ba.Password, " ", "+")
 
 	// 帐号鉴权
-	enabledRequired :=true
+	enabledRequired := true
 	/*
-	if true{
-		enabledRequired =false
-	}
-	 */
+		if true{
+			enabledRequired =false
+		}
+	*/
 	checkBasicAuth := middleware.NewCheckBasicAuthMiddleware(ctx.AccountsModel)
-	appAccount,err,ok:=checkBasicAuth.BasicAuthForHeader(r,enabledRequired)
-	if err!=nil{
+	logx.Info("ba.login=", ba.Login)
+	logx.Info("ba.passwd=", ba.Password)
+	appAccount, err := checkBasicAuth.BasicAuthByUserPasswd(ba.Login, ba.Password, enabledRequired)
+	if err != nil {
+		logx.Error("checkBasicAuth.BasicAuthByUserPasswd fail:",err.Error())
 		return nil, false
 	}
-	return appAccount,ok
+	return appAccount, true
 
 }
-
-
-
-
-
-

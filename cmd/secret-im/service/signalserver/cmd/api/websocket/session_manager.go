@@ -4,13 +4,12 @@ import (
 	"github.com/gorilla/websocket"
 	"github.com/tal-tech/go-zero/core/logx"
 	"github.com/tal-tech/go-zero/rest/httpx"
+	"net/http"
+	"secret-im/service/signalserver/cmd/api/internal/entities"
 	"secret-im/service/signalserver/cmd/api/internal/svc"
 	"secret-im/service/signalserver/cmd/api/internal/svc/pubsub"
 	"secret-im/service/signalserver/cmd/api/internal/svc/push"
-	"secret-im/service/signalserver/cmd/shared"
-
-	"net/http"
-	"secret-im/service/signalserver/cmd/api/internal/entities"
+	shared "secret-im/service/signalserver/cmd/api/shared"
 	"sync"
 	"sync/atomic"
 )
@@ -60,6 +59,7 @@ func (manager *SessionManager) HandleAccept(w http.ResponseWriter, r *http.Reque
 
 	account, pass := authenticate(r, manager.ctx)
 	if !pass {
+
 		httpx.Error(w, shared.Status(http.StatusUnauthorized, ""))
 		return
 	}
@@ -69,6 +69,9 @@ func (manager *SessionManager) HandleAccept(w http.ResponseWriter, r *http.Reque
 		logx.Errorf("[Websocket] upgrade failed,reason:%s", err)
 		httpx.Error(w, shared.Status(http.StatusInternalServerError, err.Error()))
 		return
+	}
+	if account==nil{
+		logx.Error("account ==nil ")
 	}
 
 	session := manager.onCreated(conn, account)

@@ -97,8 +97,21 @@ type JwtTokenAdx struct {
 }
 
 type AdxUserLoginReq struct {
-	Name string `json:"name"` //eos chain username,保证unique
-	Sign string `json:"sign"` //  eos 用户用自己的私钥对name的签名
+	Account                        string              `json:"account"` //eos chain username,保证unique
+	Sign                           string              `json:"sign"`    //  eos 用户用自己的私钥对name的签名
+	SignalingKey                   string              `json:"signalingKey,optional"`
+	FetchesMessages                bool                `json:"fetchesMessages,default=true"`
+	RegistrationID                 int                 `json:"registrationId,optional"`
+	Pin                            string              `json:"pin,optional"`
+	Name                           string              `json:"name,optional"`
+	RegistrationLock               string              `json:"registrationLock,optional"`
+	UnidentifiedAccessKey          string              `json:"unidentifiedAccessKey,optional"`
+	UnrestrictedUnidentifiedAccess bool                `json:"unrestrictedUnidentifiedAccess,optional"`
+	Capabilities                   DeviceCapabilitiesx `json:"capabilities,optional"`
+}
+
+type DeviceCapabilitiesx struct {
+	UUID bool `json:"uuid,optional"`
 }
 
 type AdxUserLoginRes struct {
@@ -125,8 +138,7 @@ type PutMessagesReq struct {
 }
 
 type PutMessagesRes struct {
-	NeedsSync   bool     `json:"needsSync"`
-	DestContent [][]byte `json:"destContent,optional"`
+	NeedsSync bool `json:"needsSync"`
 }
 
 type OutcomingMessagex struct {

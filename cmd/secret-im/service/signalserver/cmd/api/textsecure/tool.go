@@ -1,4 +1,13 @@
 package textsecure
+
+import "encoding/base64"
+
+// 消息解码
+func DecodeMessage(message string) []byte {
+	raw, _ := base64.StdEncoding.DecodeString(message)
+	return raw
+}
+
 func GetEnvelopeType(typ int) Envelope_Type  {
 	switch typ {
 	case 0:

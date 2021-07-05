@@ -7,7 +7,7 @@ import (
 	"secret-im/service/signalserver/cmd/api/internal/auth/helper"
 	"secret-im/service/signalserver/cmd/api/internal/middleware"
 	"secret-im/service/signalserver/cmd/api/internal/storage"
-	"secret-im/service/signalserver/cmd/shared"
+	shared "secret-im/service/signalserver/cmd/api/shared"
 	"strconv"
 
 	"secret-im/service/signalserver/cmd/api/internal/svc"
@@ -40,18 +40,18 @@ func (l *GetDeviceKeysLogic) GetDeviceKeys(req types.GetKeysReqx,r *http.Request
 	checkBasicAuth := middleware.NewCheckBasicAuthMiddleware(l.svcCtx.AccountsModel)
 
 	// 帐号鉴权
-	appAccount,err,_:=checkBasicAuth.BasicAuthForHeader(r,true)
+	appAccount,err:=checkBasicAuth.BasicAuthByHeader(r,true)
 	if appAccount == nil && accessKey==nil {
 		return nil, shared.Status(http.StatusUnauthorized,err.Error())
 	}
 	// 获取目标用户
-	target,err := storage.AccountManager{}.Get(targetName)
+	_,target,err := storage.AccountManager{}.Get(targetName)
 	if target == nil || err!=nil {
 		return nil, shared.Status(http.StatusNotFound,err.Error())
 	}
 	code,ok :=helper.OptionalAccess{}.VerifyDevices(appAccount,accessKey,target,req.DeviceId)
 	if !ok{
-		return nil,shared.Status(code,"VerifyDevices fail")
+		return nil, shared.Status(code,"VerifyDevices fail")
 	}
 
 	if appAccount!=nil {
@@ -107,7 +107,7 @@ func (l *GetDeviceKeysLogic) GetDeviceKeys(req types.GetKeysReqx,r *http.Request
 	}
 
 	if len(devices) == 0 {
-		return nil,shared.Status(http.StatusOK,"")
+		return nil, shared.Status(http.StatusOK,"")
 	}
 
 	//删除已经查到的数据

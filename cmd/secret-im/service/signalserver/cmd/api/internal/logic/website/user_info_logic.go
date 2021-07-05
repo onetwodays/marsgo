@@ -2,14 +2,13 @@ package logic
 
 import (
 	"context"
+	shared "secret-im/service/signalserver/cmd/api/shared"
 	"strconv"
 
+	"github.com/tal-tech/go-zero/core/logx"
 	"secret-im/service/signalserver/cmd/api/internal/model"
 	"secret-im/service/signalserver/cmd/api/internal/svc"
 	"secret-im/service/signalserver/cmd/api/internal/types"
-	"secret-im/service/signalserver/cmd/shared"
-
-	"github.com/tal-tech/go-zero/core/logx"
 )
 
 var errorUserNotFound = shared.NewCodeError(shared.UserNotFound, shared.CodeErrorMap[shared.UserNotFound])

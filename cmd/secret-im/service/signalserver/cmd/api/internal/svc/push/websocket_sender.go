@@ -2,6 +2,7 @@ package push
 
 import (
 	"github.com/golang/protobuf/proto"
+	"github.com/tal-tech/go-zero/core/logx"
 	"secret-im/service/signalserver/cmd/api/internal/storage"
 	"secret-im/service/signalserver/cmd/api/internal/svc/pubsub"
 	"secret-im/service/signalserver/cmd/api/textsecure"
@@ -43,11 +44,13 @@ func (sender *WebsocketSender) SendMessage(number string, deviceID int64,
 	n, err := sender.pubSubManager.Publish(address.Serialize(), pubSubMessage)
 	// 推redis成功
 	if err == nil && n > 0 {
+		logx.Info("消息已经推送至redis中，key is ",address.Serialize())
 		return true, nil
 	}
 
 	// 如果不在线的话
 	if !online {
+		logx.Errorf("online=%d",online," sender.QueueMessage(number, deviceID, message)")
 		err = sender.QueueMessage(number, deviceID, message)
 	}
 	return false, err

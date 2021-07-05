@@ -127,18 +127,21 @@ func RegisterHandlers(engine *rest.Server, serverCtx *svc.ServiceContext) {
 	)
 
 	engine.AddRoutes(
-		[]rest.Route{
-			{
-				Method:  http.MethodPut,
-				Path:    "/v1/messages/:destination",
-				Handler: textsecret_messages.PutMsgsHandler(serverCtx),
-			},
-			{
-				Method:  http.MethodGet,
-				Path:    "/v1/messages",
-				Handler: textsecret_messages.GetMsgsHandler(serverCtx),
-			},
-		},
+		rest.WithMiddlewares(
+			[]rest.Middleware{serverCtx.CheckBasicAuth},
+			[]rest.Route{
+				{
+					Method:  http.MethodPut,
+					Path:    "/v1/messages/:destination",
+					Handler: textsecret_messages.PutMsgsHandler(serverCtx),
+				},
+				{
+					Method:  http.MethodGet,
+					Path:    "/v1/messages",
+					Handler: textsecret_messages.GetMsgsHandler(serverCtx),
+				},
+			}...,
+		),
 	)
 
 	engine.AddRoutes(
@@ -175,7 +178,7 @@ func RegisterHandlers(engine *rest.Server, serverCtx *svc.ServiceContext) {
 		[]rest.Route{
 			{
 				Method:  http.MethodGet,
-				Path:    "/v1/websocket",
+				Path:    "/v2/websocket",
 				Handler: textsecret_websocket.WSConnectHandler(serverCtx),
 			},
 		},

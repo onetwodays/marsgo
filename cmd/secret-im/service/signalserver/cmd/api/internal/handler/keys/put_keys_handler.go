@@ -3,11 +3,10 @@ package handler
 import (
 	"net/http"
 	"secret-im/service/signalserver/cmd/api/internal/entities"
-	"secret-im/service/signalserver/cmd/shared"
-
 	"secret-im/service/signalserver/cmd/api/internal/logic/keys"
 	"secret-im/service/signalserver/cmd/api/internal/svc"
 	"secret-im/service/signalserver/cmd/api/internal/types"
+	shared "secret-im/service/signalserver/cmd/api/shared"
 
 	"github.com/tal-tech/go-zero/rest/httpx"
 )

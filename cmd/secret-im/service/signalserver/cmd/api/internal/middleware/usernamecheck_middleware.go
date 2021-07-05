@@ -3,7 +3,7 @@ package middleware
 import (
 	"github.com/tal-tech/go-zero/rest/httpx"
 	"net/http"
-	"secret-im/service/signalserver/cmd/shared"
+	shared "secret-im/service/signalserver/cmd/api/shared"
 )
 
 
@@ -29,7 +29,7 @@ func (m *UserNameCheckMiddleware) Handle(next http.HandlerFunc) http.HandlerFunc
 
 
 		if jwtName != adxName {
-			httpx.Error(w,shared.ErrAdxCheck)
+			httpx.Error(w, shared.ErrAdxCheck)
 			return
 		}
 

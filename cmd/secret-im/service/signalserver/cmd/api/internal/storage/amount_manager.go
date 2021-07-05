@@ -4,12 +4,15 @@ import (
 	"database/sql"
 	"encoding/json"
 	"errors"
+	uuid "github.com/satori/go.uuid"
 	"github.com/tal-tech/go-zero/core/logx"
 	"net/http"
+	pkgUtils "secret-im/pkg/utils-tools"
 	"secret-im/service/signalserver/cmd/api/internal/auth"
 	"secret-im/service/signalserver/cmd/api/internal/entities"
 	"secret-im/service/signalserver/cmd/api/internal/model"
-	"secret-im/service/signalserver/cmd/shared"
+	"secret-im/service/signalserver/cmd/api/internal/types"
+	shared "secret-im/service/signalserver/cmd/api/shared"
 )
 
 func DbAccount2AppAccount(dbAccount *model.TAccounts) (*entities.Account, error) {
@@ -18,7 +21,8 @@ func DbAccount2AppAccount(dbAccount *model.TAccounts) (*entities.Account, error)
 	}
 	appAccount := new(entities.Account)
 	err := json.Unmarshal([]byte(dbAccount.Data.String), appAccount)
-	if err == nil {
+	if err != nil {
+
 		logx.Error("json.Unmarshal([]byte(dbAccount.Data.String)) error:", err)
 		return nil, err
 	}
@@ -45,7 +49,7 @@ func (m AccountManager) Update(appAccount *entities.Account) error {
 		appAccount.UUID)
 }
 
-func (m AccountManager) Get(ambiguousIdentifier auth.AmbiguousIdentifier) (*entities.Account, error) {
+func (m AccountManager) Get(ambiguousIdentifier *auth.AmbiguousIdentifier) (*model.TAccounts,*entities.Account, error) {
 
 	var dbAccount *model.TAccounts
 
@@ -58,9 +62,13 @@ func (m AccountManager) Get(ambiguousIdentifier auth.AmbiguousIdentifier) (*enti
 		dbAccount, err = internal.accountDB.FindOneByNumber(ambiguousIdentifier.Number)
 	}
 	if err != nil {
-		return nil, err
+		return nil,nil, err
 	}
-	return DbAccount2AppAccount(dbAccount)
+	appAccount,err:= DbAccount2AppAccount(dbAccount)
+	if err!=nil{
+		return nil, nil, err
+	}
+	return dbAccount,appAccount,nil
 }
 
 func (m AccountManager) GetByNumber(number string) (*entities.Account, error) {
@@ -70,4 +78,38 @@ func (m AccountManager) GetByNumber(number string) (*entities.Account, error) {
 		return nil, err
 	}
 	return DbAccount2AppAccount(dbAccount)
+}
+
+func (m AccountManager)  CreateDBAccount(number, password,userAgent string, accountAttributes *types.AccountAttributes) (*model.TAccounts, error) {
+
+	device := new(entities.DeviceFull)
+	device.ID = entities.DeviceMasterID
+	device.SetAuthenticationCredentials(auth.NewAuthenticationCredentials(password))
+	device.SignalingKey = accountAttributes.SignalingKey
+	device.FetchesMessages = accountAttributes.FetchesMessages
+	device.RegistrationID = accountAttributes.RegistrationID
+	device.Name = accountAttributes.Name
+	device.Capabilities = accountAttributes.Capabilities
+	device.Created = pkgUtils.CurrentTimeMillis()
+	device.LastSeen = pkgUtils.TodayInMillis()
+	device.UserAgent = userAgent
+
+	account := new(entities.Account)
+	account.Number= number
+	account.UUID = uuid.NewV4().String()
+	account.AddDevice(device)
+	account.Pin = accountAttributes.Pin
+	account.UnidentifiedAccessKey = accountAttributes.UnidentifiedAccessKey
+	account.UnrestrictedUnidentifiedAccess = accountAttributes.UnrestrictedUnidentifiedAccess
+
+	jsb,err:=json.Marshal(account)
+	if err!=nil{
+		return nil, err
+	}
+
+	return &model.TAccounts{
+		Number: number,
+		Uuid: account.UUID,
+		Data: sql.NullString{String: string(jsb),Valid: true},
+	},nil
 }

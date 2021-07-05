@@ -11,9 +11,9 @@ import (
 	"github.com/tal-tech/go-zero/rest/httpx"
 	"secret-im/service/signalserver/cmd/api/internal/svc"
 	"secret-im/service/signalserver/cmd/api/internal/types"
+	shared "secret-im/service/signalserver/cmd/api/shared"
 	"secret-im/service/signalserver/cmd/api/textsecure"
 	"secret-im/service/signalserver/cmd/api/util"
-	"secret-im/service/signalserver/cmd/shared"
 	"strings"
 	"sync"
 
@@ -159,7 +159,7 @@ func WsConnectHandler(ctx *svc.ServiceContext) http.HandlerFunc {
 		conn, err := upgrader.Upgrade(w, r, nil)
 		if err != nil {
 			logx.Info(err)
-			err:=shared.NewCodeError(shared.ERRCODE_WSCONNECTERR,err.Error())
+			err:= shared.NewCodeError(shared.ERRCODE_WSCONNECTERR,err.Error())
 			httpx.Error(w, err)
 
 		}else{

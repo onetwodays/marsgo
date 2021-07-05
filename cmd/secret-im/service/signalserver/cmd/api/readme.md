@@ -45,3 +45,15 @@ api 后面接生成的语言，现支持go/java/typescript
 -api 自定义api所在路径
 -dir 自定义生成目录
 https://github.com/tal-tech/go-zero/blob/master/tools/goctl/config/readme.md
+
+
+{"@timestamp":"2021-07-05T20:58:04.810+08","level":"info","content":"消息已经推送至redis中，key is {liguozhen114}:1"}
+{"@timestamp":"2021-07-05T20:58:04.810+08","level":"info","content":"[Message] send message success delivered:true online:false destination:liguozhen114 FetchesMessages:true timestamp:1625489273757"}
+{"@timestamp":"2021-07-05T20:58:04.810+08","level":"info","content":"200 - /v1/messages/liguozhen114 - 192.168.0.211:53478 -  - 4.4ms","trace":"0d34de50f6014662","span":"0"}
+{"@timestamp":"2021-07-05T20:58:04.810+08","level":"info","content":"websocket经http处理后的响应是:{\"needsSync\":false}"}
+{"@timestamp":"2021-07-05T20:58:04.810+08","level":"info","content":"account:liguozhen114timestamp:1625489273757[Authenticated] deliver message"}
+{"@timestamp":"2021-07-05T20:58:04.810+08","level":"info","content":"[Client] send request to liguozhen114 id:3694562916659513808 verb:PUT path:/api/v1/message"}
+{"@timestamp":"2021-07-05T20:58:04.825+08","level":"info","content":"[Client] recv response from liguozhen114 WebSocketResponseMessage id:3694562916659513808"}
+{"@timestamp":"2021-07-05T20:58:04.825+08","level":"info","content":"[Authenticated] deliver message ackaccount:liguozhen114timestamp:1625489273757"}
+{"@timestamp":"2021-07-05T20:58:04.825+08","level":"info","content":" [Authenticated] send delivery receiptaccount:liguozhen114 timestamp:1625489273757"}
+{"@timestamp":"2021-07-05T20:58:04.826+08","level":"info","duration":"1.0ms","content":"sql query: liguozhen115"}

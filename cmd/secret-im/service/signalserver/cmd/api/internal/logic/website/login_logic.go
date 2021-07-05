@@ -4,7 +4,7 @@ import (
 	"context"
 	"github.com/dgrijalva/jwt-go"
 	"secret-im/service/signalserver/cmd/api/internal/model"
-	"secret-im/service/signalserver/cmd/shared"
+	shared "secret-im/service/signalserver/cmd/api/shared"
 	"strings"
 	"time"
 

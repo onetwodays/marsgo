@@ -1,20 +1,13 @@
 package chat
 
 import (
-	"context"
-	"github.com/tal-tech/go-zero/core/logx"
-	"github.com/tal-tech/go-zero/core/mapping"
-	"net/http"
-	"secret-im/service/signalserver/cmd/api/internal/entities"
-	"strings"
-
-	logic "secret-im/service/signalserver/cmd/api/internal/logic/textsecret_messages"
 	"secret-im/service/signalserver/cmd/api/internal/svc"
-	"secret-im/service/signalserver/cmd/api/internal/types"
 	"secret-im/service/signalserver/cmd/api/textsecure"
 )
 
 func PutMsgHandler(req *textsecure.WebSocketMessage,svc *svc.ServiceContext,sender string) (*textsecure.WebSocketMessage,error){
+	/*
+	
 	var putMesReq types.PutMessagesReq
 	// Unmarshal to json object
 	err:=mapping.UnmarshalJsonBytes(req.Request.Body,&putMesReq)
@@ -51,6 +44,7 @@ func PutMsgHandler(req *textsecure.WebSocketMessage,svc *svc.ServiceContext,send
 		NeedsSync: putMsgRes.NeedsSync,
 	}
 	return newWebSocketMessage(req,http.StatusOK,body),nil
-
+    */
+	return nil, nil
 
 }

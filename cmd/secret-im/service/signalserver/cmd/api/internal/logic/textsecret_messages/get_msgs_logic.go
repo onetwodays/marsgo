@@ -2,10 +2,9 @@ package logic
 
 import (
 	"context"
-	"secret-im/service/signalserver/cmd/shared"
-
 	"secret-im/service/signalserver/cmd/api/internal/svc"
 	"secret-im/service/signalserver/cmd/api/internal/types"
+	shared "secret-im/service/signalserver/cmd/api/shared"
 
 	"github.com/tal-tech/go-zero/core/logx"
 )

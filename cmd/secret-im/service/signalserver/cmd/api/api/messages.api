@@ -20,7 +20,6 @@ type PutMessagesReq{
 }
 type PutMessagesRes{
     NeedsSync bool `json:"needsSync"`
-    DestContent [][]byte `json:"destContent,optional"`
 }
 
 
@@ -77,6 +76,7 @@ type (
 @server(
     //jwt: Auth
     //middleware:UserNameCheck
+    middleware :CheckBasicAuth
     group: textsecret_messages
 
 )

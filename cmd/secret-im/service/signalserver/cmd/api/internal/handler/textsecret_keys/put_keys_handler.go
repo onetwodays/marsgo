@@ -3,11 +3,10 @@ package handler
 import (
 	"github.com/tal-tech/go-zero/core/logx"
 	"net/http"
-	"secret-im/service/signalserver/cmd/shared"
-
 	"secret-im/service/signalserver/cmd/api/internal/logic/textsecret_keys"
 	"secret-im/service/signalserver/cmd/api/internal/svc"
 	"secret-im/service/signalserver/cmd/api/internal/types"
+	shared "secret-im/service/signalserver/cmd/api/shared"
 
 	"github.com/tal-tech/go-zero/rest/httpx"
 )
@@ -27,7 +26,7 @@ func PutKeysHandler(ctx *svc.ServiceContext) http.HandlerFunc {
 			logx.Error("l.PutKeys(adxName,req) error:",err)
 			httpx.Error(w, err)
 		} else {
-			httpx.OkJson(w,shared.NewOkResponse(nil))
+			httpx.OkJson(w, shared.NewOkResponse(nil))
 		}
 	}
 }

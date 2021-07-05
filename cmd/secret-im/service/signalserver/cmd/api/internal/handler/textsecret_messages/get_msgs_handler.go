@@ -1,12 +1,11 @@
 package handler
 
 import (
-	"net/http"
-	"secret-im/service/signalserver/cmd/shared"
-
 	"github.com/tal-tech/go-zero/rest/httpx"
+	"net/http"
 	"secret-im/service/signalserver/cmd/api/internal/logic/textsecret_messages"
 	"secret-im/service/signalserver/cmd/api/internal/svc"
+	shared "secret-im/service/signalserver/cmd/api/shared"
 )
 
 func GetMsgsHandler(ctx *svc.ServiceContext) http.HandlerFunc {

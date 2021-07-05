@@ -390,7 +390,7 @@ func (handler *AuthenticatedHandler) handleSendMessage() {
 			data := request.(*textsecure.ChannelEnvelope)
 			handler.sendChannelMessage(data)
 		case sendMessageRequest:
-			data := request.(*sendMessageRequest)
+			data := request.(sendMessageRequest)
 			handler.sendMessage(data.message, data.info, data.requery)
 		}
 	}

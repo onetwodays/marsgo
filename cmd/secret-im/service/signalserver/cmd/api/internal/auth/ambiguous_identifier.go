@@ -9,13 +9,13 @@ type AmbiguousIdentifier struct {
 }
 
 // 创建模糊身份
-func NewAmbiguousIdentifier(target string) AmbiguousIdentifier {
+func NewAmbiguousIdentifier(target string) *AmbiguousIdentifier {
 	if strings.Contains(target,`-`) {
-		return AmbiguousIdentifier{
+		return &AmbiguousIdentifier{
 			UUID: target,
 		}
 	}
-	return AmbiguousIdentifier{
+	return &AmbiguousIdentifier{
 		Number: target,
 	}
 }

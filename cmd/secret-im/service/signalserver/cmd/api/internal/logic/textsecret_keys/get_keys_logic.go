@@ -5,7 +5,7 @@ import (
 	"encoding/json"
 	"secret-im/service/signalserver/cmd/api/internal/svc"
 	"secret-im/service/signalserver/cmd/api/internal/types"
-	"secret-im/service/signalserver/cmd/shared"
+	shared "secret-im/service/signalserver/cmd/api/shared"
 	"strconv"
 
 	"github.com/tal-tech/go-zero/core/logx"

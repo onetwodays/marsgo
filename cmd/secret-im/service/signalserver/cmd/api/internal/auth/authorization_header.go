@@ -30,7 +30,7 @@ func (authorizationHeader *AuthorizationHeader) FromFullHeader(header string) (*
 	if err != nil || len(concatenatedValues) == 0 {
 		return nil, errors.New("invalid authorization header")
 	}
-	logx.Infof("basic auth valus is (%s)",string(concatenatedValues))
+	logx.Info("basic auth valus is ",string(concatenatedValues))
 
 	credentialParts := strings.Split(string(concatenatedValues), ":")
 	if len(credentialParts) < 2 {
@@ -52,7 +52,7 @@ func (authorizationHeader *AuthorizationHeader) FromUserAndPassword(user, pwd st
 			return nil, err
 		}
 	}
-	authorizationHeader.Identifier = NewAmbiguousIdentifier(numberAndID[0])
+	authorizationHeader.Identifier = *NewAmbiguousIdentifier(numberAndID[0])
 	authorizationHeader.DeviceID = deviceID
 	authorizationHeader.Password = pwd
 	return authorizationHeader, nil

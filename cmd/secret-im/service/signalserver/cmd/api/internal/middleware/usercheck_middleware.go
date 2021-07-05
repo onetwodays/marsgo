@@ -3,10 +3,10 @@ package middleware
 import (
 	"encoding/json"
 	"fmt"
+	shared "secret-im/service/signalserver/cmd/api/shared"
 
 	"github.com/tal-tech/go-zero/rest/httpx"
 	"net/http"
-	"secret-im/service/signalserver/cmd/shared"
 )
 
 var (

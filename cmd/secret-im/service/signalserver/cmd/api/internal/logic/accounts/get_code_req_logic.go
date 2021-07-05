@@ -8,8 +8,8 @@ import (
 	"net/http"
 	"secret-im/service/signalserver/cmd/api/internal/auth"
 	"secret-im/service/signalserver/cmd/api/internal/model"
+	shared "secret-im/service/signalserver/cmd/api/shared"
 	"secret-im/service/signalserver/cmd/api/util"
-	"secret-im/service/signalserver/cmd/shared"
 	"time"
 
 	"secret-im/service/signalserver/cmd/api/internal/svc"

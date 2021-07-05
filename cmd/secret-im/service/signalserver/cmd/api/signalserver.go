@@ -11,8 +11,8 @@ import (
 	"secret-im/service/signalserver/cmd/api/chat"
 	"secret-im/service/signalserver/cmd/api/internal/storage"
 	"secret-im/service/signalserver/cmd/api/middleware"
+	shared "secret-im/service/signalserver/cmd/api/shared"
 	"secret-im/service/signalserver/cmd/api/websocket"
-	"secret-im/service/signalserver/cmd/shared"
 	"strings"
 
 	"github.com/tal-tech/go-zero/rest"
@@ -78,7 +78,7 @@ func main() {
 		switch e:=err.(type) {
 		case *shared.CodeError:
 			return http.StatusOK,e.Data() //一律返回200,具体有没有错误，要看报文体的body里的code
-		case *shared.ResponseStatus:  //根据具体的情况，返回不同的http状态码
+		case *shared.ResponseStatus: //根据具体的情况，返回不同的http状态码
 			return e.Code,e
 		default:
 			return http.StatusInternalServerError,err
@@ -101,7 +101,7 @@ func main() {
 
 		server.AddRoute(rest.Route{
 			Method:  http.MethodGet,
-			Path:    "/v3/websocket",
+			Path:    "/v1/websocket",
 			Handler: websocket.WsAcceptHandler,
 		})
 

@@ -1,6 +1,9 @@
 package entities
 
-import "secret-im/pkg/utils-tools"
+import (
+	"secret-im/pkg/utils-tools"
+	"secret-im/service/signalserver/cmd/api/internal/auth"
+)
 
 // 帐号信息
 type Account struct {
@@ -59,6 +62,16 @@ func (account *Account) GetDevice(deviceID int64) (*DeviceFull, bool) {
 	return nil, false
 }
 
+// 获取启动设备数
+func (account *Account) GetEnabledDeviceCount() int {
+	var count int
+	for _, device := range account.Devices {
+		if device.IsEnabled() {
+			count++
+		}
+	}
+	return count
+}
 
 
 // 获取主设备
@@ -74,4 +87,15 @@ func (account *Account) IsEnabled() bool {
 	}
 	return masterDevice.IsEnabled() &&
 		masterDevice.LastSeen > (utils.CurrentTimeMillis()-utils.DaysToMillis(365))
+}
+
+// 是否自己
+func (account *Account) IsFor(identifier *auth.AmbiguousIdentifier) bool {
+	if len(identifier.UUID) != 0 {
+		return account.UUID == identifier.UUID
+	}
+	if len(identifier.Number) != 0 {
+		return account.Number == identifier.Number
+	}
+	return false
 }

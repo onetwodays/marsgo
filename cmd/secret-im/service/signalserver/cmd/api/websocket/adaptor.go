@@ -2,11 +2,13 @@ package websocket
 
 import (
 	"context"
+	"github.com/tal-tech/go-zero/core/logx"
 	"io"
 	"net/http"
 	"net/url"
+	shared "secret-im/service/signalserver/cmd/api/shared"
 	"secret-im/service/signalserver/cmd/api/textsecure"
-	factory2 "secret-im/service/signalserver/cmd/api/websocket/factory"
+	"secret-im/service/signalserver/cmd/api/websocket/factory"
 	"strings"
 )
 
@@ -110,12 +112,20 @@ func HandleHTTPRequest(ctx *SessionContext, h http.Handler,
 	r.Body = &netHTTPBody{request.Body}
 	rURL, err := url.ParseRequestURI(r.RequestURI)
 	if err != nil {
-		return factory2.CreateResponse(request.GetId(), http.StatusNotFound, err.Error(), nil, nil)
+		return factory.CreateResponse(request.GetId(), http.StatusNotFound, err.Error(), nil, nil)
 	}
 	r.URL = rURL
 
 	w := netHTTPResponseWriter{statusCode: http.StatusOK}
-	h.ServeHTTP(&w, r.WithContext(context.WithValue(context.Background(), "ws", ctx)))
+	// 是来自ws的请求，这里上下文都设置几个值
+	c:=context.WithValue(context.Background(), "ws", ctx)
+	if ctx.Device!=nil{
+		c= context.WithValue(c, shared.CONTENTKEYUUID,ctx.Device.UUID)
+		c= context.WithValue(c, shared.CONTENTKEYDEVICEID,ctx.Device.Device.ID)
+	}
+
+
+	h.ServeHTTP(&w, r.WithContext(c))
 
 	headers := make([]string, 0)
 	for name, items := range w.Header() {
@@ -123,5 +133,10 @@ func HandleHTTPRequest(ctx *SessionContext, h http.Handler,
 			headers = append(headers, name+":"+val)
 		}
 	}
-	return factory2.CreateResponse(request.GetId(), w.statusCode, "", headers, w.body)
+	if w.StatusCode()!=http.StatusOK{
+		logx.Error("websocket经http处理后的响应是:",string(w.body))
+	}else{
+		logx.Info("websocket经http处理后的响应是:",string(w.body))
+	}
+	return factory.CreateResponse(request.GetId(), w.statusCode, "", headers, w.body)
 }

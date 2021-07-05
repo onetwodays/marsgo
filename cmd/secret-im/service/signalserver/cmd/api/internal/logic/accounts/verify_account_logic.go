@@ -12,10 +12,10 @@ import (
 	"secret-im/service/signalserver/cmd/api/internal/auth"
 	"secret-im/service/signalserver/cmd/api/internal/entities"
 	"secret-im/service/signalserver/cmd/api/internal/model"
-	"secret-im/service/signalserver/cmd/shared"
-
+	"secret-im/service/signalserver/cmd/api/internal/storage"
 	"secret-im/service/signalserver/cmd/api/internal/svc"
 	"secret-im/service/signalserver/cmd/api/internal/types"
+	shared "secret-im/service/signalserver/cmd/api/shared"
 
 	"github.com/tal-tech/go-zero/core/logx"
 )
@@ -72,7 +72,7 @@ func (l *VerifyAccountLogic) VerifyAccount(reqheader http.Header,req types.Verif
 	if err!=nil && err!=sqlx.ErrNotFound{
 		reason:=fmt.Sprintf("error:%s,%s is  exist",err.Error(),number)
 		logx.Error(reason)
-		return nil,shared.Status(http.StatusInternalServerError,reason)
+		return nil, shared.Status(http.StatusInternalServerError,reason)
 	}
 
 	//4.帐号存在时,验证pin码，pin码验证通过之后，要更新一下帐号系统
@@ -84,7 +84,7 @@ func (l *VerifyAccountLogic) VerifyAccount(reqheader http.Header,req types.Verif
 	}
 
 	userAgent := reqheader.Get("User-Agent")
-	dbNewaccount,err:=l.createDBAccount(number,authorizationHeader.Password,userAgent,accountAttr)
+	dbNewaccount,err:=storage.AccountManager{}.CreateDBAccount(number,authorizationHeader.Password,userAgent,accountAttr)
 
 	err = l.createOrUpdate(dbAccount!=nil,dbNewaccount)
 	if err != nil {
@@ -178,7 +178,7 @@ func (l *VerifyAccountLogic) checkPin(number string,
 	appAccount:=&entities.Account{}
 	err:=json.Unmarshal([]byte(dbAccount.Data.String),appAccount)
 	if err!=nil{
-		return false,shared.Status(http.StatusInternalServerError,err.Error())
+		return false, shared.Status(http.StatusInternalServerError,err.Error())
 	}
 
 	//如果帐号有pin码或者有注册锁，且距第一次登录<7 天，
@@ -205,7 +205,7 @@ func (l *VerifyAccountLogic) checkPin(number string,
 		if len(accountAttributes.Pin) == 0 && len(accountAttributes.RegistrationLock)==0 {
 			// 注册锁定失败
 			logx.Errorf("告诉客户端注册锁定:%s",reason)
-			return false,shared.Status(http.StatusLocked,reason)
+			return false, shared.Status(http.StatusLocked,reason)
 		}
 
 		/*
@@ -227,7 +227,7 @@ func (l *VerifyAccountLogic) checkPin(number string,
 
 		if !pinMatches{
 			logx.Infof("%s","pin not match")
-			return false,shared.Status(http.StatusLocked,reason)
+			return false, shared.Status(http.StatusLocked,reason)
 		}
 		//c.rateLimiters.PinLimiter.Clear(number)
 	}
