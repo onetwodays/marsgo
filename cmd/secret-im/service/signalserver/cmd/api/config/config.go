@@ -60,4 +60,8 @@ type Config struct {
 		ExpiresDays int
 	}
 
+	MessageCache struct{
+		PersistDelayMinutes int64
+	}
+
 }

@@ -206,12 +206,14 @@ func (session *Session) handleRead() {
 	for {
 		messageType, data, err := session.conn.ReadMessage()
 		if err != nil {
+			logx.Error("websocket读消息发生错误:",err)
 			closeErr, ok := err.(*websocket.CloseError)
 			if ok {
 				code, text = closeErr.Code, closeErr.Text
 			} else {
 				code, text = websocket.CloseTryAgainLater, err.Error()
 			}
+			break
 		}
 		switch messageType {
 		case websocket.PingMessage:
@@ -256,8 +258,10 @@ func (session *Session) handleRequest(request *textsecure.WebSocketRequestMessag
 	if session.context.Device != nil {
 		number = session.context.Device.Number
 	}
-	logx.Infof("{handle request from account:%s,id:%d,verb:%s,path:%s", number, request.GetId(), request.GetVerb(), request.GetPath())
+
 	message := HandleHTTPRequest(session.context, session.router, request)
+	logx.Infof("handle ws request from account:%s,id:%d,verb:%s,path:%s", number, request.GetId(), request.GetVerb(), request.GetPath())
+	logx.Info("ws response:",message.String())
 	if data, err := proto.Marshal(message); err != nil {
 		session.Send(data)
 	}

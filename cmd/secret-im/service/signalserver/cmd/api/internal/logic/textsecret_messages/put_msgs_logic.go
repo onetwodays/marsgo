@@ -36,7 +36,6 @@ func NewPutMsgsLogic(ctx context.Context, svcCtx *svc.ServiceContext) PutMsgsLog
 }
 
 func (l *PutMsgsLogic) PutMsgs(r *http.Request, sender string, req types.PutMessagesReq) (*types.PutMessagesRes, error) {
-	// todo: add your logic here and delete this line
 
 	header := r.Header.Get(helper.UNIDENTIFIED)
 	accessKey, _ := auth.NewAnonymous(header)
@@ -98,83 +97,6 @@ func (l *PutMsgsLogic) PutMsgs(r *http.Request, sender string, req types.PutMess
 				return nil, shared.Status(http.StatusNotFound, err.Error())
 			}
 		}
-
-		/*
-			//如果在线，直接通过websocket推送出去
-				//todo:send to redis
-
-				row:=&model.TMessages{}
-				row.Type=int64(msg.Type)
-				row.Source= sender
-				row.SourceUuid=account.Uuid
-				row.SourceDevice=1
-				row.Destination=req.Destination
-				row.DestinationDevice=int64(msg.DestinationDeviceId)
-				row.Timestamp=req.Timestamp
-				row.Message="miss"//msg.Body
-				row.Content=msg.Content  //
-				row.Relay=msg.Relay
-				row.Guid=utils.NewUuid() //消息的全局uuid
-				row.Ctime=time.Now()
-
-				if !online {
-					_,err:=l.svcCtx.MsgsModel.Insert(*row)
-					if err!=nil{
-						return nil, shared.NewCodeError(shared.ERRCODE_SQLINSERT,err.Error())
-					}
-				} else {
-					//if isOnline {
-					if true {
-						content,_ :=base64.StdEncoding.DecodeString(msg.Content)
-						envelopePf:=&textsecure.Envelope{}
-						envelopePf.Type=textsecure.GetEnvelopeType(msg.Type)
-						envelopePf.SourceDevice=1
-						envelopePf.Source=sender
-						envelopePf.ServerGuid=row.Guid
-						envelopePf.SourceUuid=account.Uuid
-						envelopePf.ServerTimestamp=uint64(now)
-						envelopePf.Timestamp=uint64(req.Timestamp)
-						envelopePf.Relay=row.Relay
-						//envelopePf.LegacyMessage=[]byte(row.Message)
-						envelopePf.Content=content
-						logx.Info("收件人的envelop:",envelopePf.String())
-						contentPf,err:=proto.Marshal(envelopePf)
-						if err!=nil{
-							logx.Error("proto.Marshal(envelopePf):",err)
-						}else{
-							websocketReq:=&textsecure.WebSocketRequestMessage{}
-							websocketReq.Id=msgId
-							websocketReq.Headers=[]string{"X-Signal-Key: false","X-Signal-Timestamp:"+fmt.Sprintf("%d",now)}
-							websocketReq.Path="/api/v1/message"
-							websocketReq.Verb="PUT"
-							websocketReq.Body=contentPf
-
-							websocketMsg:=&textsecure.WebSocketMessage{}
-
-							websocketMsg.Type=textsecure.WebSocketMessage_REQUEST
-							websocketMsg.Request=websocketReq
-							logx.Info("收件人最外层:",websocketMsg.String())
-							msg,err:=proto.Marshal(websocketMsg)
-
-							//pubsubMsg:=&textsecure.PubSubMessage{}
-							//pubsubMsg.Type=textsecure.PubSubMessage_DELIVER
-							//pubsubMsg.Content=contentPf
-							//logx.Info("收件人最外层:",pubsubMsg.String())
-							//msg,err:=proto.Marshal(pubsubMsg)
-
-
-							if err!=nil{
-								logx.Infof("proto.Marshal(websocketMsg) error:",err.Error() )
-							}else{
-								destContent=append(destContent,msg)
-
-							}
-						}
-					}else{
-						logx.Infof("destination is not online,not need websocket send,test brocast" )
-					}
-				}
-		*/
 	}
 
 	needsSync := !isSyncMessage && source != nil && source.GetEnabledDeviceCount() > 1
@@ -214,7 +136,7 @@ func (l *PutMsgsLogic) sendMessage(source,
 	}
 	delivered, err := l.svcCtx.PushSender.SendMessage(destinationAccount.Number, destinationDevice, messageBuilder, online)
 	if err == nil {
-		logx.Info("[Message] send message success",
+		logx.Info("[put_msg_logic] send message success",
 			" delivered:", delivered,
 			" online:", online,
 			" destination:", destinationAccount.Number,

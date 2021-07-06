@@ -46,5 +46,7 @@ ServerCertificate:
   Certificate: CiUIDBIhBbTz4h1My+tt+vw+TVscgUe/DeHS0W02tPWAWbTO2xc3EkD+go4bJnU0AcnFfbOLKoiBfCzouZtDYMOVi69rE7r4U9cXREEqOkUmU2WJBjykAxWPCcSTmVTYHDw7hkSp/puG
   PrivateKey: ABOxG29xrfq4E7IrW11Eg7+HBbtba9iiS0500YoBjn4=
   ExpiresDays: 365
+MessageCache:
+  PersistDelayMinutes: 30
 
 

@@ -1,7 +1,6 @@
 package handler
 
 import (
-	"github.com/tal-tech/go-zero/core/logx"
 	"net/http"
 	"secret-im/service/signalserver/cmd/api/internal/logic/textsecret_messages"
 	"secret-im/service/signalserver/cmd/api/internal/svc"
@@ -24,7 +23,6 @@ func PutMsgsHandler(ctx *svc.ServiceContext) http.HandlerFunc {
 		l := logic.NewPutMsgsLogic(r.Context(), ctx)
 		resp, err := l.PutMsgs(r,adxName,req)
 		if err != nil {
-			logx.Error("122222",err)
 			httpx.Error(w, err)
 		} else {
 			httpx.OkJson(w, resp)

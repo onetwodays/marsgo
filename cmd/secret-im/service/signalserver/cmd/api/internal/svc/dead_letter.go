@@ -35,13 +35,10 @@ func (DeadLetterHandler) OnDispatchMessage(channel string, message *textsecure.P
 		return
 	}
 
-
 	err = storage.MessagesManager{}.Insert(address.Number, address.DeviceID, &envelope)
 	if err != nil {
 		logx.Info("[DeadLetterHandler] failed to storage message"," channel:",channel)
 	}
-
-
 }
 
 // 订阅成功

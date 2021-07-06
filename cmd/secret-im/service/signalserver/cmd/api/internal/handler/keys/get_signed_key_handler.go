@@ -3,7 +3,6 @@ package handler
 import (
 	"github.com/tal-tech/go-zero/rest/httpx"
 	"net/http"
-	"secret-im/service/signalserver/cmd/api/internal/entities"
 	"secret-im/service/signalserver/cmd/api/internal/logic/keys"
 	"secret-im/service/signalserver/cmd/api/internal/svc"
 	shared "secret-im/service/signalserver/cmd/api/shared"
@@ -19,7 +18,7 @@ func GetSignedKeyHandler(ctx *svc.ServiceContext) http.HandlerFunc {
 			return
 		}
 
-		resp, err := l.GetSignedKey(appAccount.(*entities.Account))
+		resp, err := l.GetSignedKey(r)
 		if err != nil {
 			httpx.Error(w, err)
 		} else {

@@ -56,11 +56,9 @@ type GetProfileKeyRes{
 }
 
 
-
-
 @server(
     //jwt: Auth
-    //middleware:UserNameCheck
+    middleware : CheckBasicAuth
     group: textsecret_keys
 
 )

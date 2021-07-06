@@ -72,6 +72,14 @@ func NewServiceContext(c config.Config) *ServiceContext {
 		// PoolSize: 0,
 		//MinIdleConns: 32,
 	})
+	pingRes:=redisClient.Ping()
+	if pingRes.Err()!=nil{
+		logx.Error("ping redis error:",pingRes.Err())
+		return nil
+	}else{
+		logx.Info(pingRes.String())
+	}
+
 
 
 	redisOperation, err := push.NewRedisOperation(redisClient)

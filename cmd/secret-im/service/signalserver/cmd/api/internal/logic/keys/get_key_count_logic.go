@@ -25,9 +25,15 @@ func NewGetKeyCountLogic(ctx context.Context, svcCtx *svc.ServiceContext) GetKey
 	}
 }
 
-func (l *GetKeyCountLogic) GetKeyCount(appAccount *entities.Account) (*types.PreKeyCountx, error) {
-	// todo: add your logic here and delete this line
-	count,err:=l.svcCtx.KeysModel.CountKey(appAccount.Number,appAccount.AuthenticatedDevice.ID)
+func (l *GetKeyCountLogic) GetKeyCount(r *http.Request) (*types.PreKeyCountx, error) {
+	appAccount := r.Context().Value(shared.HttpReqContextAccountKey)
+	if appAccount == nil {
+		reason := "check basic auth fail ,may by the handler not use middle"
+		logx.Error(reason)
+		return nil,shared.Status(http.StatusUnauthorized, reason)
+	}
+	account := appAccount.(*entities.Account)
+	count,err:=l.svcCtx.KeysModel.CountKey(account.Number,account.AuthenticatedDevice.ID)
 	if err!=nil{
 		return nil, shared.Status(http.StatusInternalServerError,err.Error())
 	}

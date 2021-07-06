@@ -129,14 +129,17 @@ func (r *RedisDispatchManager) startPolling() {
 
 			continue
 		}
+		logx.Info("[redis_dispatch]从redis读取到1条textsecure.PubSubMessage格式消息:" ,pubSubMessage.String())
 
 		value, ok := r.subscriptions.Load(message.Channel)
 		r.pool.Add(message.Channel, func() {
 			if !ok {
+				logx.Error("信道",message.Channel,"找不到，启用默认信道")
 				if r.deadLetterChannel != nil {
 					r.deadLetterChannel.OnDispatchMessage(message.Channel, &pubSubMessage)
 				}
 			} else {
+				logx.Info("[redis_dispatch]已交给信道 ",message.Channel," 处理")
 				value.(channel.DispatchChannel).OnDispatchMessage(message.Channel, &pubSubMessage)
 			}
 		})

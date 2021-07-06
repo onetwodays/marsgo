@@ -10,6 +10,7 @@ import (
 	"secret-im/common"
 	"secret-im/service/signalserver/cmd/api/chat"
 	"secret-im/service/signalserver/cmd/api/internal/storage"
+	"secret-im/service/signalserver/cmd/api/jobs"
 	"secret-im/service/signalserver/cmd/api/middleware"
 	shared "secret-im/service/signalserver/cmd/api/shared"
 	"secret-im/service/signalserver/cmd/api/websocket"
@@ -45,7 +46,7 @@ func main() {
 		fmt.Println("new service context error ")
 	}
 
-	storage.InitStorage(ctx.RedisClient,ctx.AccountsModel,ctx.MsgsModel)
+
 
 	server := rest.MustNewServer(config.AppConfig.RestConf, rest.WithRouter(rt)) //url 不存在时会报 服务器开小差了,这里可定制
 	//server := rest.MustNewServer(c.RestConf) //url 不存在时默认会报 404 page not found
@@ -88,7 +89,7 @@ func main() {
 
 
 
-
+	storage.InitStorage(ctx.RedisClient,ctx.AccountsModel,ctx.MsgsModel)
     //websocket server.调试使用，可以通过网页看到ws结果，生产环境要关闭
     if isStartWss{
 
@@ -115,10 +116,15 @@ func main() {
 	})
 
 	 */
+	js:=startJobs(ctx)
 
 
 	fmt.Printf("Starting server at %s:%d...\n", config.AppConfig.Host, config.AppConfig.Port)
 	server.Start()
+
+	for _,job:=range js{
+		job.Stop()
+	}
 
 
 }
@@ -150,6 +156,17 @@ func registerDirHandlers(engine *rest.Server) {
 
 		logx.Infof("register dir  %s  %s", path,dirpath)
 	}
+}
+
+func startJobs(serverCtx *svc.ServiceContext) []jobs.Job {
+	//消息持久化作业
+	messagePersistJob := jobs.NewMessagePersistJob(serverCtx.PushSender, serverCtx.PubSubManager)
+	if err:=messagePersistJob.Start();err!=nil{
+		logx.Error("[Main] failed to start message persist job,reason:",err)
+		panic(err)
+	}
+	js:=[]jobs.Job{messagePersistJob}
+	return js
 }
 
 

@@ -90,6 +90,38 @@ type VerifyAccountRes struct {
 	UUID string `json:"uuid"`
 }
 
+type SetAttributesReq struct {
+	SignalingKey                   string             `json:"signalingKey,optional"`
+	FetchesMessages                bool               `json:"fetchesMessages"`
+	RegistrationID                 int                `json:"registrationId"`
+	Name                           string             `json:"name,optional"`
+	Pin                            string             `json:"pin,optional"`
+	RegistrationLock               string             `json:"registrationLock,optional"`
+	UnidentifiedAccessKey          string             `json:"unidentifiedAccessKey,optional"`
+	UnrestrictedUnidentifiedAccess bool               `json:"unrestrictedUnidentifiedAccess,optional"`
+	Capabilities                   DeviceCapabilities `json:"capabilities,optional"`
+}
+
+type DeprecatedPin struct {
+	Pin string `json:"pin"`
+}
+
+type RegistrationLock struct {
+	RegistrationLock string `json:"registrationLock"`
+}
+
+type DeviceName struct {
+	DeviceName string `json:"deviceName"`
+}
+
+type AccountCreationResult struct {
+	UUID string `json:"uuid"`
+}
+
+type GcmRegistrationID struct {
+	GcmRegistrationID string `json:"gcmRegistrationId"`
+}
+
 type JwtTokenAdx struct {
 	AccessToken  string `json:"accessToken,omitempty"`
 	AccessExpire int64  `json:"accessExpire,omitempty"`

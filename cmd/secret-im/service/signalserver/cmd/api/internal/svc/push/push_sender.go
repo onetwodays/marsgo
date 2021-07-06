@@ -2,7 +2,6 @@ package push
 
 import (
 	"errors"
-	"github.com/tal-tech/go-zero/core/logx"
 	"secret-im/service/signalserver/cmd/api/internal/svc/pubsub"
 
 	"secret-im/service/signalserver/cmd/api/internal/entities"
@@ -40,7 +39,6 @@ func (sender *Sender) SendMessage(number string, device *entities.Device,
 	} else if len(device.ApnID)!=0 {
 		return sender.sendApnMessage(number, device, message, online)
 	} else if device.FetchesMessages {
-		logx.Info("xixixixixixi")
 		return sender.websocketSender.SendMessage(number, device.ID, message, ChannelTypeWEB, online)
 	} else {
 		return false, errors.New("not implemented")

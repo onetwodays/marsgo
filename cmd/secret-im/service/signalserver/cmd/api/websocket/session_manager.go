@@ -9,7 +9,7 @@ import (
 	"secret-im/service/signalserver/cmd/api/internal/svc"
 	"secret-im/service/signalserver/cmd/api/internal/svc/pubsub"
 	"secret-im/service/signalserver/cmd/api/internal/svc/push"
-	shared "secret-im/service/signalserver/cmd/api/shared"
+	"secret-im/service/signalserver/cmd/api/shared"
 	"sync"
 	"sync/atomic"
 )
@@ -156,7 +156,7 @@ func (manager *SessionManager) onClosed(id int64, code int, text string) error {
 	}
 
 	if ok && session != nil {
-		logx.Infof("[Websocket] connection closed[id:%d,count:%d,code:%d,text:%s]", id, count, code, text)
+		logx.Infof("[SessionManager Websocket] connection closed[sessionId:%d, total session count:%d,code:%d,text:%s]", id, count, code, text)
 	}
 	return nil
 }

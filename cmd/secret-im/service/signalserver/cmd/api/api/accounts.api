@@ -46,6 +46,44 @@ type VerifyAccountRes{
 }
 
 
+type SetAttributesReq{
+    SignalingKey string `json:"signalingKey,optional"`
+    FetchesMessages                bool                `json:"fetchesMessages"`
+    RegistrationID                 int                 `json:"registrationId"`
+    Name                           string              `json:"name,optional"`
+    Pin                            string              `json:"pin,optional"`
+    RegistrationLock               string              `json:"registrationLock,optional"`
+    UnidentifiedAccessKey          string              `json:"unidentifiedAccessKey,optional"`
+    UnrestrictedUnidentifiedAccess bool                `json:"unrestrictedUnidentifiedAccess,optional"`
+    Capabilities                   DeviceCapabilities  `json:"capabilities,optional"`
+}
+
+// PIN码
+type DeprecatedPin  {
+    Pin string `json:"pin"`
+}
+
+// 注册锁
+type RegistrationLock  {
+    RegistrationLock string `json:"registrationLock"`
+}
+
+// 设备名称
+type DeviceName {
+    DeviceName string `json:"deviceName"`
+}
+
+
+// 帐号创建结果
+type AccountCreationResult  {
+    UUID string `json:"uuid"`
+}
+
+// GCM注册ID
+type GcmRegistrationID  {
+    GcmRegistrationID string `json:"gcmRegistrationId"`
+}
+
 
 
 
@@ -65,8 +103,39 @@ service signalserver-api {
     group: accounts
 )
 service signalserver-api {
-    @handler TestHandler
-    get /v2/accounts/:transport/code/:number (GetCodeReq) returns ()
+    @handler SetattributesHandler
+    put /v1/accounts/attributes (SetAttributesReq) returns ()
+
+    @handler SetPinHandler
+    put /v1/accounts/pin (DeprecatedPin) returns ()
+
+    @handler DelPinHandler
+    delete /v1/accounts/pin () returns ()
+
+    @handler SetRegLockHandler
+    put /v1/accounts/registration_lock (RegistrationLock) returns ()
+
+    @handler DelRegLockHandler
+    delete /v1/accounts/registration_lock () returns ()
+
+    @handler SetDeviceNameHandler
+    put /v1/accounts/name (DeviceName) returns ()
+
+
+    @handler DelSignlingKeyHandler
+    delete /v1/accounts/signaling_key () returns ()
+
+    @handler GetWhoamiHandler
+    get /v1/accounts/whoami () returns (AccountCreationResult)
+
+
+    @handler SetGcmRegistrationIDHandler
+    put /v1/accounts/gcm (GcmRegistrationID) returns ()
+
+    @handler DelGcmRegistrationIDHandler
+    delete /v1/accounts/gcm () returns ()
+
+
 }
 
 

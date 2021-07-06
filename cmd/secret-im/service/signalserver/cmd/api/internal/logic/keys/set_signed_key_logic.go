@@ -26,15 +26,21 @@ func NewSetSignedKeyLogic(ctx context.Context, svcCtx *svc.ServiceContext) SetSi
 	}
 }
 
-func (l *SetSignedKeyLogic) SetSignedKey(req types.SignedPrekey,appAccount *entities.Account) error {
-	// todo: add your logic here and delete this line
+func (l *SetSignedKeyLogic) SetSignedKey(r *http.Request,req types.SignedPrekey) error {
+	appAccount := r.Context().Value(shared.HttpReqContextAccountKey)
+	if appAccount == nil {
+		reason := "check basic auth fail ,may by the handler not use middle"
+		logx.Error(reason)
+		return shared.Status(http.StatusUnauthorized, reason)
+	}
+	account := appAccount.(*entities.Account)
 
-	appAccount.AuthenticatedDevice.SignedPreKey = & types.SignedPrekey{
+	account.AuthenticatedDevice.SignedPreKey = & types.SignedPrekey{
 		PublicKey:req.PublicKey,
 		Signature: req.Signature,
 		KeyId: req.KeyId,
 	}
-	err := storage.AccountManager{}.Update(appAccount)
+	err := storage.AccountManager{}.Update(account)
 	if err !=nil{
 		return shared.Status(http.StatusInternalServerError,err.Error())
 	}

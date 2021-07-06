@@ -73,7 +73,8 @@ func (l *AdxUserLoginLogic) AdxUserLogin(req types.AdxUserLoginReq,userAgent str
 
 	dbNewaccount, err := storage.AccountManager{}.CreateDBAccount(req.Account, "1234",userAgent , accountAttr)
 
-	err = l.createOrUpdate(dbAccount != nil, dbNewaccount)
+	//err = l.createOrUpdate(dbAccount != nil, dbNewaccount)
+	err = l.createOrUpdate(false, dbNewaccount)
 	if err != nil {
 		return nil, err
 	}

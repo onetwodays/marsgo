@@ -54,28 +54,24 @@ type PreKeyCountx {
 
 )
 service signalserver-api {
+
+   // 设置密钥
     @handler PutKeysHandler
     put  /v3/keys (PutKeysReq) returns ()
-
+    // 获取密钥数量
     @handler GetKeyCountHandler
     get /v3/keys () returns (PreKeyCountx)
 
+    // 获取设备密钥
+    @handler GetDeviceKeysHandler
+    get /v3/keys/:identifier/:deviceId (GetKeysReqx) returns (GetKeysRes)
+
+    // 设置已签名密钥
     @handler SetSignedKeyHandler
     put /v3/keys/signed (SignedPrekey) returns ()
 
+    // 获取已签名密钥
     @handler GetSignedKeyHandler
     get /v3/keys/signed () returns (SignedPrekey)
 }
 
-@server(
-    //jwt: Auth
-
-    group: keys
-
-)
-service signalserver-api {
-
-    @handler GetDeviceKeysHandler
-    get /v3/keys/:identifier/:deviceId (GetKeysReqx) returns (GetKeysRes)
-
-}

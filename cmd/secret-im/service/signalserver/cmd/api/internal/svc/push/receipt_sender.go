@@ -29,14 +29,11 @@ func (sender *ReceiptSender) SendReceipt(number, uuid string, deviceID int64,
 	}
 
 	var message textsecure.Envelope
-	temp := uint64(timestamp)
-	typ := textsecure.Envelope_RECEIPT
-	sourceDeviceID := uint32(deviceID)
 	message.Source = number
 	message.SourceUuid = uuid
-	message.SourceDevice = sourceDeviceID
-	message.Timestamp = temp
-	message.Type = typ
+	message.SourceDevice =uint32(deviceID)
+	message.Timestamp = uint64(timestamp)
+	message.Type =textsecure.Envelope_RECEIPT
 
 	destinationDevices := destinationAccount.Devices
 	for _, destinationDevice := range destinationDevices {

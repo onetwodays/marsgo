@@ -1,11 +1,13 @@
 package storage
 
 import (
+	"encoding/base64"
 	"github.com/go-redis/redis"
 	uuid "github.com/satori/go.uuid"
 	"secret-im/service/signalserver/cmd/api/internal/model"
 	"secret-im/service/signalserver/cmd/api/internal/types"
 	"secret-im/service/signalserver/cmd/api/textsecure"
+	"time"
 )
 
 // MessagesManager 消息管理器
@@ -138,4 +140,32 @@ func (MessagesManager) DeleteBySender(destination string, destinationDevice int6
 	}
 	entity := constructEntityFromMessage(msg)
 	return entity, nil
+}
+func (MessagesManager) Store(guid string,message *textsecure.Envelope,destination string,destinationDevice int64)(*model.TMessages,error){
+	recode:=&model.TMessages{
+		Guid: guid,
+		Destination: destination,
+		DestinationDevice: destinationDevice,
+		Type: int64(message.GetType()),
+		Relay: message.GetRelay(),
+		Timestamp: int64(message.GetTimestamp()),
+		ServerTimestamp: int64(message.GetServerTimestamp()),
+		Source: message.GetSource(),
+		SourceDevice: int64(message.GetSourceDevice()),
+		Message: base64.StdEncoding.EncodeToString(message.GetLegacyMessage()),
+		Content: base64.StdEncoding.EncodeToString(message.GetContent()),
+		Ctime: time.Now(),
+	}
+
+	_,err:=internal.msgDB.Insert(*recode)
+	if err!=nil{
+		return nil,err
+	}
+
+	return recode,nil
+
+
+
+
+
 }

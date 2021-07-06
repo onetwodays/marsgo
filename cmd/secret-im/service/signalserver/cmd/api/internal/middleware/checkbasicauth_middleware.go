@@ -32,7 +32,9 @@ func (m *CheckBasicAuthMiddleware) Handle(next http.HandlerFunc) http.HandlerFun
 
 		r, err := m.basicAuth(r, true)
 		if err != nil {
-			httpx.Error(w, shared.Status(http.StatusUnauthorized, err.Error()))
+			e := shared.Status(http.StatusUnauthorized, err.Error())
+			logx.Error("CheckBasicAuthMiddleware fail:", e)
+			httpx.Error(w, e)
 			return
 		}
 		next(w, r)
@@ -51,7 +53,6 @@ func (m *CheckBasicAuthMiddleware) basicAuth(r *http.Request, enabledRequired bo
 	return r, nil
 }
 
-
 func (m *CheckBasicAuthMiddleware) BasicAuthByUserPasswd(user, passwd string, enabledRequired bool, ignorePassword ...bool) (*entities.Account, error) {
 
 	header, err := new(auth.AuthorizationHeader).FromUserAndPassword(user, passwd)
@@ -63,7 +64,7 @@ func (m *CheckBasicAuthMiddleware) BasicAuthByUserPasswd(user, passwd string, en
 
 func (m *CheckBasicAuthMiddleware) BasicAuthByHeader(r *http.Request, enabledRequired bool, ignorePassword ...bool) (*entities.Account, error) {
 
-	header:=new(auth.AuthorizationHeader)
+	header := new(auth.AuthorizationHeader)
 
 	ctx := r.Context().Value("ws")
 	if ctx != nil {
@@ -71,31 +72,39 @@ func (m *CheckBasicAuthMiddleware) BasicAuthByHeader(r *http.Request, enabledReq
 		uuid := r.Context().Value(shared.CONTENTKEYUUID)
 		deviceId := r.Context().Value(shared.CONTENTKEYDEVICEID)
 		if uuid != nil && deviceId != nil {
-			logx.Infof("2.从context拿uuid=%s和deviceid=%d来校验头",uuid,deviceId)
-			header.Identifier =  auth.AmbiguousIdentifier{
+			logx.Infof("2.从context拿uuid=%s和deviceid=%d来校验头", uuid, deviceId)
+			header.Identifier = auth.AmbiguousIdentifier{
 				UUID: uuid.(string),
 			}
-			header.DeviceID=deviceId.(int64)
+			header.DeviceID = deviceId.(int64)
 			logx.Info("3.websocket请求context,basicAuthForHeader.....")
 			return m.basicAuthForHeader(header, enabledRequired, ignorePassword...)
 		}
 	}
-	header, err := header.FromFullHeader(r.Header.Get(shared.AuthorizationHeader))
+	_, err := header.FromFullHeader(r.Header.Get(shared.AuthorizationHeader))
 	if err != nil {
+		logx.Error("header.FromFullHeader fail:", err, " 再次尝试自定义头")
+		//return nil, err
+	}
+
+	// 这里容错一下，防止有些头没有传进来
+	if len(header.Identifier.UUID) == 0 && len(header.Identifier.Number) == 0 {
+
+		logx.Error("header.Identifier.UUID 与header.Identifier.Number 都是空，已从x-user-name 取值，作为用户标识 ")
+		header.Identifier.Number = r.Header.Get(shared.HEADADXUSERNAME)
+		logx.Info(shared.HEADADXUSERNAME, "=", header.Identifier.Number)
+	}
+	if len(header.Identifier.Number) == 0 {
+		err = errors.New("x-user-name 值为空，报错")
+		logx.Error(err)
 		return nil, err
 	}
-	// 这里容错一下，防止有些头没有传进来
-	if len(header.Identifier.UUID)==0 && len(header.Identifier.Number) ==0{
-		logx.Error("header.Identifier.UUID 与header.Identifier.Number 都是空，已从x-user-name 取值，作为用户标识 ")
-		header.Identifier.Number=r.Header.Get(shared.HEADADXUSERNAME)
-	}
-	if header.DeviceID==0{
+	if header.DeviceID == 0 {
 		logx.Error("设备id=0,，已默认是1")
-		header.DeviceID=entities.DeviceMasterID
+		header.DeviceID = entities.DeviceMasterID
 	}
 	return m.basicAuthForHeader(header, enabledRequired, ignorePassword...)
 }
-
 
 // 更新活动日期
 func (m *CheckBasicAuthMiddleware) updateLastSeen(dbAccount *model.TAccounts,
@@ -136,8 +145,8 @@ func (m *CheckBasicAuthMiddleware) basicAuthForHeader(header *auth.Authorization
 		reason := fmt.Sprintf("account(%s) has no header setting device (%d)", number, header.DeviceID)
 		return nil, errors.New(reason)
 	}
-     // todo
-     enabledRequired=false
+	// todo
+	enabledRequired = false
 	if enabledRequired {
 		if !device.IsEnabled() {
 			reason := fmt.Sprintf("account(%s) has  header setting device (id=%d) is not enable", number, header.DeviceID)

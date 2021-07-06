@@ -2,7 +2,9 @@ package logic
 
 import (
 	"context"
+	"net/http"
 	"secret-im/service/signalserver/cmd/api/internal/entities"
+	"secret-im/service/signalserver/cmd/api/shared"
 
 	"secret-im/service/signalserver/cmd/api/internal/svc"
 	"secret-im/service/signalserver/cmd/api/internal/types"
@@ -24,15 +26,20 @@ func NewGetSignedKeyLogic(ctx context.Context, svcCtx *svc.ServiceContext) GetSi
 	}
 }
 
-func (l *GetSignedKeyLogic) GetSignedKey(appAccount *entities.Account) (*types.SignedPrekey, error) {
-	// todo: add your logic here and delete this line
+func (l *GetSignedKeyLogic) GetSignedKey(r *http.Request) (*types.SignedPrekey, error) {
+	appAccount := r.Context().Value(shared.HttpReqContextAccountKey)
+	if appAccount == nil {
+		reason := "check basic auth fail ,may by the handler not use middle"
+		logx.Error(reason)
+		return nil, shared.Status(http.StatusUnauthorized, reason)
+	}
+	account := appAccount.(*entities.Account)
 
-	device :=appAccount.AuthenticatedDevice
-	signedPreKey:=device.SignedPreKey
+	spk := account.AuthenticatedDevice.SignedPreKey
 
 	return &types.SignedPrekey{
-		PublicKey: signedPreKey.PublicKey,
-		KeyId: signedPreKey.KeyId,
-		Signature: signedPreKey.Signature,
+		PublicKey: spk.PublicKey,
+		KeyId:     spk.KeyId,
+		Signature: spk.Signature,
 	}, nil
 }

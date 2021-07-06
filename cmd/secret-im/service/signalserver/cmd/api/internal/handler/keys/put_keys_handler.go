@@ -1,20 +1,15 @@
 package handler
 
 import (
+	"github.com/tal-tech/go-zero/rest/httpx"
 	"net/http"
-	"secret-im/service/signalserver/cmd/api/internal/entities"
 	"secret-im/service/signalserver/cmd/api/internal/logic/keys"
 	"secret-im/service/signalserver/cmd/api/internal/svc"
 	"secret-im/service/signalserver/cmd/api/internal/types"
-	shared "secret-im/service/signalserver/cmd/api/shared"
-
-	"github.com/tal-tech/go-zero/rest/httpx"
 )
 
 func PutKeysHandler(ctx *svc.ServiceContext) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-
-
 
 		var req types.PutKeysReq
 		if err := httpx.Parse(r, &req); err != nil {
@@ -22,16 +17,8 @@ func PutKeysHandler(ctx *svc.ServiceContext) http.HandlerFunc {
 			return
 		}
 
-		appAccount :=r.Context().Value(shared.HttpReqContextAccountKey)
-		if appAccount==nil{
-			httpx.Error(w, shared.Status(http.StatusUnauthorized,"check basic auth fail ,may by the handler not use middle"))
-			return
-		}
-
-
-
 		l := logic.NewPutKeysLogic(r.Context(), ctx)
-		err := l.PutKeys(req,appAccount.(*entities.Account))
+		err := l.PutKeys(r ,req)
 		if err != nil {
 			httpx.Error(w, err)
 		} else {

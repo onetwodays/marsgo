@@ -94,9 +94,54 @@ func RegisterHandlers(engine *rest.Server, serverCtx *svc.ServiceContext) {
 			[]rest.Middleware{serverCtx.CheckBasicAuth},
 			[]rest.Route{
 				{
+					Method:  http.MethodPut,
+					Path:    "/v1/accounts/attributes",
+					Handler: accounts.SetattributesHandler(serverCtx),
+				},
+				{
+					Method:  http.MethodPut,
+					Path:    "/v1/accounts/pin",
+					Handler: accounts.SetPinHandler(serverCtx),
+				},
+				{
+					Method:  http.MethodDelete,
+					Path:    "/v1/accounts/pin",
+					Handler: accounts.DelPinHandler(serverCtx),
+				},
+				{
+					Method:  http.MethodPut,
+					Path:    "/v1/accounts/registration_lock",
+					Handler: accounts.SetRegLockHandler(serverCtx),
+				},
+				{
+					Method:  http.MethodDelete,
+					Path:    "/v1/accounts/registration_lock",
+					Handler: accounts.DelRegLockHandler(serverCtx),
+				},
+				{
+					Method:  http.MethodPut,
+					Path:    "/v1/accounts/name",
+					Handler: accounts.SetDeviceNameHandler(serverCtx),
+				},
+				{
+					Method:  http.MethodDelete,
+					Path:    "/v1/accounts/signaling_key",
+					Handler: accounts.DelSignlingKeyHandler(serverCtx),
+				},
+				{
 					Method:  http.MethodGet,
-					Path:    "/v2/accounts/:transport/code/:number",
-					Handler: accounts.TestHandler(serverCtx),
+					Path:    "/v1/accounts/whoami",
+					Handler: accounts.GetWhoamiHandler(serverCtx),
+				},
+				{
+					Method:  http.MethodPut,
+					Path:    "/v1/accounts/gcm",
+					Handler: accounts.SetGcmRegistrationIDHandler(serverCtx),
+				},
+				{
+					Method:  http.MethodDelete,
+					Path:    "/v1/accounts/gcm",
+					Handler: accounts.DelGcmRegistrationIDHandler(serverCtx),
 				},
 			}...,
 		),
@@ -145,33 +190,36 @@ func RegisterHandlers(engine *rest.Server, serverCtx *svc.ServiceContext) {
 	)
 
 	engine.AddRoutes(
-		[]rest.Route{
-			{
-				Method:  http.MethodPut,
-				Path:    "/v2/keys",
-				Handler: textsecret_keys.PutKeysHandler(serverCtx),
-			},
-			{
-				Method:  http.MethodGet,
-				Path:    "/v2/keys/:identifier/:deviceId",
-				Handler: textsecret_keys.GetKeysHandler(serverCtx),
-			},
-			{
-				Method:  http.MethodGet,
-				Path:    "/v2/keys",
-				Handler: textsecret_keys.GetKeyCountHandler(serverCtx),
-			},
-			{
-				Method:  http.MethodPut,
-				Path:    "/v1/profile/:accountName",
-				Handler: textsecret_keys.PutProfileKeyHandler(serverCtx),
-			},
-			{
-				Method:  http.MethodGet,
-				Path:    "/v1/profile/:accountName",
-				Handler: textsecret_keys.GetProfileKeyHandler(serverCtx),
-			},
-		},
+		rest.WithMiddlewares(
+			[]rest.Middleware{serverCtx.CheckBasicAuth},
+			[]rest.Route{
+				{
+					Method:  http.MethodPut,
+					Path:    "/v2/keys",
+					Handler: textsecret_keys.PutKeysHandler(serverCtx),
+				},
+				{
+					Method:  http.MethodGet,
+					Path:    "/v2/keys/:identifier/:deviceId",
+					Handler: textsecret_keys.GetKeysHandler(serverCtx),
+				},
+				{
+					Method:  http.MethodGet,
+					Path:    "/v2/keys",
+					Handler: textsecret_keys.GetKeyCountHandler(serverCtx),
+				},
+				{
+					Method:  http.MethodPut,
+					Path:    "/v1/profile/:accountName",
+					Handler: textsecret_keys.PutProfileKeyHandler(serverCtx),
+				},
+				{
+					Method:  http.MethodGet,
+					Path:    "/v1/profile/:accountName",
+					Handler: textsecret_keys.GetProfileKeyHandler(serverCtx),
+				},
+			}...,
+		),
 	)
 
 	engine.AddRoutes(
@@ -222,6 +270,11 @@ func RegisterHandlers(engine *rest.Server, serverCtx *svc.ServiceContext) {
 					Handler: keys.GetKeyCountHandler(serverCtx),
 				},
 				{
+					Method:  http.MethodGet,
+					Path:    "/v3/keys/:identifier/:deviceId",
+					Handler: keys.GetDeviceKeysHandler(serverCtx),
+				},
+				{
 					Method:  http.MethodPut,
 					Path:    "/v3/keys/signed",
 					Handler: keys.SetSignedKeyHandler(serverCtx),
@@ -233,15 +286,5 @@ func RegisterHandlers(engine *rest.Server, serverCtx *svc.ServiceContext) {
 				},
 			}...,
 		),
-	)
-
-	engine.AddRoutes(
-		[]rest.Route{
-			{
-				Method:  http.MethodGet,
-				Path:    "/v3/keys/:identifier/:deviceId",
-				Handler: keys.GetDeviceKeysHandler(serverCtx),
-			},
-		},
 	)
 }

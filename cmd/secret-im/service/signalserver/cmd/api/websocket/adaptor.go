@@ -2,7 +2,6 @@ package websocket
 
 import (
 	"context"
-	"github.com/tal-tech/go-zero/core/logx"
 	"io"
 	"net/http"
 	"net/url"
@@ -108,6 +107,7 @@ func HandleHTTPRequest(ctx *SessionContext, h http.Handler,
 		}
 		header.Set(strip(slice[0]), strip(slice[1]))
 	}
+	header.Set("flag","ws") //标识请求来自ws
 	r.Header = header
 	r.Body = &netHTTPBody{request.Body}
 	rURL, err := url.ParseRequestURI(r.RequestURI)
@@ -118,7 +118,7 @@ func HandleHTTPRequest(ctx *SessionContext, h http.Handler,
 
 	w := netHTTPResponseWriter{statusCode: http.StatusOK}
 	// 是来自ws的请求，这里上下文都设置几个值
-	c:=context.WithValue(context.Background(), "ws", ctx)
+	c:=context.WithValue(context.Background(), "ws", ctx) //没有被使用
 	if ctx.Device!=nil{
 		c= context.WithValue(c, shared.CONTENTKEYUUID,ctx.Device.UUID)
 		c= context.WithValue(c, shared.CONTENTKEYDEVICEID,ctx.Device.Device.ID)
@@ -133,10 +133,6 @@ func HandleHTTPRequest(ctx *SessionContext, h http.Handler,
 			headers = append(headers, name+":"+val)
 		}
 	}
-	if w.StatusCode()!=http.StatusOK{
-		logx.Error("websocket经http处理后的响应是:",string(w.body))
-	}else{
-		logx.Info("websocket经http处理后的响应是:",string(w.body))
-	}
+
 	return factory.CreateResponse(request.GetId(), w.statusCode, "", headers, w.body)
 }

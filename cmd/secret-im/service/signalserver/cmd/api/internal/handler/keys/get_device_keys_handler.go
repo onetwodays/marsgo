@@ -19,7 +19,7 @@ func GetDeviceKeysHandler(ctx *svc.ServiceContext) http.HandlerFunc {
 		}
 
 		l := logic.NewGetDeviceKeysLogic(r.Context(), ctx)
-		resp, err := l.GetDeviceKeys(req,r )
+		resp, err := l.GetDeviceKeys(r,req)
 		if err != nil {
 			httpx.Error(w, err)
 		} else {

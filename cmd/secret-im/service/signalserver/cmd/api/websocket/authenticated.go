@@ -44,7 +44,6 @@ func constructEnvelopFromTypeMessage(message *types.OutcomingMessagex) *textsecu
 		jsb,err=base64.StdEncoding.DecodeString(message.Message)
 	}
 	if err!=nil{
-
 		return nil
 	}
 
@@ -116,12 +115,13 @@ func (handler *AuthenticatedHandler) OnWebSocketConnect(context *SessionContext)
 
 	// 订阅设备消息
 	if err = handler.context.PubSubManager.Subscribe(address.Serialize(), handler); err != nil {
+		logx.Error("subscribe fail:",err)
 		handler.context.Session.Close(1000, "OK")
 		return
 	}
 
 	go handler.handleSendMessage()
-	logx.Infof("number:%s,device_id:%d [Authenticated] device on-line",device.Number,device.Device.ID)
+	logx.Infof("[Authenticated OnWebSocketConnect] subscribe ok, number:%s,device_id:%d,channel_id=%s,  device on-line",device.Number,device.Device.ID,handler.connectionID)
 
 }
 
@@ -145,7 +145,7 @@ func (handler *AuthenticatedHandler) OnWebSocketDisconnect() {
 	}
 
 	 */
-	logx.Infof("number:%s,device_id:%d [Authenticated] device off-line",device.Number,device.Device.ID)
+	logx.Infof("[Authenticated OnWebSocketDisconnect]account:%s,device_id:%d,channel_id=%s device off-line",device.Number,device.Device.ID,handler.connectionID)
 
 }
 
@@ -157,6 +157,7 @@ func (handler *AuthenticatedHandler) OnDispatchMessage(channel string, message *
 		var envelope textsecure.Envelope
 		err := proto.Unmarshal(message.GetContent(), &envelope)
 		if err == nil {
+			logx.Infof("[Authenticated](%s)信道收到redis_dispatch转发的DELIVER信息，转成textsecure.Envelope格式，放到自己的队列中",envelope.ServerGuid)
 			handler.toBeSent.Push(sendMessageRequest{message: &envelope}) //放到自己的队列里面
 		} else {
 			logx.Errorf("[Authenticated] protobuf parse error,reason:%s",err.Error())
@@ -198,14 +199,15 @@ func (handler *AuthenticatedHandler) sendDeliveryReceiptFor(message *textsecure.
 	}
 
 	device := handler.context.Device
-	logx.Info(" [Authenticated] send delivery receipt","account:",device.Number," timestamp:",message.GetTimestamp())
+
 
 	err := handler.receiptSender.SendReceipt(
 		device.Number, device.UUID, device.Device.ID, message.GetSource(), int64(message.GetTimestamp()))
 	if err != nil {
-		logx.Error("[Authenticated] failed to send receipt ","source:",device.Number,"destination:", message.GetSource(),"timestamp:",message.GetTimestamp(),"reason:",err)
+		logx.Error("[Authenticated5] failed to send receipt ","source:",device.Number,"destination:", message.GetSource(),"timestamp:",message.GetTimestamp(),"reason:",err)
 
 	}
+	logx.Infof(" [Authenticated5](%s) send delivery receipt to 发送方(redis) ,from %s->%s",message.ServerGuid,device.Number,message.GetSource())
 }
 
 // 消息持久化
@@ -259,7 +261,7 @@ func (handler *AuthenticatedHandler) processStoredMessages() {
 
 }
 
-// 发送消息
+// 转发消息
 func (handler *AuthenticatedHandler) sendMessage(message *textsecure.Envelope, info *storedMessageInfo, requery bool) {
 	var body []byte
 	var header string
@@ -288,7 +290,7 @@ func (handler *AuthenticatedHandler) sendMessage(message *textsecure.Envelope, i
 		messageType = "message receipt"
 	}
 
-	logx.Info("account:", device.Number,"timestamp:",message.GetTimestamp(),"[Authenticated] deliver ",messageType)
+	logx.Info("[Authenticated1](",message.ServerGuid, messageType,"),从队列中取出消息，构造websocket_requset发送给接收方", message.Source,"->", device.Number,"timestamp:",message.GetTimestamp()," ")
 
 
 
@@ -299,19 +301,21 @@ func (handler *AuthenticatedHandler) sendMessage(message *textsecure.Envelope, i
 		if info == nil {
 			handler.requeueMessage(message)
 		}
-		logx.Info("[Authenticated] failed to send request ","reason:",err,"timestamp:", message.GetTimestamp() )
+		logx.Info("[Authenticated2] 给接收方 send request fail,关闭ws connect  ","reason:",err," timestamp:", message.GetTimestamp() )
 
 		handler.context.Session.Close(1001, "Request error")
 		return
 	}
-	logx.Info("[Authenticated] deliver " + messageType + " ack","account:",   device.Number,"timestamp:", message.GetTimestamp(),)
+
+	logx.Info("[Authenticated2],(",message.ServerGuid, messageType,") deliver finish，检查接收方的回复， " + messageType + " ack","recv account:",   device.Number,"timestamp:", message.GetTimestamp()," 接收方回复报文:",response.String())
 
 
 
 	if handler.isSuccessResponse(response) {
+
 		if info != nil {
 			// 删除消息记录
-
+			logx.Infof("[Authenticated3](%s)接收方已经接收到消息，入参info不为空，执行删除消息动作",message.ServerGuid)
 			err = storage.MessagesManager{}.Delete(device.Number, device.Device.ID, info.id, info.cached)
 			if err != nil {
 				logx.Error("[Authenticated] failed to delete message:",
@@ -322,19 +326,23 @@ func (handler *AuthenticatedHandler) sendMessage(message *textsecure.Envelope, i
 					" reason:", err)
 
 			}
-
-
 		}
+		logx.Info("[Authenticated3](%s)接收方已经接收到消息，入参info为空，不执行删除消息动作",message.ServerGuid)
 
 		if !isReceipt {
+			logx.Info("[Authenticated4](%s)接收方(%s)已经接收到消息，开始给发送方%s发送消息回执",message.ServerGuid,device.Number,message.Source)
 			handler.sendDeliveryReceiptFor(message)
+		}else{
+			logx.Info("投递报文是给发送方的回执")
 		}
 
 		// 推送未读消息
 		if requery {
+			logx.Info("[Authenticated5]接收方已经接收到消息，开始推送未读消息")
 			handler.processStoredMessages()
 		}
 	} else if info == nil {
+		logx.Info("[Authenticated3]接收方没有接收到消息，且入参info为空，handler.requeueMessage(message)动作")
 		handler.requeueMessage(message)
 	}
 }
@@ -391,6 +399,7 @@ func (handler *AuthenticatedHandler) handleSendMessage() {
 			handler.sendChannelMessage(data)
 		case sendMessageRequest:
 			data := request.(sendMessageRequest)
+
 			handler.sendMessage(data.message, data.info, data.requery)
 		}
 	}

@@ -2,7 +2,6 @@ package handler
 
 import (
 	"net/http"
-	"secret-im/service/signalserver/cmd/api/internal/entities"
 	"secret-im/service/signalserver/cmd/api/internal/logic/keys"
 	"secret-im/service/signalserver/cmd/api/internal/svc"
 	"secret-im/service/signalserver/cmd/api/internal/types"
@@ -26,7 +25,7 @@ func SetSignedKeyHandler(ctx *svc.ServiceContext) http.HandlerFunc {
 		}
 
 		l := logic.NewSetSignedKeyLogic(r.Context(), ctx)
-		err := l.SetSignedKey(req,appAccount.(*entities.Account))
+		err := l.SetSignedKey(r,req)
 		if err != nil {
 			httpx.Error(w, err)
 		} else {
