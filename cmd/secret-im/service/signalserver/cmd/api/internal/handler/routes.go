@@ -176,11 +176,6 @@ func RegisterHandlers(engine *rest.Server, serverCtx *svc.ServiceContext) {
 			[]rest.Middleware{serverCtx.CheckBasicAuth},
 			[]rest.Route{
 				{
-					Method:  http.MethodPut,
-					Path:    "/v1/messages/:destination",
-					Handler: textsecret_messages.PutMsgsHandler(serverCtx),
-				},
-				{
 					Method:  http.MethodGet,
 					Path:    "/v1/messages",
 					Handler: textsecret_messages.GetMsgsHandler(serverCtx),
@@ -190,22 +185,32 @@ func RegisterHandlers(engine *rest.Server, serverCtx *svc.ServiceContext) {
 	)
 
 	engine.AddRoutes(
+		[]rest.Route{
+			{
+				Method:  http.MethodPut,
+				Path:    "/v1/messages/:destination",
+				Handler: textsecret_messages.PutMsgsHandler(serverCtx),
+			},
+		},
+	)
+
+	engine.AddRoutes(
 		rest.WithMiddlewares(
 			[]rest.Middleware{serverCtx.CheckBasicAuth},
 			[]rest.Route{
 				{
 					Method:  http.MethodPut,
-					Path:    "/v2/keys",
+					Path:    "/v3/keys",
 					Handler: textsecret_keys.PutKeysHandler(serverCtx),
 				},
 				{
 					Method:  http.MethodGet,
-					Path:    "/v2/keys/:identifier/:deviceId",
+					Path:    "/v3/keys/:identifier/:deviceId",
 					Handler: textsecret_keys.GetKeysHandler(serverCtx),
 				},
 				{
 					Method:  http.MethodGet,
-					Path:    "/v2/keys",
+					Path:    "/v3/keys",
 					Handler: textsecret_keys.GetKeyCountHandler(serverCtx),
 				},
 				{
@@ -261,30 +266,35 @@ func RegisterHandlers(engine *rest.Server, serverCtx *svc.ServiceContext) {
 			[]rest.Route{
 				{
 					Method:  http.MethodPut,
-					Path:    "/v3/keys",
+					Path:    "/v2/keys",
 					Handler: keys.PutKeysHandler(serverCtx),
 				},
 				{
 					Method:  http.MethodGet,
-					Path:    "/v3/keys",
+					Path:    "/v2/keys",
 					Handler: keys.GetKeyCountHandler(serverCtx),
 				},
 				{
-					Method:  http.MethodGet,
-					Path:    "/v3/keys/:identifier/:deviceId",
-					Handler: keys.GetDeviceKeysHandler(serverCtx),
-				},
-				{
 					Method:  http.MethodPut,
-					Path:    "/v3/keys/signed",
+					Path:    "/v2/keys/signed",
 					Handler: keys.SetSignedKeyHandler(serverCtx),
 				},
 				{
 					Method:  http.MethodGet,
-					Path:    "/v3/keys/signed",
+					Path:    "/v2/keys/signed",
 					Handler: keys.GetSignedKeyHandler(serverCtx),
 				},
 			}...,
 		),
+	)
+
+	engine.AddRoutes(
+		[]rest.Route{
+			{
+				Method:  http.MethodGet,
+				Path:    "/v2/keys/:identifier/:deviceId",
+				Handler: keys.GetDeviceKeysHandler(serverCtx),
+			},
+		},
 	)
 }

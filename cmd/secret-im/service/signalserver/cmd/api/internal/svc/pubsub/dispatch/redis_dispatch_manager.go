@@ -60,11 +60,13 @@ func (r *RedisDispatchManager) HasSubscription(name string) bool {
 func (r *RedisDispatchManager) Publish(name string, message *textsecure.PubSubMessage) (int64, error) {
 	data, err := proto.Marshal(message)
 	if err != nil {
+		logx.Error("[RedisDispatchManager.Publish]",err)
 		return 0, err
 	}
 
 	cmd := r.client.Publish(name, data)
 	if cmd.Err() != nil {
+		logx.Error("[RedisDispatchManager.Publish]",cmd.Err())
 		return 0, cmd.Err()
 	}
 	return cmd.Val(), nil
@@ -117,7 +119,7 @@ func (r *RedisDispatchManager) startPolling() {
 		if err != nil {
 
 			if err != io.EOF {
-				logx.Errorf("[PubSub] failed to receive message,%s",err.Error())
+				logx.Error("[PubSub] failed to receive message，推出for",err)
 			}
 			break
 		}
@@ -129,7 +131,7 @@ func (r *RedisDispatchManager) startPolling() {
 
 			continue
 		}
-		logx.Info("[redis_dispatch]从redis读取到1条textsecure.PubSubMessage格式消息:" ,pubSubMessage.String())
+		//logx.Info("[redis_dispatch]从redis读取到1条textsecure.PubSubMessage格式消息:" ,pubSubMessage.String())
 
 		value, ok := r.subscriptions.Load(message.Channel)
 		r.pool.Add(message.Channel, func() {
@@ -139,7 +141,7 @@ func (r *RedisDispatchManager) startPolling() {
 					r.deadLetterChannel.OnDispatchMessage(message.Channel, &pubSubMessage)
 				}
 			} else {
-				logx.Info("[redis_dispatch]已交给信道 ",message.Channel," 处理")
+				//logx.Info("[redis_dispatch]从redis收到1条消息交给信道的 ",message.Channel,"OnDispatchMessage函数处理")
 				value.(channel.DispatchChannel).OnDispatchMessage(message.Channel, &pubSubMessage)
 			}
 		})

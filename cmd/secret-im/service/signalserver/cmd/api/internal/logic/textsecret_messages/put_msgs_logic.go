@@ -2,6 +2,8 @@ package logic
 
 import (
 	"context"
+	uuid "github.com/satori/go.uuid"
+	"secret-im/service/signalserver/cmd/api/internal/middleware"
 
 	"encoding/json"
 
@@ -39,13 +41,16 @@ func (l *PutMsgsLogic) PutMsgs(r *http.Request, sender string, req types.PutMess
 
 	header := r.Header.Get(helper.UNIDENTIFIED)
 	accessKey, _ := auth.NewAnonymous(header)
-	appAccount := r.Context().Value(shared.HttpReqContextAccountKey)
-	if appAccount == nil && accessKey == nil {
-		reason := "check basic auth fail ,may by the handler not use middle"
-		logx.Error(reason)
-		return nil, shared.Status(http.StatusUnauthorized, reason)
+
+	checkBasicAuth := middleware.NewCheckBasicAuthMiddleware(l.svcCtx.AccountsModel)
+	// 帐号鉴权
+	source, err := checkBasicAuth.BasicAuthByHeader(r, true)
+	if accessKey == nil {
+		if err!=nil {
+			return nil, shared.Status(http.StatusUnauthorized, err.Error())
+		}
 	}
-	source := appAccount.(*entities.Account)
+
 	destinationName := auth.NewAmbiguousIdentifier(req.Destination)
 
 	if source != nil && source.IsFor(destinationName) {
@@ -66,8 +71,8 @@ func (l *PutMsgsLogic) PutMsgs(r *http.Request, sender string, req types.PutMess
 
 	_, ok := helper.OptionalAccess{}.Verify(source, accessKey, destination)
 	if !ok {
-		//reason:="helper.OptionalAccess{}.Verify(source,accessKey,destination) fail"
-		//logx.Error(reason)
+		reason:="helper.OptionalAccess{}.Verify(source,accessKey,destination) fail"
+		logx.Error(reason)
 		//return nil,shared.Status(code,reason)
 	}
 
@@ -75,7 +80,7 @@ func (l *PutMsgsLogic) PutMsgs(r *http.Request, sender string, req types.PutMess
 	missingDevices, ok := l.validateCompleteDeviceList(destination, req.Messages, isSyncMessage)
 	if !ok {
 		jsb, _ := json.Marshal(missingDevices)
-		logx.Error(string(jsb))
+		logx.Error("验证完备设备列表失败:",string(jsb))
 		//return nil,shared.Status(http.StatusConflict,string(jsb))
 	}
 
@@ -83,7 +88,7 @@ func (l *PutMsgsLogic) PutMsgs(r *http.Request, sender string, req types.PutMess
 	staleDevices, ok := l.validateRegistrationIds(destination, req.Messages)
 	if !ok {
 		jsb, _ := json.Marshal(staleDevices)
-		logx.Error(string(jsb))
+		logx.Error("验证注册id失败:",string(jsb))
 		//return nil,shared.Status(http.StatusGone,string(jsb))
 	}
 
@@ -120,6 +125,7 @@ func (l *PutMsgsLogic) sendMessage(source,
 		Type:            textsecure.GetEnvelopeType(incomingMessage.Type),
 		Timestamp:       uint64(timestamp),
 		ServerTimestamp: uint64(now),
+		ServerGuid: uuid.NewV4().String(), // 这里新生成一个,原来是推送redis不成功，才生成一个，这里提前生成
 	}
 	if source != nil {
 		messageBuilder.Source = source.Number
@@ -179,23 +185,27 @@ func (l *PutMsgsLogic) validateCompleteDeviceList(account *entities.Account,
 
 	for _, message := range messages {
 		messageDeviceIDs[int64(message.DestinationDeviceId)] = struct{}{}
-
 	}
+	//logx.Info("消息中的设备id列表:",messageDeviceIDs)
 	for _, device := range account.Devices {
 		if device.IsEnabled() && !(isSyncMessage && device.ID == account.AuthenticatedDevice.ID) {
 			accountDeviceIDs[device.ID] = struct{}{}
 
 			if _, ok := messageDeviceIDs[device.ID]; !ok {
-				missingDeviceIDs[device.ID] = struct{}{}
+				missingDeviceIDs[device.ID] = struct{}{} //帐号中有，消息中没有
 			}
 		}
 	}
+	//logx.Info("帐号中有但不在消息中的可用设备id列表是:",missingDeviceIDs)
+	//logx.Infof("帐号%s可用设备id列表是%v",account.Number,accountDeviceIDs)
+
 
 	for _, message := range messages {
 		if _, ok := accountDeviceIDs[int64(message.DestinationDeviceId)]; !ok {
-			extraDeviceIDs[message.DestinationDeviceId] = struct{}{}
+			extraDeviceIDs[message.DestinationDeviceId] = struct{}{} //消息中有设备中没有
 		}
 	}
+	//logx.Info("**消息中有，帐号中没有的可用设备id列表:",extraDeviceIDs)
 
 	if len(missingDeviceIDs) > 0 || len(extraDeviceIDs) > 0 {
 		devices := entities.MismatchedDevices{

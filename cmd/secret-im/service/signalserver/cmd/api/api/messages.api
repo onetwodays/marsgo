@@ -81,10 +81,22 @@ type (
 
 )
 service signalserver-api {
-    @handler PutMsgsHandler
-    put /v1/messages/:destination (PutMessagesReq) returns (PutMessagesRes)
+
 
     @handler GetMsgsHandler
     get /v1/messages () returns (GetPendingMsgsRes)
 
+}
+
+
+@server(
+    //jwt: Auth
+    //middleware:UserNameCheck
+    //middleware :CheckBasicAuth
+    group: textsecret_messages
+
+)
+service signalserver-api {
+    @handler PutMsgsHandler
+    put /v1/messages/:destination (PutMessagesReq) returns (PutMessagesRes)
 }

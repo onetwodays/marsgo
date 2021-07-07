@@ -17,13 +17,14 @@ type OptionalAccess struct {
 // 验证访问权限
 func (OptionalAccess) Verify(
 	requestAccount *entities.Account,
-	accessKey *auth.Anonymous, targetAccount *entities.Account) (int, bool) {
+	accessKey *auth.Anonymous,
+	targetAccount *entities.Account) (int, bool) {
 
 	if requestAccount != nil && targetAccount != nil && targetAccount.IsEnabled() {
 		return http.StatusOK, true
 	}
 
-	if requestAccount != nil && (targetAccount == nil || (targetAccount != nil && !targetAccount.IsEnabled())) {
+	if requestAccount != nil && (targetAccount == nil || ( !targetAccount.IsEnabled())) {
 		return http.StatusNotFound, false
 	}
 
@@ -45,7 +46,9 @@ func (OptionalAccess) Verify(
 // 验证设备访问权限
 func (oa OptionalAccess) VerifyDevices(
 	requestAccount *entities.Account,
-	accessKey *auth.Anonymous, targetAccount *entities.Account, deviceSelector string) (int, bool) {
+	accessKey *auth.Anonymous,
+	targetAccount *entities.Account,
+	deviceSelector string) (int, bool) {
 	code, ok := oa.Verify(requestAccount, accessKey, targetAccount)
 	if !ok {
 		return code, false

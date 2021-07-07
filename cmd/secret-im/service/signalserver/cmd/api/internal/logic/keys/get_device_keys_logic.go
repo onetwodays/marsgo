@@ -7,7 +7,7 @@ import (
 	"secret-im/service/signalserver/cmd/api/internal/auth/helper"
 	"secret-im/service/signalserver/cmd/api/internal/middleware"
 	"secret-im/service/signalserver/cmd/api/internal/storage"
-	shared "secret-im/service/signalserver/cmd/api/shared"
+	"secret-im/service/signalserver/cmd/api/shared"
 	"strconv"
 
 	"secret-im/service/signalserver/cmd/api/internal/svc"
@@ -31,27 +31,29 @@ func NewGetDeviceKeysLogic(ctx context.Context, svcCtx *svc.ServiceContext) GetD
 }
 
 func (l *GetDeviceKeysLogic) GetDeviceKeys(r *http.Request, req types.GetKeysReqx) (*types.GetKeysRes, error) {
-	// todo: add your logic here and delete this line
 
-	targetName := auth.NewAmbiguousIdentifier(req.Identifier)
+
 
 	header := r.Header.Get(helper.UNIDENTIFIED)
 	accessKey, _ := auth.NewAnonymous(header)
 	checkBasicAuth := middleware.NewCheckBasicAuthMiddleware(l.svcCtx.AccountsModel)
-
 	// 帐号鉴权
 	appAccount, err := checkBasicAuth.BasicAuthByHeader(r, true)
-	if appAccount == nil && accessKey == nil {
-		return nil, shared.Status(http.StatusUnauthorized, err.Error())
+	if accessKey == nil {
+		if err!=nil {
+			return nil, shared.Status(http.StatusUnauthorized, err.Error())
+		}
 	}
 	// 获取目标用户
+	targetName := auth.NewAmbiguousIdentifier(req.Identifier)
 	_, target, err := storage.AccountManager{}.Get(targetName)
-	if target == nil || err != nil {
+	if  err != nil {
 		return nil, shared.Status(http.StatusNotFound, err.Error())
 	}
 	code, ok := helper.OptionalAccess{}.VerifyDevices(appAccount, accessKey, target, req.DeviceId)
 	if !ok {
-		return nil, shared.Status(code, "VerifyDevices fail")
+		logx.Error("VerifyDevices fail,code=",code)
+		//return nil, shared.Status(code, "VerifyDevices fail")
 	}
 
 	if appAccount != nil {
@@ -80,25 +82,24 @@ func (l *GetDeviceKeysLogic) GetDeviceKeys(r *http.Request, req types.GetKeysReq
 	devices := make([]types.PreKeyResponseItemx, 0)
 
 	for _, device := range target.Devices {
-		if device.IsEnabled() && (req.DeviceId == "*" || device.ID == deviceId) {
-			var preKey *types.PreKey
+		//if device.IsEnabled() && (req.DeviceId == "*" || device.ID == deviceId) {
+		if  req.DeviceId == "*" || device.ID == deviceId {
 			signedPreKey := device.SignedPreKey
 			for _, keyRecode := range keys {
 				if keyRecode.DeviceId == device.ID {
-					preKey = &types.PreKey{
-						KeyId:     keyRecode.KeyId,
-						PublicKey: keyRecode.PublicKey,
+					if signedPreKey != nil  {
+						devices = append(devices, types.PreKeyResponseItemx{
+							DeviceId:       device.ID,
+							RegistrationId: int64(device.RegistrationID),
+							SignedPrekey:   *signedPreKey,
+							PreKey:         types.PreKey{
+								KeyId:     keyRecode.KeyId,
+								PublicKey: keyRecode.PublicKey,
+							},
+						})
+						deleteIds = append(deleteIds, keyRecode.Id)
 					}
 				}
-			}
-			if signedPreKey != nil || preKey != nil {
-				devices = append(devices, types.PreKeyResponseItemx{
-					DeviceId:       device.ID,
-					RegistrationId: int64(device.RegistrationID),
-					SignedPrekey:   *signedPreKey,
-					PreKey:         *preKey,
-				})
-				deleteIds = append(deleteIds, device.ID)
 			}
 		}
 	}

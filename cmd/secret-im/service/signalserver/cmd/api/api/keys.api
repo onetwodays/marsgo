@@ -64,13 +64,13 @@ type GetProfileKeyRes{
 )
 service signalserver-api {
     @handler PutKeysHandler
-    put  /v2/keys (PutKeysReqx) returns ()
+    put  /v3/keys (PutKeysReqx) returns ()
 
     @handler GetKeysHandler
-    get /v2/keys/:identifier/:deviceId (GetKeysReq) returns (GetKeysResx)
+    get /v3/keys/:identifier/:deviceId (GetKeysReq) returns (GetKeysResx)
 
     @handler GetKeyCountHandler
-    get /v2/keys () returns (PreKeyCount)
+    get /v3/keys () returns (PreKeyCount)
 
     @handler PutProfileKeyHandler
     put /v1/profile/:accountName (PutProfileKeyReq) returns()

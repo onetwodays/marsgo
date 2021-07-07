@@ -40,11 +40,11 @@ func (sender *WebsocketSender) SendMessage(number string, deviceID int64,
 		Type:    textsecure.PubSubMessage_DELIVER,
 		Content: content,
 	}
-	// 只是写到redis里面.
+	// 只是写到redis里面. n表示 接收到信息 message 的订阅者数量。
 	n, err := sender.pubSubManager.Publish(address.Serialize(), pubSubMessage)
 	// 推redis成功
 	if err == nil && n > 0 {
-		logx.Info("[ws_sender]消息已经推送至redis中，key is ",address.Serialize())
+		//logx.Info("[ws_sender]消息已经推送至redis中，key is ",address.Serialize())
 		return true, nil
 	}
 
@@ -55,7 +55,7 @@ func (sender *WebsocketSender) SendMessage(number string, deviceID int64,
 
 	// 如果不在线的话
 	if !online {
-		logx.Errorf("[Websocket_sender]redis推送不成功，n=%d,online=%v,sender.QueueMessage",n,online)
+		logx.Infof("收到信息 message 的订阅者数量:%d",n,"消息暂时存redis")
 		err = sender.QueueMessage(number, deviceID, message)
 	}
 	return false, err

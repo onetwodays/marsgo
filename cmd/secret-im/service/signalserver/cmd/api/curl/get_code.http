@@ -1,4 +1,0 @@
-GET http://127.0.0.1:38888/v1/accounts/sms/code/+8618588250437
-Content-Type: application/json
-x-user-name: otcexchange
-Authorization: Basic ODRmYzVhMTItYTYyZS00OTNmLTg5NjMtMzY0NDdmZjMxMjQ1OnV3OFJyQ1AwdDhGVWQ1anpVR0xrVXI1Nw==

@@ -57,21 +57,31 @@ service signalserver-api {
 
    // 设置密钥
     @handler PutKeysHandler
-    put  /v3/keys (PutKeysReq) returns ()
+    put  /v2/keys (PutKeysReq) returns ()
     // 获取密钥数量
     @handler GetKeyCountHandler
-    get /v3/keys () returns (PreKeyCountx)
+    get /v2/keys () returns (PreKeyCountx)
 
-    // 获取设备密钥
-    @handler GetDeviceKeysHandler
-    get /v3/keys/:identifier/:deviceId (GetKeysReqx) returns (GetKeysRes)
+
 
     // 设置已签名密钥
     @handler SetSignedKeyHandler
-    put /v3/keys/signed (SignedPrekey) returns ()
+    put /v2/keys/signed (SignedPrekey) returns ()
 
     // 获取已签名密钥
     @handler GetSignedKeyHandler
-    get /v3/keys/signed () returns (SignedPrekey)
+    get /v2/keys/signed () returns (SignedPrekey)
 }
 
+
+
+@server(
+    group: keys
+
+)
+
+service signalserver-api {
+    // 获取设备密钥
+    @handler GetDeviceKeysHandler
+    get /v2/keys/:identifier/:deviceId (GetKeysReqx) returns (GetKeysRes)
+}

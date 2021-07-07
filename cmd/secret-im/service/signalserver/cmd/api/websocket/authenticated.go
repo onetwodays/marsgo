@@ -7,6 +7,7 @@ import (
 	"github.com/tal-tech/go-zero/core/logx"
 	"secret-im/pkg/queue"
 	"secret-im/pkg/utils-tools"
+	"secret-im/service/signalserver/cmd/api/internal/entities"
 	"secret-im/service/signalserver/cmd/api/internal/storage"
 	"secret-im/service/signalserver/cmd/api/internal/svc/push"
 	"secret-im/service/signalserver/cmd/api/internal/types"
@@ -15,8 +16,7 @@ import (
 	"time"
 )
 
-
-// 消息信息
+// 离线消息信息
 type storedMessageInfo struct {
 	id     int64
 	cached bool
@@ -38,30 +38,33 @@ type AuthenticatedHandler struct {
 }
 
 func constructEnvelopFromTypeMessage(message *types.OutcomingMessagex) *textsecure.Envelope {
+
 	var jsb []byte
 	var err error
-	if len(message.Message)!=0{
-		jsb,err=base64.StdEncoding.DecodeString(message.Message)
+	if len(message.Message) != 0 {
+		jsb, err = base64.StdEncoding.DecodeString(message.Message)
 	}
-	if err!=nil{
+	if err != nil {
 		return nil
 	}
 
-	jtt,err:=base64.StdEncoding.DecodeString(message.Content)
-	if err!=nil{
+	jtt, err := base64.StdEncoding.DecodeString(message.Content)
+	if err != nil {
 		return nil
 	}
 	envelope := &textsecure.Envelope{
 		Type:            textsecure.Envelope_Type(message.Type),
+		Relay:           message.Relay,
 		Timestamp:       uint64(message.Timestamp),
+		ServerGuid:      message.Guid,
 		ServerTimestamp: uint64(message.ServerTimestamp),
 		Source:          message.Source,
-		SourceUuid: message.SourceUuid,
+		SourceUuid:      message.SourceUuid,
 		SourceDevice:    uint32(message.SourceDevice),
-		LegacyMessage: jsb,
-		Content: jtt,
-		Relay: message.Relay,
-		ServerGuid: message.Guid,
+		LegacyMessage:   jsb,
+		Content:         jtt,
+
+
 	}
 	return envelope
 }
@@ -95,33 +98,35 @@ func (handler *AuthenticatedHandler) OnWebSocketConnect(context *SessionContext)
 	address := push.Address{Number: device.Number, DeviceID: device.Device.ID}
 	_, err := handler.context.PubSubManager.Publish(address.Serialize(), &connectMessage) //推到redis了
 	if err != nil {
-		handler.context.Session.Close(1000, "OK")
+		logx.Error(" 推送上线信息失败  ",err)
+		err=handler.context.Session.Close(1000, "OK")
+		if err!=nil{
+			logx.Error("handler.context.Session.Close(1000, \"OK\") ",err)
+		}
 		return
 	}
 
 	// 标记设备上线
 
-
 	partition := 1 //conf.GetServer().PartitionID
 	storage.DevicesManager{}.SetOnline(device.UUID, device.Device.ID, partition)
 	/*
 
-	if true {
-		storage.ChannelParticipantsManager{}.SetOnline(device.UUID, device.Device.ID, partition)
-	}
+		if true {
+			storage.ChannelParticipantsManager{}.SetOnline(device.UUID, device.Device.ID, partition)
+		}
 
-	 */
-
+	*/
 
 	// 订阅设备消息
 	if err = handler.context.PubSubManager.Subscribe(address.Serialize(), handler); err != nil {
-		logx.Error("subscribe fail:",err)
+		logx.Error("subscribe fail:", err)
 		handler.context.Session.Close(1000, "OK")
 		return
 	}
 
 	go handler.handleSendMessage()
-	logx.Infof("[Authenticated OnWebSocketConnect] subscribe ok, number:%s,device_id:%d,channel_id=%s,  device on-line",device.Number,device.Device.ID,handler.connectionID)
+	logx.Infof("[Authenticated OnWebSocketConnect] subscribe ok, number:%s,device_id:%d,channel_id=%s,  device on-line", device.Number, device.Device.ID, handler.connectionID)
 
 }
 
@@ -136,16 +141,15 @@ func (handler *AuthenticatedHandler) OnWebSocketDisconnect() {
 	address := push.Address{Number: device.Number, DeviceID: device.Device.ID}
 	handler.context.PubSubManager.Unsubscribe(address.Serialize(), handler)
 
-
 	partition := 1
 	storage.DevicesManager{}.SetOffline(device.UUID, device.Device.ID, partition)
 	/*
-	if conf.GetServer().EnableChannel {
-		storage.ChannelParticipantsManager{}.SetOffline(device.UUID, device.Device.ID)
-	}
+		if conf.GetServer().EnableChannel {
+			storage.ChannelParticipantsManager{}.SetOffline(device.UUID, device.Device.ID)
+		}
 
-	 */
-	logx.Infof("[Authenticated OnWebSocketDisconnect]account:%s,device_id:%d,channel_id=%s device off-line",device.Number,device.Device.ID,handler.connectionID)
+	*/
+	logx.Infof("[Authenticated OnWebSocketDisconnect]account:%s,device_id:%d,channel_id=%s device off-line", device.Number, device.Device.ID, handler.connectionID)
 
 }
 
@@ -157,14 +161,15 @@ func (handler *AuthenticatedHandler) OnDispatchMessage(channel string, message *
 		var envelope textsecure.Envelope
 		err := proto.Unmarshal(message.GetContent(), &envelope)
 		if err == nil {
-			logx.Infof("[Authenticated](%s)信道收到redis_dispatch转发的DELIVER信息，转成textsecure.Envelope格式，放到自己的队列中",envelope.ServerGuid)
+			//logx.Infof("[Authenticated.OnDispatchMessage]把在线 %s，转成sendMessageRequest放到自己的队列中", envelope.String())
 			handler.toBeSent.Push(sendMessageRequest{message: &envelope}) //放到自己的队列里面
 		} else {
-			logx.Errorf("[Authenticated] protobuf parse error,reason:%s",err.Error())
+			logx.Errorf("[Authenticated] protobuf parse error,reason:%s", err.Error())
 
 		}
 	// 查询消息
 	case textsecure.PubSubMessage_QUERY_DB:
+		logx.Info("[Authenticated]收到PubSubMessage_QUERY_DB 消息，执行handler.processStoredMessages()")
 		handler.processStoredMessages()
 	// 连接成功
 	case textsecure.PubSubMessage_CONNECTED:
@@ -172,7 +177,7 @@ func (handler *AuthenticatedHandler) OnDispatchMessage(channel string, message *
 			handler.context.Session.Close(1000, "OK")
 		}
 	default:
-		logx.Errorf("[Authenticated] unknown pubsub message")
+		logx.Errorf("[Authenticated] unknown pubsub message type")
 
 	}
 }
@@ -200,25 +205,23 @@ func (handler *AuthenticatedHandler) sendDeliveryReceiptFor(message *textsecure.
 
 	device := handler.context.Device
 
-
 	err := handler.receiptSender.SendReceipt(
 		device.Number, device.UUID, device.Device.ID, message.GetSource(), int64(message.GetTimestamp()))
 	if err != nil {
-		logx.Error("[Authenticated5] failed to send receipt ","source:",device.Number,"destination:", message.GetSource(),"timestamp:",message.GetTimestamp(),"reason:",err)
+		logx.Error("[Authenticated5] failed to send receipt ", "source:", device.Number, "destination:", message.GetSource(), "timestamp:", message.GetTimestamp(), "reason:", err)
 
 	}
-	logx.Infof(" [Authenticated5](%s) send delivery receipt to 发送方(redis) ,from %s->%s",message.ServerGuid,device.Number,message.GetSource())
+	//logx.Infof(" [Authenticated5](%s) send delivery receipt to 发送方(redis) ,from %s to  %s", message.ServerGuid, device.Number, message.GetSource())
 }
 
 // 消息持久化
 func (handler *AuthenticatedHandler) requeueMessage(message *textsecure.Envelope) {
 	device := handler.context.Device
-	logx.Info("account:", device.Number,"[Authenticated] requeue message")
-
+	logx.Info("account:", device.Number, "[Authenticated] requeue message")
 
 	err := handler.context.PushSender.GetWebsocketSender().QueueMessage(device.Number, device.Device.ID, message)
 	if err != nil {
-		logx.Error("[Authenticated] failed to requeue message ","account:",device.Number,"device:",device.Device.ID,"timestamp:",message.Timestamp,"reason:",err,)
+		logx.Error("[Authenticated] failed to requeue message ", "account:", device.Number, "device:", device.Device.ID, "timestamp:", message.Timestamp, "reason:", err)
 
 	}
 
@@ -230,19 +233,19 @@ func (handler *AuthenticatedHandler) requeueMessage(message *textsecure.Envelope
 func (handler *AuthenticatedHandler) processStoredMessages() {
 	device := handler.context.Device
 
-	logx.Info("account:", device.Number,"[Authenticated] process stored messages")
-
+	logx.Info("account:", device.Number, "[Authenticated] process stored messages")
 
 	messages, err := storage.MessagesManager{}.GetMessagesForDevice(device.Number, device.Device.ID)
 	if err != nil {
-		logx.Error("[Authenticated] failed to get messages for device,reason:",err)
+		logx.Error("[Authenticated] failed to get messages for device,reason:", err)
 		return
 	}
+	logx.Info("离线消息条数:", len(messages.List))
 
 	for idx, message := range messages.List {
 
 		envelope := constructEnvelopFromTypeMessage(&message)
-		if envelope!=nil{
+		if envelope == nil {
 			continue
 		}
 
@@ -258,7 +261,6 @@ func (handler *AuthenticatedHandler) processStoredMessages() {
 		handler.context.Clientx.SendRequest("PUT", "/api/v1/queue/empty", nil, nil)
 	}
 
-
 }
 
 // 转发消息
@@ -266,22 +268,18 @@ func (handler *AuthenticatedHandler) sendMessage(message *textsecure.Envelope, i
 	var body []byte
 	var header string
 	device := handler.context.Device
-	if len(device.Device.SignalingKey) ==0 {
+	if len(device.Device.SignalingKey) == 0 {
 		header = "X-Signal-Key: false"
 		body, _ = proto.Marshal(message)
 	} else {
-		body, _ = proto.Marshal(message) // 暂时这样
-		/*
 		header = "X-Signal-Key: true"
-		encrypted, err := entities.NewEncryptedOutgoingMessage(&message, *device.Device.SignalingKey)
+		encrypted, err := entities.NewEncryptedOutgoingMessage(message, device.Device.SignalingKey)
+
 		if err != nil {
-			log.WithFields(log.Fields{
-				"reason": err,
-			}).Error("[Authenticated] failed to encrypt message with use signaling key")
+			logx.Error("[Authenticated] failed to encrypt message with use signaling key,reason:",err)
 		}
 		body = encrypted.Serialized
 
-		 */
 	}
 
 	messageType := "message"
@@ -289,60 +287,51 @@ func (handler *AuthenticatedHandler) sendMessage(message *textsecure.Envelope, i
 	if isReceipt {
 		messageType = "message receipt"
 	}
-
-	logx.Info("[Authenticated1](",message.ServerGuid, messageType,"),从队列中取出消息，构造websocket_requset发送给接收方", message.Source,"->", device.Number,"timestamp:",message.GetTimestamp()," ")
-
-
-
+	//logx.Infof("1.[Authenticated]服务器要转发的消息类型是:%s, envelop [%s]", messageType, message.String())
+	logx.Infof("1.[Authenticated]服务器要转发的消息类型是:%s", messageType)
 	future := handler.context.Clientx.SendRequest("PUT", "/api/v1/message", []string{header}, body)
 	response, err := future.Get(time.Second * 10)
 	if err != nil {
+		logx.Error("3.[Authenticated]服务器转发消息失败，如果是离线消息，将再次保存到redis，然后关闭接收方的ws:", err)
 		// 消息持久化
 		if info == nil {
-			handler.requeueMessage(message)
+			handler.requeueMessage(message) //离线消息再次保存到redis
 		}
-		logx.Info("[Authenticated2] 给接收方 send request fail,关闭ws connect  ","reason:",err," timestamp:", message.GetTimestamp() )
-
 		handler.context.Session.Close(1001, "Request error")
 		return
 	}
 
-	logx.Info("[Authenticated2],(",message.ServerGuid, messageType,") deliver finish，检查接收方的回复， " + messageType + " ack","recv account:",   device.Number,"timestamp:", message.GetTimestamp()," 接收方回复报文:",response.String())
-
-
+	//logx.Info("3.[Authenticated]服务器收到接收方的回复:", response.String())
 
 	if handler.isSuccessResponse(response) {
 
 		if info != nil {
 			// 删除消息记录
-			logx.Infof("[Authenticated3](%s)接收方已经接收到消息，入参info不为空，执行删除消息动作",message.ServerGuid)
+			logx.Infof("4[Authenticated]接收方回复ok，开始删除db的离线消息")
 			err = storage.MessagesManager{}.Delete(device.Number, device.Device.ID, info.id, info.cached)
 			if err != nil {
-				logx.Error("[Authenticated] failed to delete message:",
-					" number:",device.Number,
+				logx.Error("[Authenticated] failed to delete offline message:",
+					" number:", device.Number,
 					" device:", device.Device.ID,
-					" id:",     info.id,
+					" id:", info.id,
 					" cached:", info.cached,
 					" reason:", err)
 
 			}
 		}
-		logx.Info("[Authenticated3](%s)接收方已经接收到消息，入参info为空，不执行删除消息动作",message.ServerGuid)
 
 		if !isReceipt {
-			logx.Info("[Authenticated4](%s)接收方(%s)已经接收到消息，开始给发送方%s发送消息回执",message.ServerGuid,device.Number,message.Source)
+			logx.Infof("4[Authenticated]接收方回复ok，给发送方发送消息回执")
 			handler.sendDeliveryReceiptFor(message)
-		}else{
-			logx.Info("投递报文是给发送方的回执")
 		}
 
 		// 推送未读消息
 		if requery {
-			logx.Info("[Authenticated5]接收方已经接收到消息，开始推送未读消息")
+			logx.Info("4[Authenticated]服务器开始推送剩余未读消息")
 			handler.processStoredMessages()
 		}
 	} else if info == nil {
-		logx.Info("[Authenticated3]接收方没有接收到消息，且入参info为空，handler.requeueMessage(message)动作")
+		logx.Infof("4[Authenticated]接收方回复err，消息将再次保存到redis")
 		handler.requeueMessage(message)
 	}
 }
@@ -357,32 +346,29 @@ func (handler *AuthenticatedHandler) sendChannelMessage(message *textsecure.Chan
 	body, _ = proto.Marshal(message)
 
 	logx.Info("[Authenticated] deliver channel message ",
-		" account:",    device.Number,
-		" device:",     device.Device.ID,
+		" account:", device.Number,
+		" device:", device.Device.ID,
 		" channel_id:", message.GetChannelId(),
 		" message_id:", message.GetId())
-
-
 
 	future := handler.context.Clientx.SendRequest("PUT", "/api/v1/channel/message", []string{header}, body)
 	_, err := future.Get(time.Second * 10)
 	if err != nil {
 		logx.Error("[Authenticated] failed to send request: ",
-			" account:",    device.Number,
-			" device:",   device.Device.ID,
+			" account:", device.Number,
+			" device:", device.Device.ID,
 			" channel_id:", message.GetChannelId(),
 			" message_id:", message.GetId(),
-			" reason:",     err)
+			" reason:", err)
 		handler.context.Session.Close(1001, "Request error")
 		return
 	}
 
 	logx.Info("[Authenticated] deliver channel message ack ",
-		" account:",   device.Number,
-		" device:",  device.Device.ID,
+		" account:", device.Number,
+		" device:", device.Device.ID,
 		" channel_id:", message.GetChannelId(),
 		" message_id:", message.GetId())
-
 
 }
 
@@ -404,4 +390,3 @@ func (handler *AuthenticatedHandler) handleSendMessage() {
 		}
 	}
 }
-

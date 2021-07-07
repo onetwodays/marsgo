@@ -165,21 +165,21 @@ func (m *defaultTMessagesModel) DeleteManyByGuid(guids []string) error {
 }
 
 func (m *defaultTMessagesModel)  DeleteManyByDestination(destination string) error{
-	query := fmt.Sprintf("delete from %s where `destination=` ?", m.table)
+	query := fmt.Sprintf("delete from %s where `destination`= ?", m.table)
 	_, err := m.conn.Exec(query, destination)
 	return err
 }
 
 
 func (m *defaultTMessagesModel) DeleteManyByDestinationDeviceId(destination string, deviceId int64) error{
-	query := fmt.Sprintf("delete from %s where `destination=` ? and `destination_device`=?", m.table)
+	query := fmt.Sprintf("delete from %s where `destination`= ? and `destination_device`=?", m.table)
 	_, err := m.conn.Exec(query, destination,deviceId)
 	return err
 }
 
 
 func (m *defaultTMessagesModel) Remove(destination string,id int64) error {
-	query := fmt.Sprintf("delete from %s where  `id`=?  and `destination=` ? ", m.table)
-	_, err := m.conn.Exec(query, destination,id)
+	query := fmt.Sprintf("delete from %s where  `id`=?  and `destination`= ? ", m.table)
+	_, err := m.conn.Exec(query, id,destination)
 	return err
 }

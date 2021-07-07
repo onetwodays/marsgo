@@ -5,6 +5,7 @@ import (
 	"github.com/golang/protobuf/proto"
 	"github.com/gorilla/websocket"
 	"github.com/tal-tech/go-zero/core/logx"
+	"github.com/tal-tech/go-zero/core/timex"
 	"net/http"
 	"secret-im/pkg/utils-tools"
 	"secret-im/service/signalserver/cmd/api/internal/svc/pubsub"
@@ -47,7 +48,7 @@ func (client *Clientx) handleResponse(message *textsecure.WebSocketResponseMessa
 	future.setResult(message, nil)
 	client.requestMap.Delete(id)
 	if client.session.context.Device != nil {
-		logx.Info("[Client] recv response from ", client.session.context.Device.Number,
+		logx.Info("[Client] 服务器收到 recv response from ", client.session.context.Device.Number,
 			" WebSocketResponseMessage id:", id)
 	}
 }
@@ -64,6 +65,8 @@ func (client *Clientx) SendRequest(verb, path string, headers []string, body []b
 	client.requestMap.Store(requestID, future)
 
 	requestMessage := factory.CreateRequest(uint64(requestID), verb, path, headers, body)
+
+	//logx.Info("2.[Client]服务器发出的websocket request :",requestMessage.String())
 	data, err := proto.Marshal(requestMessage)
 	if err != nil {
 		client.requestMap.Delete(requestID)
@@ -77,11 +80,14 @@ func (client *Clientx) SendRequest(verb, path string, headers []string, body []b
 	}
 
 	if client.session.context.Device != nil {
+		/*
 
 		logx.Info("[Client] send request to ",client.session.context.Device.Number,
 			" id:",   requestID,
 			" verb:", verb,
 			" path:", path)
+
+		 */
 	}
 	return future
 }
@@ -127,7 +133,7 @@ func newSession(option Options) *Session {
 		router:       option.router,
 		handler:      option.handler,      // 全局函数
 		closeHandler: option.closeHandler, //session_manager.onClosed
-		toBeSent:     make(chan []byte, 256),
+		toBeSent:     make(chan []byte, 1024),
 	}
 	session.client = &Clientx{session: session}
 	session.context = &SessionContext{ //这个是为了在http.Request传送
@@ -189,6 +195,9 @@ func (session *Session) Close(code int, text string) error {
 	return err
 }
 
+//message = bytes.TrimSpace(bytes.Replace(message, newline, space, -1))
+//c.hub.broadcast <- message //读到的消息放到广播里面, to write redis,测试用
+
 // 处理读操作
 func (session *Session) handleRead() {
 	session.conn.SetReadLimit(maxMessageLimit)
@@ -197,6 +206,9 @@ func (session *Session) handleRead() {
 		session.conn.SetReadDeadline(time.Now().Add(pongWait))
 		return nil
 	})
+
+
+
 
 	var code int
 	var text string
@@ -226,6 +238,10 @@ func (session *Session) handleRead() {
 	}
 }
 
+
+
+
+
 //处理写操作
 func (session *Session) handleWrite() {
 	ticker := time.NewTicker(pingPeriod)
@@ -236,11 +252,35 @@ func (session *Session) handleWrite() {
 			if !ok {
 				return
 			}
+
+
 			session.conn.SetWriteDeadline(time.Now().Add(writeWait))
+			//w, err := c.conn.NextWriter(websocket.TextMessage)
+			w, err := session.conn.NextWriter(websocket.BinaryMessage)
+			if err != nil {
+				logx.Errorf("ws sender(%d) get NextWriter error:%s ",session.id,err.Error())
+				return
+			}
+			w.Write(data)
+
+			// Add queued chat messages to the current websocket message.
+			n := len(session.toBeSent)
+			for i := 0; i < n; i++ {
+				//w.Write(newline) //如果是二进制，这行请注释
+				w.Write(<-session.toBeSent)
+			}
+			if err := w.Close(); err != nil { //写完关闭w，不是关闭连接
+				logx.Errorf("ws sender(%d) close got NextWriter error:%s",session.id,err.Error())
+				return
+			}
+
+			/*
 			err := session.conn.WriteMessage(websocket.BinaryMessage, data)
 			if err != nil {
 				continue
 			}
+
+			 */
 
 		case <-ticker.C:
 			session.conn.SetWriteDeadline(time.Now().Add(writeWait))
@@ -254,13 +294,17 @@ func (session *Session) handleWrite() {
 
 // 处理请求消息
 func (session *Session) handleRequest(request *textsecure.WebSocketRequestMessage) {
+	startTime:=timex.Now()
+	defer func(){
+		logx.WithDuration(timex.Since(startTime)).Infof("==========websocket完成处理 [%s-%d] ws消息===============",request.GetPath(),request.Id)
+	}()
 	number := "null"
 	if session.context.Device != nil {
 		number = session.context.Device.Number
 	}
-
-	message := HandleHTTPRequest(session.context, session.router, request)
 	logx.Infof("handle ws request from account:%s,id:%d,verb:%s,path:%s", number, request.GetId(), request.GetVerb(), request.GetPath())
+	message := HandleHTTPRequest(session.context, session.router, request)
+
 	logx.Info("ws response:",message.String())
 	if data, err := proto.Marshal(message); err != nil {
 		session.Send(data)
