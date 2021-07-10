@@ -7,12 +7,10 @@ import (
 	"github.com/tal-tech/go-zero/core/logx"
 	"github.com/tal-tech/go-zero/core/timex"
 	"net/http"
-	"secret-im/pkg/utils-tools"
+	"secret-im/service/signalserver/cmd/api/internal/entities"
 	"secret-im/service/signalserver/cmd/api/internal/svc/pubsub"
 	"secret-im/service/signalserver/cmd/api/internal/svc/push"
 	"secret-im/service/signalserver/cmd/api/textsecure"
-	"secret-im/service/signalserver/cmd/api/websocket/factory"
-	"sync"
 	"sync/atomic"
 	"time"
 )
@@ -31,76 +29,6 @@ type MessageHandler func(int64, []byte)
 // 连接关闭处理
 type CloseHandler func(int64, int, string) error
 
-//请求客户端
-type Clientx struct {
-	session    *Session
-	requestMap sync.Map
-}
-
-// 处理响应消息
-func (client *Clientx) handleResponse(message *textsecure.WebSocketResponseMessage) {
-	id := int64(message.GetId())
-	value, ok := client.requestMap.Load(id)
-	if !ok {
-		return
-	}
-	future := value.(*Future)
-	future.setResult(message, nil)
-	client.requestMap.Delete(id)
-	if client.session.context.Device != nil {
-		logx.Info("[Client] 服务器收到 recv response from ", client.session.context.Device.Number,
-			" WebSocketResponseMessage id:", id)
-	}
-}
-
-// 发送请求
-func (client *Clientx) SendRequest(verb, path string, headers []string, body []byte) *Future {
-	future := newFuture()
-	if client.session.IsClosed(){
-		err:=errors.New("closed")
-		future.setResult(nil,err)
-		return future
-	}
-	requestID := utils.SecureRandInt64()
-	client.requestMap.Store(requestID, future)
-
-	requestMessage := factory.CreateRequest(uint64(requestID), verb, path, headers, body)
-
-	//logx.Info("2.[Client]服务器发出的websocket request :",requestMessage.String())
-	data, err := proto.Marshal(requestMessage)
-	if err != nil {
-		client.requestMap.Delete(requestID)
-		future.setResult(nil, err)
-		return future
-	}
-
-	if err = client.session.Send(data); err != nil {
-		client.requestMap.Delete(requestID)
-		future.setResult(nil, err)
-	}
-
-	if client.session.context.Device != nil {
-		/*
-
-		logx.Info("[Client] send request to ",client.session.context.Device.Number,
-			" id:",   requestID,
-			" verb:", verb,
-			" path:", path)
-
-		 */
-	}
-	return future
-}
-
-func (client *Clientx) CancelAll() {
-	err := errors.New("canceled")
-	client.requestMap.Range(func(key, value interface{}) bool {
-		future := value.(*Future)
-		future.setResult(nil, err)
-		client.requestMap.Delete(key)
-		return true
-	})
-}
 
 // 会话信息
 type Session struct {
@@ -113,6 +41,7 @@ type Session struct {
 	context      *SessionContext
 	handler      SessionHandler
 	closeHandler CloseHandler
+	sessionName   string
 }
 
 type Options struct {
@@ -124,6 +53,7 @@ type Options struct {
 	pushSender    *push.Sender
 	pubSubManager *pubsub.Manager
 	device        *ConnectedDevice
+	account       *entities.Account
 }
 
 func newSession(option Options) *Session {
@@ -134,6 +64,7 @@ func newSession(option Options) *Session {
 		handler:      option.handler,      // 全局函数
 		closeHandler: option.closeHandler, //session_manager.onClosed
 		toBeSent:     make(chan []byte, 1024),
+
 	}
 	session.client = &Clientx{session: session}
 	session.context = &SessionContext{ //这个是为了在http.Request传送
@@ -142,6 +73,12 @@ func newSession(option Options) *Session {
 		Clientx:       session.client,
 		PushSender:    option.pushSender,
 		PubSubManager: option.pubSubManager,
+		account:       option.account,
+	}
+	if session.context.account==nil{
+		session.sessionName=session.conn.RemoteAddr().String()+":anonymous"
+	}else {
+		session.sessionName=session.conn.RemoteAddr().String()+":"+session.context.account.Number
 	}
 	return session
 }
@@ -295,20 +232,34 @@ func (session *Session) handleWrite() {
 // 处理请求消息
 func (session *Session) handleRequest(request *textsecure.WebSocketRequestMessage) {
 	startTime:=timex.Now()
-	defer func(){
-		logx.WithDuration(timex.Since(startTime)).Infof("==========websocket完成处理 [%s-%d] ws消息===============",request.GetPath(),request.Id)
-	}()
+
+	/*
 	number := "null"
 	if session.context.Device != nil {
 		number = session.context.Device.Number
 	}
-	logx.Infof("handle ws request from account:%s,id:%d,verb:%s,path:%s", number, request.GetId(), request.GetVerb(), request.GetPath())
+	 */
+	//logx.Infof("handle ws request from account:%s,id:%d,verb:%s,path:%s", )
 	message := HandleHTTPRequest(session.context, session.router, request)
 
-	logx.Info("ws response:",message.String())
-	if data, err := proto.Marshal(message); err != nil {
+
+	if data, err := proto.Marshal(message); err == nil {
 		session.Send(data)
+
+	}else{
+		logx.Error("(session *Session) handleRequest:",err)
 	}
+	if request.Path!="/v1/keepalive" {
+		logx.WithDuration(timex.Since(startTime)).Infof("完成 [%s] wsreq处理 [verb:%s,path:%s,code:%d,id:%d,(%s)]",
+			session.sessionName,
+			request.GetVerb(),
+			request.GetPath(),
+			message.GetResponse().Status,
+			request.GetId(),
+			message.String())
+	}
+
+
 }
 
 // 接收消息处理

@@ -10,6 +10,7 @@ import (
 	"github.com/tal-tech/go-zero/core/logx"
 	"github.com/tal-tech/go-zero/core/stores/sqlx"
 	"github.com/tal-tech/go-zero/rest"
+	"regexp"
 	"secret-im/service/signalserver/cmd/api/config"
 	"secret-im/service/signalserver/cmd/api/internal/auth"
 	"secret-im/service/signalserver/cmd/api/internal/crypto"
@@ -26,6 +27,8 @@ var preKeysInsertStmt string = `insert into t_keys (number,device_id,key_id,publ
 type ServiceContext struct {
 	Config config.Config
 	//Hub       *chat.Hub
+	MatchUserNameRegx *regexp.Regexp
+
 
 	UserModel model.UserModel //CRUD
 
@@ -38,6 +41,8 @@ type ServiceContext struct {
 	KeysModel         model.TKeysModel
 	MsgsModel         model.TMessagesModel
 	ProfileKeyModel   model.TProfilekeyModel
+	ProfilesModel     model.TProfilesModel
+	UsernameModel     model.TUsernamesModel
 
 	// --------------------
 	UserCheck      rest.Middleware // jwt
@@ -50,16 +55,17 @@ type ServiceContext struct {
 
 	ProfileKeyMap map[string]string
 
-	BackupCredentialsGenerator *auth.ExternalServiceCredentialGenerator
+	BackupCredentialsGenerator   *auth.ExternalServiceCredentialGenerator
+	DirectoryCredentialsGenerator *auth.ExternalServiceCredentialGenerator
 
 	CertificateGenerator *auth.CertificateGenerator
 
 	RedisClient *redis.Client
 
-	RedisOperation   *push.RedisOperation
-	Dispatcher       *dispatch.RedisDispatchManager
-	PubSubManager    *pubsub.Manager
-	PushSender       *push.Sender
+	RedisOperation *push.RedisOperation
+	Dispatcher     *dispatch.RedisDispatchManager
+	PubSubManager  *pubsub.Manager
+	PushSender     *push.Sender
 }
 
 func NewServiceContext(c config.Config) *ServiceContext {
@@ -72,15 +78,13 @@ func NewServiceContext(c config.Config) *ServiceContext {
 		// PoolSize: 0,
 		//MinIdleConns: 32,
 	})
-	pingRes:=redisClient.Ping()
-	if pingRes.Err()!=nil{
-		logx.Error("ping redis error:",pingRes.Err())
+	pingRes := redisClient.Ping()
+	if pingRes.Err() != nil {
+		logx.Error("ping redis error:", pingRes.Err())
 		return nil
-	}else{
+	} else {
 		logx.Info(pingRes.String())
 	}
-
-
 
 	redisOperation, err := push.NewRedisOperation(redisClient)
 	if err != nil {
@@ -91,11 +95,6 @@ func NewServiceContext(c config.Config) *ServiceContext {
 	dispatcher := dispatch.NewRedisDispatchManager(redisClient, 128, new(DeadLetterHandler))
 	pubSubManager := pubsub.NewManager(dispatcher)
 	pushSender := push.NewPushSender(pubSubManager, redisOperation)
-
-
-
-
-
 
 	if err := redisClient.Ping().Err(); err != nil {
 		logx.Errorf("ping redis fail,reason:%s", err.Error())
@@ -143,8 +142,12 @@ func NewServiceContext(c config.Config) *ServiceContext {
 
 	})
 
+	matchUsername, _:= regexp.Compile("^[a-z_][a-z0-9_]+$")
+
 	return &ServiceContext{
 		Config:          c,
+		MatchUserNameRegx: matchUsername,
+
 		PreKeysInsertor: preKeysInsertor,
 
 		//Hub: hub,
@@ -155,6 +158,8 @@ func NewServiceContext(c config.Config) *ServiceContext {
 		KeysModel:         model.NewTKeysModel(mysqlConn),
 		MsgsModel:         model.NewTMessagesModel(mysqlConn),
 		ProfileKeyModel:   model.NewTProfilekeyModel(mysqlConn),
+		ProfilesModel:     model.NewTProfilesModel(mysqlConn),
+		UsernameModel:     model.NewTUsernamesModel(mysqlConn),
 
 		UserCheck:      middleware.NewUsercheckMiddleware().Handle,
 		CheckBasicAuth: middleware.NewCheckBasicAuthMiddleware(model.NewTAccountsModel(mysqlConn)).Handle,
@@ -164,11 +169,15 @@ func NewServiceContext(c config.Config) *ServiceContext {
 		ProfileKeyMap: make(map[string]string),
 
 		BackupCredentialsGenerator: auth.NewExternalServiceCredentialGenerator([]byte(c.BackupService.UserAuthenticationTokenSharedSecret), nil, false),
+		DirectoryCredentialsGenerator: auth.NewExternalServiceCredentialGenerator(
+			[]byte(c.DirectoryClient.UserAuthenticationTokenSharedSecret),
+			[]byte(c.DirectoryClient.UserAuthenticationTokenUserIdSecret),
+			true),
 		CertificateGenerator:       certificateGenerator,
 		RedisClient:                redisClient,
-		RedisOperation:   redisOperation,
-		Dispatcher:       dispatcher,
-		PubSubManager:    pubSubManager,
-		PushSender:       pushSender,
+		RedisOperation:             redisOperation,
+		Dispatcher:                 dispatcher,
+		PubSubManager:              pubSubManager,
+		PushSender:                 pushSender,
 	}
 }

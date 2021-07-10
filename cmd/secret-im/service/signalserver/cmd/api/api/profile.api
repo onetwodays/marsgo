@@ -1,0 +1,94 @@
+syntax = "v2"
+type SetNameReq {
+    Name string `path:"name"`
+}
+
+// 设置profile
+type CreateProfileRequest {
+    Version string `json:"version"`
+    Name string `json:"name"`
+    Avatar bool `json:"avatar"`
+    Commitment string `json:"commitment"`
+}
+
+// 上传头像属性
+type ProfileAvatarUploadAttributes {
+    Key string `json:"key"`
+    Credential string `json:"credential"`
+    Acl string `json:"acl"`
+    Algorithm string `json:"algorithm"`
+    Date string `json:"date"`
+    Policy string `json:"policy"`
+    Signature string `json:"signature"`
+}
+
+type GetProfileByUserName {
+    UserName string `path:"username"`
+}
+
+type UserCapabilities {
+    Uuid bool `json:"uuid"`
+    Gv2 bool `json:"gv2"`
+}
+
+type Profile {
+    IdentityKey string `json:"identityKey"`
+    Name string `json:"name"`
+    Avatar string `json:"avatar"`
+    UnidentifiedAccess string `json:"unidentifiedAccess"`
+    UnrestrictedUnidentifiedAccess bool `json:"unrestrictedUnidentifiedAccess"`
+    Capabilities UserCapabilities `json:"capabilities"`
+    UserName string `json:"userName"`
+    Uuid string `json:"uuid"`
+    Credential string `json:"credential"`
+}
+
+type GetProfileByUUID{
+    Uuid string `path:"uuid"`
+    Version string `path:"version"`
+}
+
+type GetProfileByUUIDCredentia{
+    Uuid string `path:"uuid"`
+    Version string `path:"version"`
+    CredentialRequest string `path:"credentialRequest"`
+}
+
+
+
+@server(
+    middleware : CheckBasicAuth
+    group: profile
+)
+service signalserver-api {
+    // 设置显示名字 废弃
+    @handler SetNameHandler
+    put /v1/profile/name/:name (SetNameReq) returns ()
+
+    // 设置profile
+    @handler SetProfileHandler
+    put /v1/profile (CreateProfileRequest) returns (ProfileAvatarUploadAttributes)
+
+
+    // 根据用户昵称获取profile
+    @handler GetProfileByUserNameHandler
+    get /v1/profile/username/:username (GetProfileByUserName) returns (Profile)
+}
+
+
+@server(
+    group: profile
+)
+service signalserver-api {
+
+
+    // profile
+    @handler GetProfileByUuidHandler
+    get /v1/profile/:uuid/:version (GetProfileByUUID) returns (Profile)
+
+
+    //
+    @handler GetProfileByUuidCredentiaHandler
+    get /v1/profile/:uuid/:version/:credentialRequest (GetProfileByUUIDCredentia) returns (Profile)
+}
+

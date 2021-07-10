@@ -5,15 +5,16 @@ import (
 	"net/http"
 
 	accounts "secret-im/service/signalserver/cmd/api/internal/handler/accounts"
-	bookstore "secret-im/service/signalserver/cmd/api/internal/handler/bookstore"
 	certificate "secret-im/service/signalserver/cmd/api/internal/handler/certificate"
+	device "secret-im/service/signalserver/cmd/api/internal/handler/device"
+	directory "secret-im/service/signalserver/cmd/api/internal/handler/directory"
+	keepalive "secret-im/service/signalserver/cmd/api/internal/handler/keepalive"
 	keys "secret-im/service/signalserver/cmd/api/internal/handler/keys"
+	messages "secret-im/service/signalserver/cmd/api/internal/handler/messages"
+	profile "secret-im/service/signalserver/cmd/api/internal/handler/profile"
+	profilekey "secret-im/service/signalserver/cmd/api/internal/handler/profilekey"
+	provision "secret-im/service/signalserver/cmd/api/internal/handler/provision"
 	textsecret "secret-im/service/signalserver/cmd/api/internal/handler/textsecret"
-	textsecret_keepalive "secret-im/service/signalserver/cmd/api/internal/handler/textsecret_keepalive"
-	textsecret_keys "secret-im/service/signalserver/cmd/api/internal/handler/textsecret_keys"
-	textsecret_messages "secret-im/service/signalserver/cmd/api/internal/handler/textsecret_messages"
-	textsecret_websocket "secret-im/service/signalserver/cmd/api/internal/handler/textsecret_websocket"
-	website "secret-im/service/signalserver/cmd/api/internal/handler/website"
 	"secret-im/service/signalserver/cmd/api/internal/svc"
 
 	"github.com/tal-tech/go-zero/rest"
@@ -26,50 +27,6 @@ func RegisterHandlers(engine *rest.Server, serverCtx *svc.ServiceContext) {
 				Method:  http.MethodGet,
 				Path:    "/index",
 				Handler: IndexHandler(serverCtx),
-			},
-		},
-	)
-
-	engine.AddRoutes(
-		[]rest.Route{
-			{
-				Method:  http.MethodPost,
-				Path:    "/user/register",
-				Handler: website.RegisterHandler(serverCtx),
-			},
-			{
-				Method:  http.MethodPost,
-				Path:    "/user/login",
-				Handler: website.LoginHandler(serverCtx),
-			},
-		},
-	)
-
-	engine.AddRoutes(
-		rest.WithMiddlewares(
-			[]rest.Middleware{serverCtx.UserCheck},
-			[]rest.Route{
-				{
-					Method:  http.MethodGet,
-					Path:    "/user/info",
-					Handler: website.UserInfoHandler(serverCtx),
-				},
-			}...,
-		),
-		rest.WithJwt(serverCtx.Config.Auth.AccessSecret),
-	)
-
-	engine.AddRoutes(
-		[]rest.Route{
-			{
-				Method:  http.MethodGet,
-				Path:    "/add",
-				Handler: bookstore.AddHandler(serverCtx),
-			},
-			{
-				Method:  http.MethodGet,
-				Path:    "/check",
-				Handler: bookstore.CheckHandler(serverCtx),
 			},
 		},
 	)
@@ -143,6 +100,16 @@ func RegisterHandlers(engine *rest.Server, serverCtx *svc.ServiceContext) {
 					Path:    "/v1/accounts/gcm",
 					Handler: accounts.DelGcmRegistrationIDHandler(serverCtx),
 				},
+				{
+					Method:  http.MethodDelete,
+					Path:    "/v1/accounts/username",
+					Handler: accounts.DeleteUserNameHandler(serverCtx),
+				},
+				{
+					Method:  http.MethodDelete,
+					Path:    "/v1/accounts/username/:username",
+					Handler: accounts.SetUserNameHandler(serverCtx),
+				},
 			}...,
 		),
 	)
@@ -178,7 +145,7 @@ func RegisterHandlers(engine *rest.Server, serverCtx *svc.ServiceContext) {
 				{
 					Method:  http.MethodGet,
 					Path:    "/v1/messages",
-					Handler: textsecret_messages.GetMsgsHandler(serverCtx),
+					Handler: messages.GetMsgsHandler(serverCtx),
 				},
 			}...,
 		),
@@ -189,7 +156,7 @@ func RegisterHandlers(engine *rest.Server, serverCtx *svc.ServiceContext) {
 			{
 				Method:  http.MethodPut,
 				Path:    "/v1/messages/:destination",
-				Handler: textsecret_messages.PutMsgsHandler(serverCtx),
+				Handler: messages.PutMsgsHandler(serverCtx),
 			},
 		},
 	)
@@ -200,28 +167,13 @@ func RegisterHandlers(engine *rest.Server, serverCtx *svc.ServiceContext) {
 			[]rest.Route{
 				{
 					Method:  http.MethodPut,
-					Path:    "/v3/keys",
-					Handler: textsecret_keys.PutKeysHandler(serverCtx),
-				},
-				{
-					Method:  http.MethodGet,
-					Path:    "/v3/keys/:identifier/:deviceId",
-					Handler: textsecret_keys.GetKeysHandler(serverCtx),
-				},
-				{
-					Method:  http.MethodGet,
-					Path:    "/v3/keys",
-					Handler: textsecret_keys.GetKeyCountHandler(serverCtx),
-				},
-				{
-					Method:  http.MethodPut,
 					Path:    "/v1/profile/:accountName",
-					Handler: textsecret_keys.PutProfileKeyHandler(serverCtx),
+					Handler: profilekey.PutProfileKeyHandler(serverCtx),
 				},
 				{
 					Method:  http.MethodGet,
 					Path:    "/v1/profile/:accountName",
-					Handler: textsecret_keys.GetProfileKeyHandler(serverCtx),
+					Handler: profilekey.GetProfileKeyHandler(serverCtx),
 				},
 			}...,
 		),
@@ -231,18 +183,13 @@ func RegisterHandlers(engine *rest.Server, serverCtx *svc.ServiceContext) {
 		[]rest.Route{
 			{
 				Method:  http.MethodGet,
-				Path:    "/v2/websocket",
-				Handler: textsecret_websocket.WSConnectHandler(serverCtx),
+				Path:    "/v1/keepalive",
+				Handler: keepalive.GetKeepAliveHandler(serverCtx),
 			},
-		},
-	)
-
-	engine.AddRoutes(
-		[]rest.Route{
 			{
 				Method:  http.MethodGet,
-				Path:    "/v1/keepalive",
-				Handler: textsecret_keepalive.GetKeepAliveHandler(serverCtx),
+				Path:    "/v1/keepalive/provisioning",
+				Handler: keepalive.GetProvisioningKeepAliveHandler(serverCtx),
 			},
 		},
 	)
@@ -296,5 +243,112 @@ func RegisterHandlers(engine *rest.Server, serverCtx *svc.ServiceContext) {
 				Handler: keys.GetDeviceKeysHandler(serverCtx),
 			},
 		},
+	)
+
+	engine.AddRoutes(
+		rest.WithMiddlewares(
+			[]rest.Middleware{serverCtx.CheckBasicAuth},
+			[]rest.Route{
+				{
+					Method:  http.MethodPut,
+					Path:    "/v1/profile/name/:name",
+					Handler: profile.SetNameHandler(serverCtx),
+				},
+				{
+					Method:  http.MethodPut,
+					Path:    "/v1/profile",
+					Handler: profile.SetProfileHandler(serverCtx),
+				},
+				{
+					Method:  http.MethodGet,
+					Path:    "/v1/profile/username/:username",
+					Handler: profile.GetProfileByUserNameHandler(serverCtx),
+				},
+			}...,
+		),
+	)
+
+	engine.AddRoutes(
+		[]rest.Route{
+			{
+				Method:  http.MethodGet,
+				Path:    "/v1/profile/:uuid/:version",
+				Handler: profile.GetProfileByUuidHandler(serverCtx),
+			},
+			{
+				Method:  http.MethodGet,
+				Path:    "/v1/profile/:uuid/:version/:credentialRequest",
+				Handler: profile.GetProfileByUuidCredentiaHandler(serverCtx),
+			},
+		},
+	)
+
+	engine.AddRoutes(
+		rest.WithMiddlewares(
+			[]rest.Middleware{serverCtx.CheckBasicAuth},
+			[]rest.Route{
+				{
+					Method:  http.MethodPut,
+					Path:    "/v1/provisioning/:destination",
+					Handler: provision.SendProvisioningMessageHandler(serverCtx),
+				},
+			}...,
+		),
+	)
+
+	engine.AddRoutes(
+		rest.WithMiddlewares(
+			[]rest.Middleware{serverCtx.CheckBasicAuth},
+			[]rest.Route{
+				{
+					Method:  http.MethodGet,
+					Path:    "/v1/directory/auth",
+					Handler: directory.GetAuthTokenHandler(serverCtx),
+				},
+				{
+					Method:  http.MethodGet,
+					Path:    "/v1/directory/:token",
+					Handler: directory.GetTokenPresenceHandler(serverCtx),
+				},
+				{
+					Method:  http.MethodPut,
+					Path:    "/v1/directory/tokens",
+					Handler: directory.GetContactIntersectionHandler(serverCtx),
+				},
+			}...,
+		),
+	)
+
+	engine.AddRoutes(
+		rest.WithMiddlewares(
+			[]rest.Middleware{serverCtx.CheckBasicAuth},
+			[]rest.Route{
+				{
+					Method:  http.MethodGet,
+					Path:    "/v1/devices",
+					Handler: device.GetDevicesHandler(serverCtx),
+				},
+				{
+					Method:  http.MethodDelete,
+					Path:    "/v1/devices/:device_id",
+					Handler: device.DelDeviceHandler(serverCtx),
+				},
+				{
+					Method:  http.MethodGet,
+					Path:    "/v1/devices/provisioning/code",
+					Handler: device.CreateDeviceTokenHandler(serverCtx),
+				},
+				{
+					Method:  http.MethodPut,
+					Path:    "/v1/devices/unauthenticated_delivery",
+					Handler: device.SetUnauthenticatedDeliveryHandler(serverCtx),
+				},
+				{
+					Method:  http.MethodPut,
+					Path:    "/v1/devices/:verification_code",
+					Handler: device.VerifyDeviceTokenHandler(serverCtx),
+				},
+			}...,
+		),
 	)
 }

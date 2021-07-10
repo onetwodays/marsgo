@@ -41,6 +41,8 @@ func CreateResponse(requstID uint64,status int,messageString string,headers []st
 	if len(headers) >0 {
 		responseMessage.Headers =headers
 	}
+	responseMessage.Headers=append(responseMessage.Headers,"Flag:ws")
+
 
 
 	message := &textsecure.WebSocketMessage{}

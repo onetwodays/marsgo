@@ -107,7 +107,10 @@ func HandleHTTPRequest(ctx *SessionContext, h http.Handler,
 		}
 		header.Set(strip(slice[0]), strip(slice[1]))
 	}
-	header.Set("flag","ws") //标识请求来自ws
+	header.Set("Flag","ws") //标识请求来自ws
+
+
+
 	r.Header = header
 	r.Body = &netHTTPBody{request.Body}
 	rURL, err := url.ParseRequestURI(r.RequestURI)
@@ -118,11 +121,16 @@ func HandleHTTPRequest(ctx *SessionContext, h http.Handler,
 
 	w := netHTTPResponseWriter{statusCode: http.StatusOK}
 	// 是来自ws的请求，这里上下文都设置几个值
-	c:=context.WithValue(context.Background(), "ws", ctx) //没有被使用
+
+	c:=context.WithValue(context.Background(), "ws",ctx) //没有被使用
 	if ctx.Device!=nil{
+		header.Set("Ws-Auth","ok") //标识请求来自ws
 		c= context.WithValue(c, shared.CONTENTKEYUUID,ctx.Device.UUID)
 		c= context.WithValue(c, shared.CONTENTKEYDEVICEID,ctx.Device.Device.ID)
+		c=context.WithValue(c, shared.HttpReqContextAccountKey, ctx.account)
 	}
+
+	// //////////////////////////////////
 
 
 	h.ServeHTTP(&w, r.WithContext(c))

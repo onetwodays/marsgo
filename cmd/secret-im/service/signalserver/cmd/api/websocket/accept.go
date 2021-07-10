@@ -46,8 +46,7 @@ func authenticate(r *http.Request, ctx *svc.ServiceContext) (*entities.Account, 
 		}
 	*/
 	checkBasicAuth := middleware.NewCheckBasicAuthMiddleware(ctx.AccountsModel)
-	logx.Info("ba.login=", ba.Login)
-	logx.Info("ba.passwd=", ba.Password)
+
 	appAccount, err := checkBasicAuth.BasicAuthByUserPasswd(ba.Login, ba.Password, enabledRequired)
 	if err != nil {
 		logx.Error("checkBasicAuth.BasicAuthByUserPasswd fail:",err.Error())

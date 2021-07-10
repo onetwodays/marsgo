@@ -77,7 +77,7 @@ type (
     //jwt: Auth
     //middleware:UserNameCheck
     middleware :CheckBasicAuth
-    group: textsecret_messages
+    group: messages
 
 )
 service signalserver-api {
@@ -93,7 +93,7 @@ service signalserver-api {
     //jwt: Auth
     //middleware:UserNameCheck
     //middleware :CheckBasicAuth
-    group: textsecret_messages
+    group: messages
 
 )
 service signalserver-api {

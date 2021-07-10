@@ -13,6 +13,8 @@ import (
 var internal struct {
 	accountDB model.TAccountsModel
 	msgDB     model.TMessagesModel
+	profileDB model.TProfilesModel
+	userNameDB model.TUsernamesModel
 	client          *redis.Client
 	// 查询消息操作
 	getOperation *operation.GetOperation
@@ -21,10 +23,15 @@ var internal struct {
 	// 删除消息操作
 	removeOperation *operation.RemoveOperation
 }
-func InitStorage(client *redis.Client,accountDB model.TAccountsModel,msgDB model.TMessagesModel)  {
+func InitStorage(client *redis.Client,accountDB model.TAccountsModel,
+	                                  msgDB model.TMessagesModel,
+	                                  profileDB model.TProfilesModel,
+	                                  userNameDB model.TUsernamesModel)  {
 	syncx.Once(func() {
 		internal.accountDB =accountDB
 		internal.msgDB=msgDB
+		internal.profileDB=profileDB
+		internal.userNameDB=userNameDB
 		internal.client=client
 		var err error
 		internal.getOperation,err = operation.NewGetOperation(client)

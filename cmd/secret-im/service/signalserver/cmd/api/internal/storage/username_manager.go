@@ -1,7 +1,8 @@
 package storage
-/*
+
 import (
 	"fmt"
+	"secret-im/service/signalserver/cmd/api/internal/model"
 
 	"github.com/go-redis/redis"
 )
@@ -12,6 +13,7 @@ type UsernamesManager struct {
 
 // 放入用户名
 func (m UsernamesManager) Put(uuid, username string) (bool, error) {
+	/*
 	ok, err := ReservedUsernames{}.IsReserved(username, uuid)
 	if ok {
 		return false, nil
@@ -20,15 +22,19 @@ func (m UsernamesManager) Put(uuid, username string) (bool, error) {
 		return false, err
 	}
 
-	ok, err = Usernames{}.Put(uuid, username)
+	 */
+	record :=&model.TUsernames{
+		Uuid: uuid,
+		Username: username,
+	}
+	_,err:=internal.userNameDB.Insert(*record)
+
 	if err != nil {
 		return false, err
 	}
 
-	if ok {
-		m.redisSet(uuid, username)
-	}
-	return ok, nil
+	m.redisSet(uuid, username)
+	return true, nil
 }
 
 // 根据UUID获取用户名
@@ -38,12 +44,12 @@ func (m UsernamesManager) GetUsernameForUUID(uuid string) (string, error) {
 		return *username, nil
 	}
 
-	data, err := Usernames{}.GetUsernameForUUID(uuid)
-	if err != nil {
+	recode,err:=internal.userNameDB.FindOneByUuid(uuid)
+	if err!=nil{
 		return "", err
 	}
-	m.redisSet(uuid, data)
-	return data, nil
+	m.redisSet(uuid, recode.Username)
+	return recode.Username, nil
 }
 
 // 根据用户名获取UUID
@@ -52,13 +58,14 @@ func (m UsernamesManager) GetUUIDForUsername(username string) (string, error) {
 	if uuid != nil {
 		return *uuid, nil
 	}
-
-	data, err := Usernames{}.GetUUIDForUsername(username)
-	if err != nil {
+	record,err:=internal.userNameDB.FindOneByUsername(username)
+	if err!=nil{
 		return "", err
 	}
-	m.redisSet(data, username)
-	return data, nil
+
+
+	m.redisSet(record.Uuid, username)
+	return record.Uuid, nil
 }
 
 // 删除用户名
@@ -66,7 +73,8 @@ func (m UsernamesManager) Delete(uuid string) error {
 	if err := m.redisDelete(uuid); err != nil {
 		return err
 	}
-	return Usernames{}.Delete(uuid)
+
+	return internal.userNameDB.DeleteByUuid(uuid)
 }
 
 // UUID->用户名
@@ -131,4 +139,3 @@ func (m UsernamesManager) redisDelete(uuid string) error {
 	}
 	return internal.client.Del(m.usernameMapKey(*username)).Err()
 }
-*/

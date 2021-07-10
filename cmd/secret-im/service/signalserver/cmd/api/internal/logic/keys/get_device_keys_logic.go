@@ -5,7 +5,7 @@ import (
 	"net/http"
 	"secret-im/service/signalserver/cmd/api/internal/auth"
 	"secret-im/service/signalserver/cmd/api/internal/auth/helper"
-	"secret-im/service/signalserver/cmd/api/internal/middleware"
+	"secret-im/service/signalserver/cmd/api/internal/logic"
 	"secret-im/service/signalserver/cmd/api/internal/storage"
 	"secret-im/service/signalserver/cmd/api/shared"
 	"strconv"
@@ -36,13 +36,12 @@ func (l *GetDeviceKeysLogic) GetDeviceKeys(r *http.Request, req types.GetKeysReq
 
 	header := r.Header.Get(helper.UNIDENTIFIED)
 	accessKey, _ := auth.NewAnonymous(header)
-	checkBasicAuth := middleware.NewCheckBasicAuthMiddleware(l.svcCtx.AccountsModel)
-	// 帐号鉴权
-	appAccount, err := checkBasicAuth.BasicAuthByHeader(r, true)
-	if accessKey == nil {
-		if err!=nil {
-			return nil, shared.Status(http.StatusUnauthorized, err.Error())
-		}
+	appAccount,err:= logic.GetSourceAccount(r,l.svcCtx.AccountsModel)
+	if err!=nil{
+		return nil,shared.Status(http.StatusUnauthorized,err.Error())
+	}
+	if accessKey == nil && appAccount==nil {
+		return nil, shared.Status(http.StatusUnauthorized, "")
 	}
 	// 获取目标用户
 	targetName := auth.NewAmbiguousIdentifier(req.Identifier)

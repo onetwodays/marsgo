@@ -3,68 +3,68 @@ syntax = "v2"
 // 获取sms code
 type GetCodeReq {
     Transport string `path:"transport"`
-    Number    string `path:"number"`
-    Client    string `form:"client,optional"`
-    Captcha   string `form:"captcha,optional"`
+    Number string `path:"number"`
+    Client string `form:"client,optional"`
+    Captcha string `form:"captcha,optional"`
     Challenge string `form:"challenge,optional"`
 }
 
 
 // 设备功能集
-type DeviceCapabilities  {
+type DeviceCapabilities {
     UUID bool `json:"uuid,optional"`
 }
 
 
 type AccountAttributes {
     SignalingKey string `json:"signalingKey,optional"`
-    FetchesMessages                bool                `json:"fetchesMessages"`
-    RegistrationID                 int                 `json:"registrationId"`
-    Name                           string              `json:"name,optional"`
-    Pin                            string              `json:"pin,optional"`
-    RegistrationLock               string              `json:"registrationLock,optional"`
-    UnidentifiedAccessKey          string              `json:"unidentifiedAccessKey,optional"`
-    UnrestrictedUnidentifiedAccess bool                `json:"unrestrictedUnidentifiedAccess,optional"`
-    Capabilities                   DeviceCapabilities  `json:"capabilities,optional"`
+    FetchesMessages bool `json:"fetchesMessages"`
+    RegistrationID int `json:"registrationId"`
+    Name string `json:"name,optional"`
+    Pin string `json:"pin,optional"`
+    RegistrationLock string `json:"registrationLock,optional"`
+    UnidentifiedAccessKey string `json:"unidentifiedAccessKey,optional"`
+    UnrestrictedUnidentifiedAccess bool `json:"unrestrictedUnidentifiedAccess,optional"`
+    Capabilities DeviceCapabilities `json:"capabilities,optional"`
 }
 
 type VerifyAccountReq {
     VerificationCode string `path:"verificationCode"`
     SignalingKey string `json:"signalingKey,optional"`
-    FetchesMessages                bool                `json:"fetchesMessages"`
-    RegistrationID                 int                 `json:"registrationId"`
-    Name                           string              `json:"name,optional"`
-    Pin                            string              `json:"pin,optional"`
-    RegistrationLock               string              `json:"registrationLock,optional"`
-    UnidentifiedAccessKey          string              `json:"unidentifiedAccessKey,optional"`
-    UnrestrictedUnidentifiedAccess bool                `json:"unrestrictedUnidentifiedAccess,optional"`
-    Capabilities                   DeviceCapabilities  `json:"capabilities,optional"`
+    FetchesMessages bool `json:"fetchesMessages"`
+    RegistrationID int `json:"registrationId"`
+    Name string `json:"name,optional"`
+    Pin string `json:"pin,optional"`
+    RegistrationLock string `json:"registrationLock,optional"`
+    UnidentifiedAccessKey string `json:"unidentifiedAccessKey,optional"`
+    UnrestrictedUnidentifiedAccess bool `json:"unrestrictedUnidentifiedAccess,optional"`
+    Capabilities DeviceCapabilities `json:"capabilities,optional"`
 }
 
-type VerifyAccountRes{
+type VerifyAccountRes {
     UUID string `json:"uuid"`
 }
 
 
-type SetAttributesReq{
+type SetAttributesReq {
     SignalingKey string `json:"signalingKey,optional"`
-    FetchesMessages                bool                `json:"fetchesMessages"`
-    RegistrationID                 int                 `json:"registrationId"`
-    Name                           string              `json:"name,optional"`
-    Pin                            string              `json:"pin,optional"`
-    RegistrationLock               string              `json:"registrationLock,optional"`
-    UnidentifiedAccessKey          string              `json:"unidentifiedAccessKey,optional"`
-    UnrestrictedUnidentifiedAccess bool                `json:"unrestrictedUnidentifiedAccess,optional"`
-    Capabilities                   DeviceCapabilities  `json:"capabilities,optional"`
+    FetchesMessages bool `json:"fetchesMessages"`
+    RegistrationID int `json:"registrationId"`
+    Name string `json:"name,optional"`
+    Pin string `json:"pin,optional"`
+    RegistrationLock string `json:"registrationLock,optional"`
+    UnidentifiedAccessKey string `json:"unidentifiedAccessKey,optional"`
+    UnrestrictedUnidentifiedAccess bool `json:"unrestrictedUnidentifiedAccess,optional"`
+    Capabilities DeviceCapabilities `json:"capabilities,optional"`
 }
 
 // PIN码
-type DeprecatedPin  {
+type DeprecatedPin {
     Pin string `json:"pin"`
 }
 
 // 注册锁
-type RegistrationLock  {
+type RegistrationLock {
     RegistrationLock string `json:"registrationLock"`
 }
 
@@ -75,13 +75,17 @@ type DeviceName {
 
 
 // 帐号创建结果
-type AccountCreationResult  {
+type AccountCreationResult {
     UUID string `json:"uuid"`
 }
 
 // GCM注册ID
-type GcmRegistrationID  {
+type GcmRegistrationID {
     GcmRegistrationID string `json:"gcmRegistrationId"`
+}
+
+type SetUserName {
+    Username string `json:"username"`
 }
 
 
@@ -135,7 +139,11 @@ service signalserver-api {
     @handler DelGcmRegistrationIDHandler
     delete /v1/accounts/gcm () returns ()
 
+    @handler DeleteUserNameHandler
+    delete /v1/accounts/username () returns ()
 
+    @handler SetUserNameHandler
+    delete /v1/accounts/username/:username (SetUserName) returns ()
 }
 
 

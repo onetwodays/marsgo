@@ -22,6 +22,7 @@ type SessionContext struct {
 	Device *ConnectedDevice
 	PushSender    *push.Sender
 	PubSubManager *pubsub.Manager
+	account     *entities.Account
 
 }
 

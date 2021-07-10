@@ -4,12 +4,16 @@ syntax = "v2"
 @server(
     //jwt: Auth
     //middleware:UserNameCheck
-    group: textsecret_keepalive
+    group: keepalive
 
 )
 service signalserver-api {
     @handler GetKeepAliveHandler
     get /v1/keepalive () returns ()
+
+
+    @handler GetProvisioningKeepAliveHandler
+    get /v1/keepalive/provisioning () returns ()
 
 
 }

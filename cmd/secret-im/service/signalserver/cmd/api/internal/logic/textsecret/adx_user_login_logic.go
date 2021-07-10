@@ -39,14 +39,14 @@ func NewAdxUserLoginLogic(ctx context.Context, svcCtx *svc.ServiceContext) AdxUs
 func (l *AdxUserLoginLogic) AdxUserLogin(req types.AdxUserLoginReq,userAgent string) (*types.AdxUserLoginRes, error) {
 	// todo: add your logic here and delete this line
 	if err := l.checkEosUserValid(req.Account, req.Sign); err != nil {
-		return nil, err
+		return nil, shared.Status(http.StatusInternalServerError,err.Error())
 	}
 
 	now := time.Now().Unix()
 	accessExpire := l.svcCtx.Config.Auth.AccessExpire
 	jwtToken, err := l.getJwtToken(l.svcCtx.Config.Auth.AccessSecret, now, accessExpire, req.Account)
 	if err != nil {
-		return nil, err
+		return nil, shared.Status(http.StatusInternalServerError,err.Error())
 	}
 
 	accountAttr := &types.AccountAttributes{
@@ -66,7 +66,7 @@ func (l *AdxUserLoginLogic) AdxUserLogin(req types.AdxUserLoginReq,userAgent str
 	//新用户的话，创建一个，不是新用户的话，返回已经存在的uuid
 	dbAccount, err := l.svcCtx.AccountsModel.FindOneByNumber(req.Account)
 	if err != nil && err != sqlx.ErrNotFound {
-		return nil, err
+		return nil, shared.Status(http.StatusInternalServerError,err.Error())
 	}
 
 

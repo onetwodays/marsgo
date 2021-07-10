@@ -10,8 +10,7 @@ import (
 	"github.com/tal-tech/go-zero/core/timex"
 	"github.com/tal-tech/go-zero/rest/httpx"
 	"secret-im/service/signalserver/cmd/api/internal/svc"
-	"secret-im/service/signalserver/cmd/api/internal/types"
-	shared "secret-im/service/signalserver/cmd/api/shared"
+	"secret-im/service/signalserver/cmd/api/shared"
 	"secret-im/service/signalserver/cmd/api/textsecure"
 	"secret-im/service/signalserver/cmd/api/util"
 	"strings"
@@ -129,6 +128,11 @@ func (c *Client) handleMsg(msg []byte) {
 	}
 }
 
+type wsConnReq struct {
+	Login    string `form:"login,optional"`
+	Password string `form:"password,optional"`
+}
+
 // serveWs handles websocket requests from the peer.
 func WsConnectHandler(ctx *svc.ServiceContext) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
@@ -142,7 +146,7 @@ func WsConnectHandler(ctx *svc.ServiceContext) http.HandlerFunc {
 		}
 
 
-		var req types.WsConnReq
+		var req wsConnReq
 		if err := httpx.Parse(r, &req); err != nil {
 			logx.Error("httpx.Parse /v1/websocket/?login= error",err.Error(),"->匿名建立websocket连接")
 

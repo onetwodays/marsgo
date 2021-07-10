@@ -1,0 +1,59 @@
+syntax = "v2"
+
+info(
+    title: "type title here"
+    desc: "type desc here"
+    author: "type author here"
+    email: "type email here"
+    version: "type version here"
+)
+
+
+
+
+
+// 设备信息
+type DeviceInfo  {
+    ID       int64  `json:"id"`
+    Name     string `json:"name"`
+    LastSeen int64  `json:"lastSeen"`
+    Created  int64  `json:"created"`
+}
+
+// 设备信息列表
+type DeviceInfoList  {
+    Devices []DeviceInfo `json:"devices"`
+}
+type DelDeviceReq{
+    DeviceId string    `path:"device_id"`
+}
+// 验证码
+type VerificationCode  {
+    Code      string  `json:"code"`
+    Timestamp int64   `json:"timestamp"`
+    PushCode  string `json:"pushCode,optional"`
+}
+
+
+@server(
+    middleware : CheckBasicAuth
+    group: device
+)
+service signalserver-api {
+    //获取设备列表
+    @handler GetDevicesHandler
+    get /v1/devices () returns (DeviceInfoList)
+    // 移除设备
+    @handler DelDeviceHandler
+    delete /v1/devices/:device_id (DelDeviceReq) returns ()
+    //创建设备令牌
+    @handler CreateDeviceTokenHandler
+    get /v1/devices/provisioning/code () returns (VerificationCode)
+
+    //设置未认证的交付证书
+    @handler SetUnauthenticatedDeliveryHandler
+    put /v1/devices/unauthenticated_delivery () returns ()
+    // 验证设备令牌
+    @handler VerifyDeviceTokenHandler
+    put /v1/devices/:verification_code () returns ()
+}

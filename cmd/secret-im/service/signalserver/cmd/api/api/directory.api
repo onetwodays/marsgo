@@ -1,0 +1,53 @@
+syntax = "v2"
+
+info(
+    title: "type title here"
+    desc: "type desc here"
+    author: "type author here"
+    email: "type email here"
+    version: "type version here"
+)
+
+// 外部服务证书
+type ExternalServiceCredentials {
+    Username string `json:"username"`
+    Password string `json:"password"` // UserName:UserName加盐哈系
+}
+
+// 联系人信息
+type ClientContact {
+    Token string `json:"token"`
+    Voice bool `json:"voice,optional"`
+    Video bool `json:"video,optional"`
+    Relay string `json:"relay,optional"`
+    Inactive bool `json:"inactive,optional"`
+}
+
+// 联系人令牌
+type ClientContactTokens {
+    Contacts []string `json:"contacts"`
+}
+
+// 联系人列表
+type ClientContacts struct {
+    Contacts []ClientContact `json:"contacts"`
+}
+
+type GetTokenPresenceReq {
+    Token string `path:"token"`
+}
+
+@server(
+    middleware : CheckBasicAuth
+    group: directory
+)
+service signalserver-api {
+    @handler GetAuthTokenHandler // TODO: replace handler name and delete this comment
+    get /v1/directory/auth () returns (ExternalServiceCredentials)
+
+    @handler GetTokenPresenceHandler // TODO: replace handler name and delete this comment
+    get /v1/directory/:token () returns (ClientContact)
+
+    @handler GetContactIntersectionHandler // TODO: replace handler name and delete this comment
+    put /v1/directory/tokens (ClientContactTokens) returns (ClientContacts)
+}

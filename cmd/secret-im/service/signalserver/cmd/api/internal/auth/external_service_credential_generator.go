@@ -7,15 +7,16 @@ import (
 	"encoding/hex"
 	"math"
 	"secret-im/pkg/utils-tools"
+	"secret-im/service/signalserver/cmd/api/internal/types"
 	"strconv"
 	"strings"
 )
 
 // 外部服务证书生成器
 type ExternalServiceCredentialGenerator struct {
-	key                []byte
-	userIDKey          []byte
-	usernameDerivation bool  //用户名字推导
+	key                []byte //来自配置文件
+	userIDKey          []byte // nil
+	usernameDerivation bool  //用户名字推导 false
 }
 
 // 创建外部服务证书生成器
@@ -29,7 +30,7 @@ func NewExternalServiceCredentialGenerator(
 }
 
 // 生成证书
-func (generator *ExternalServiceCredentialGenerator) GenerateFor(number string) *ExternalServiceCredentials {
+func (generator *ExternalServiceCredentialGenerator) GenerateFor(number string) *types.ExternalServiceCredentials {
 	username := generator.getUserID(number, generator.usernameDerivation)
 	currentTimeSeconds := utils.CurrentTimeMillis() / 1000
 	prefix := username + ":" + strconv.FormatInt(currentTimeSeconds, 10)
@@ -43,7 +44,7 @@ func (generator *ExternalServiceCredentialGenerator) GenerateFor(number string) 
 	output := hex.EncodeToString(sum)
 
 	token := prefix + ":" + output
-	return &ExternalServiceCredentials{Username: username, Password: token}
+	return &types.ExternalServiceCredentials{Username: username, Password: token}
 }
 
 // 是否有效

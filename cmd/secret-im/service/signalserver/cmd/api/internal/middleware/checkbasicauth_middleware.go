@@ -29,15 +29,21 @@ func NewCheckBasicAuthMiddleware(model model.TAccountsModel) *CheckBasicAuthMidd
 
 func (m *CheckBasicAuthMiddleware) Handle(next http.HandlerFunc) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-
-		r, err := m.basicAuth(r, true)
-		if err != nil {
-			e := shared.Status(http.StatusUnauthorized, err.Error())
-			logx.Error("CheckBasicAuthMiddleware fail:", e)
-			httpx.Error(w, e)
-			return
+		//来自ws的请求已经可以获取到帐号信息了
+		if r.Header.Get("Ws-Auth")!="ok"{
+			new, err := m.basicAuth(r, true)
+			if err != nil {
+				e := shared.Status(http.StatusUnauthorized, err.Error())
+				logx.Error("CheckBasicAuthMiddleware fail:", e)
+				httpx.Error(w, e)
+				return
+			}
+			next(w, new)
+		}else{
+			next(w, r)
 		}
-		next(w, r)
+
+
 	}
 }
 
@@ -68,22 +74,22 @@ func (m *CheckBasicAuthMiddleware) BasicAuthByHeader(r *http.Request, enabledReq
 
 	ctx := r.Context().Value("ws")
 	if ctx != nil {
-		logx.Info("1.通过websocket进来的请求")
+		//logx.Info("1.通过websocket进来的请求")
 		uuid := r.Context().Value(shared.CONTENTKEYUUID)
 		deviceId := r.Context().Value(shared.CONTENTKEYDEVICEID)
 		if uuid != nil && deviceId != nil {
-			logx.Infof("2.从context拿uuid=%s和deviceid=%d来校验头", uuid, deviceId)
+			//logx.Infof("2.从context拿uuid=%s和deviceid=%d来校验头", uuid, deviceId)
 			header.Identifier = auth.AmbiguousIdentifier{
 				UUID: uuid.(string),
 			}
 			header.DeviceID = deviceId.(int64)
-			logx.Info("3.websocket请求context,basicAuthForHeader.....")
+			//logx.Info("3.websocket请求context,basicAuthForHeader.....")
 			return m.basicAuthForHeader(header, enabledRequired, ignorePassword...)
 		}
 	}
 	_, err := header.FromFullHeader(r.Header.Get(shared.AuthorizationHeader))
 	if err != nil {
-		logx.Error("header.FromFullHeader fail:", err, " 再次尝试自定义头")
+		//logx.Error("header.FromFullHeader fail:", err, " 再次尝试自定义头")
 		//return nil, err
 	}
 
@@ -92,7 +98,7 @@ func (m *CheckBasicAuthMiddleware) BasicAuthByHeader(r *http.Request, enabledReq
 
 		logx.Error("header.Identifier.UUID 与header.Identifier.Number 都是空，已从x-user-name 取值，作为用户标识 ")
 		header.Identifier.Number = r.Header.Get(shared.HEADADXUSERNAME)
-		logx.Info(shared.HEADADXUSERNAME, "=", header.Identifier.Number)
+		//logx.Info(shared.HEADADXUSERNAME, "=", header.Identifier.Number)
 	}
 	if len(header.Identifier.Number) == 0 {
 		err = errors.New("x-user-name 值为空，报错")
@@ -100,7 +106,7 @@ func (m *CheckBasicAuthMiddleware) BasicAuthByHeader(r *http.Request, enabledReq
 		return nil, err
 	}
 	if header.DeviceID == 0 {
-		logx.Error("设备id=0,，已默认是1")
+		//logx.Error("设备id=0,，已默认是1")
 		header.DeviceID = entities.DeviceMasterID
 	}
 	return m.basicAuthForHeader(header, enabledRequired, ignorePassword...)

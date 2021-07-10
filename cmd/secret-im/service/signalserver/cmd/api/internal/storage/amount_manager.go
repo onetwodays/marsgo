@@ -80,6 +80,16 @@ func (m AccountManager) GetByNumber(number string) (*entities.Account, error) {
 	return DbAccount2AppAccount(dbAccount)
 }
 
+
+func (m AccountManager) GetByUuid(uuid string) (*entities.Account, error) {
+
+	dbAccount, err := internal.accountDB.FindOneByUuid(uuid)
+	if err != nil {
+		return nil, err
+	}
+	return DbAccount2AppAccount(dbAccount)
+}
+
 func (m AccountManager)  CreateDBAccount(number, password,userAgent string, accountAttributes *types.AccountAttributes) (*model.TAccounts, error) {
 
 	device := new(entities.DeviceFull)

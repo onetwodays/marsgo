@@ -1,43 +1,6 @@
 syntax = "v2"
 
-type PreKeyx{
-    KeyId int64 `json:"keyId"`
-    PublicKey string `json:"publicKey"`
-}
-type SignedPrekeyx{
-    Signature string  `json:"signature"`
-    KeyId int64 `json:"keyId"`
-    PublicKey string `json:"publicKey"`
-}
 
-
-type PutKeysReqx{
-    IdentityKey string  `json:"identityKey"`
-    SignedPreKey SignedPrekeyx `json:"signedPreKey"`
-    PreKeys []PreKeyx `json:"preKeys"`
-}
-
-type GetKeysReq{
-    Identifier string `path:"identifier"`
-    DeviceId string `path:"deviceId"`
-}
-
-
-type PreKeyResponseItem{
-    DeviceId int64 `json:"deviceId"`
-    RegistrationId int64 `json:"registrationId"`
-    PreKey PreKeyx `json:"preKey"`
-    SignedPrekey SignedPrekeyx `json:"signedPreKey"`
-
-}
-type GetKeysResx{
-    IdentityKey string `json:"identityKey"`
-    Devices []PreKeyResponseItem `json:"devices"`
-}
-
-type PreKeyCount {
-    Count int `json:"count"`
-}
 
 type PutProfileKeyReq{
     accountName string `path:"accountName"`
@@ -59,18 +22,10 @@ type GetProfileKeyRes{
 @server(
     //jwt: Auth
     middleware : CheckBasicAuth
-    group: textsecret_keys
+    group: profilekey
 
 )
 service signalserver-api {
-    @handler PutKeysHandler
-    put  /v3/keys (PutKeysReqx) returns ()
-
-    @handler GetKeysHandler
-    get /v3/keys/:identifier/:deviceId (GetKeysReq) returns (GetKeysResx)
-
-    @handler GetKeyCountHandler
-    get /v3/keys () returns (PreKeyCount)
 
     @handler PutProfileKeyHandler
     put /v1/profile/:accountName (PutProfileKeyReq) returns()

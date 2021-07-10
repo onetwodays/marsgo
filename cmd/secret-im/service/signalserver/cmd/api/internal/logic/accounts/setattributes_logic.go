@@ -5,7 +5,7 @@ import (
 	"net/http"
 	"secret-im/pkg/utils-tools"
 	"secret-im/service/signalserver/cmd/api/internal/auth"
-	"secret-im/service/signalserver/cmd/api/internal/entities"
+	"secret-im/service/signalserver/cmd/api/internal/logic"
 	"secret-im/service/signalserver/cmd/api/internal/storage"
 	"secret-im/service/signalserver/cmd/api/shared"
 
@@ -30,13 +30,10 @@ func NewSetattributesLogic(ctx context.Context, svcCtx *svc.ServiceContext) Seta
 }
 
 func (l *SetattributesLogic) Setattributes(r *http.Request,req types.SetAttributesReq) error {
-	appAccount := r.Context().Value(shared.HttpReqContextAccountKey)
-	if appAccount == nil  {
-		reason := "check basic auth fail ,may by the handler not use middle"
-		logx.Error(reason)
-		return shared.Status(http.StatusUnauthorized, reason)
+	account,err:= logic.GetSourceAccount(r,l.svcCtx.AccountsModel)
+	if err!=nil{
+		return shared.Status(http.StatusUnauthorized,err.Error())
 	}
-	account := appAccount.(*entities.Account)
 	userAgent := r.Header.Get("User-Agent")
 
 	// 更新帐号信息

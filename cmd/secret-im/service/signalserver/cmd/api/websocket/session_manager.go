@@ -165,13 +165,16 @@ func (manager *SessionManager) onClosed(id int64, code int, text string) error {
 func (manager *SessionManager) onCreated(conn *websocket.Conn, account *entities.Account) *Session {
 	id := manager.nextID()
 	var device *ConnectedDevice
+
 	if account != nil {
 		device = &ConnectedDevice{
 			Number: account.Number,
 			UUID:   account.UUID,
 			Device: account.AuthenticatedDevice.Device, //设备的基本信息
 		}
+
 	}
+
 
 	session := newSession(Options{
 		id:     id,
@@ -182,6 +185,7 @@ func (manager *SessionManager) onCreated(conn *websocket.Conn, account *entities
 		pubSubManager: manager.pubSubManager,
 		handler:      manager.makeSessionHandler(),
 		closeHandler: manager.onClosed,
+		account: account,
 	})
 	manager.mutex.Lock()
 	manager.sessionMapper[session.id] = session

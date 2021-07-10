@@ -5,50 +5,6 @@ type IndexReply struct {
 	Resp string `json:"resp"`
 }
 
-type RegisterReq struct {
-	Username string `json:"username"`
-	Mobile   string `json:"mobile"`
-	Password string `json:"password"`
-}
-
-type LoginReq struct {
-	Username string `json:"username"`
-	Password string `json:"password"`
-}
-
-type UserReply struct {
-	Id       int64  `json:"id"`
-	Username string `json:"username"`
-	Mobile   string `json:"mobile"`
-	Nickname string `json:"nickname"`
-	Gender   string `json:"gender"`
-	JwtToken
-}
-
-type JwtToken struct {
-	AccessToken  string `json:"accessToken,omitempty"`
-	AccessExpire int64  `json:"accessExpire,omitempty"`
-	RefreshAfter int64  `json:"refreshAfter,omitempty"`
-}
-
-type AddReq struct {
-	Book  string `form:"book"`
-	Price int64  `form:"price"`
-}
-
-type AddResp struct {
-	Ok bool `json:"ok"`
-}
-
-type CheckReq struct {
-	Book string `form:"book"`
-}
-
-type CheckResp struct {
-	Found bool  `json:"found"`
-	Price int64 `json:"price"`
-}
-
 type GetCodeReq struct {
 	Transport string `path:"transport"`
 	Number    string `path:"number"`
@@ -120,6 +76,10 @@ type AccountCreationResult struct {
 
 type GcmRegistrationID struct {
 	GcmRegistrationID string `json:"gcmRegistrationId"`
+}
+
+type SetUserName struct {
+	Username string `json:"username"`
 }
 
 type JwtTokenAdx struct {
@@ -214,44 +174,6 @@ type PubsubMessage struct {
 	Content Envelope `json:"envelop"`
 }
 
-type PreKeyx struct {
-	KeyId     int64  `json:"keyId"`
-	PublicKey string `json:"publicKey"`
-}
-
-type SignedPrekeyx struct {
-	Signature string `json:"signature"`
-	KeyId     int64  `json:"keyId"`
-	PublicKey string `json:"publicKey"`
-}
-
-type PutKeysReqx struct {
-	IdentityKey  string        `json:"identityKey"`
-	SignedPreKey SignedPrekeyx `json:"signedPreKey"`
-	PreKeys      []PreKeyx     `json:"preKeys"`
-}
-
-type GetKeysReq struct {
-	Identifier string `path:"identifier"`
-	DeviceId   string `path:"deviceId"`
-}
-
-type PreKeyResponseItem struct {
-	DeviceId       int64         `json:"deviceId"`
-	RegistrationId int64         `json:"registrationId"`
-	PreKey         PreKeyx       `json:"preKey"`
-	SignedPrekey   SignedPrekeyx `json:"signedPreKey"`
-}
-
-type GetKeysResx struct {
-	IdentityKey string               `json:"identityKey"`
-	Devices     []PreKeyResponseItem `json:"devices"`
-}
-
-type PreKeyCount struct {
-	Count int `json:"count"`
-}
-
 type PutProfileKeyReq struct {
 	AccountName string `path:"accountName"`
 	Profilekey  string `json:"profileKey"`
@@ -265,11 +187,6 @@ type GetProfileKeyRes struct {
 	Profilekey  string `json:"profileKey"`
 	Uuid        string `json:"uuid"`
 	AccountName string `path:"accountName"`
-}
-
-type WsConnReq struct {
-	Login    string `form:"login,optional"`
-	Password string `form:"password,optional"`
 }
 
 type DeliveryReq struct {
@@ -315,4 +232,108 @@ type GetKeysRes struct {
 
 type PreKeyCountx struct {
 	Count int `json:"count"`
+}
+
+type SetNameReq struct {
+	Name string `path:"name"`
+}
+
+type CreateProfileRequest struct {
+	Version    string `json:"version"`
+	Name       string `json:"name"`
+	Avatar     bool   `json:"avatar"`
+	Commitment string `json:"commitment"`
+}
+
+type ProfileAvatarUploadAttributes struct {
+	Key        string `json:"key"`
+	Credential string `json:"credential"`
+	Acl        string `json:"acl"`
+	Algorithm  string `json:"algorithm"`
+	Date       string `json:"date"`
+	Policy     string `json:"policy"`
+	Signature  string `json:"signature"`
+}
+
+type GetProfileByUserName struct {
+	UserName string `path:"username"`
+}
+
+type UserCapabilities struct {
+	Uuid bool `json:"uuid"`
+	Gv2  bool `json:"gv2"`
+}
+
+type Profile struct {
+	IdentityKey                    string           `json:"identityKey"`
+	Name                           string           `json:"name"`
+	Avatar                         string           `json:"avatar"`
+	UnidentifiedAccess             string           `json:"unidentifiedAccess"`
+	UnrestrictedUnidentifiedAccess bool             `json:"unrestrictedUnidentifiedAccess"`
+	Capabilities                   UserCapabilities `json:"capabilities"`
+	UserName                       string           `json:"userName"`
+	Uuid                           string           `json:"uuid"`
+	Credential                     string           `json:"credential"`
+}
+
+type GetProfileByUUID struct {
+	Uuid    string `path:"uuid"`
+	Version string `path:"version"`
+}
+
+type GetProfileByUUIDCredentia struct {
+	Uuid              string `path:"uuid"`
+	Version           string `path:"version"`
+	CredentialRequest string `path:"credentialRequest"`
+}
+
+type ProvisioningMessage struct {
+	Destination string `path:"destination"`
+	Body        string `json:"body"`
+}
+
+type ExternalServiceCredentials struct {
+	Username string `json:"username"`
+	Password string `json:"password"` // UserName:UserName加盐哈系
+}
+
+type ClientContact struct {
+	Token    string `json:"token"`
+	Voice    bool   `json:"voice,optional"`
+	Video    bool   `json:"video,optional"`
+	Relay    string `json:"relay,optional"`
+	Inactive bool   `json:"inactive,optional"`
+}
+
+type ClientContactTokens struct {
+	Contacts []string `json:"contacts"`
+}
+
+type ClientContacts struct {
+	Contacts []ClientContact `json:"contacts"`
+}
+
+type GetTokenPresenceReq struct {
+	Token string `path:"token"`
+}
+
+type DeviceInfo struct {
+	ID       int64  `json:"id"`
+	Name     string `json:"name"`
+	LastSeen int64  `json:"lastSeen"`
+	Created  int64  `json:"created"`
+}
+
+type DeviceInfoList struct {
+	Devices []DeviceInfo `json:"devices"`
+}
+
+type DelDeviceReq struct {
+	DeviceId string `path:"device_id"`
+}
+
+type VerificationCode struct {
+	Code      string `json:"code"`
+	Timestamp int64  `json:"timestamp"`
+	PushCode  string `json:"pushCode,optional"`
 }

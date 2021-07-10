@@ -1,0 +1,16 @@
+syntax = "v2"
+// 配置消息
+type ProvisioningMessage  {
+    Destination string  `path:"destination"`
+    Body string `json:"body"`
+}
+
+@server(
+    middleware : CheckBasicAuth
+    group: provision
+)
+service signalserver-api {
+    // 设置显示名字 废弃
+    @handler SendProvisioningMessageHandler
+    put /v1/provisioning/:destination (ProvisioningMessage) returns ()
+}

@@ -1,30 +1,53 @@
 syntax = "v2"
 info(
-	title: "api api"
-	desc: "websocket server"
-	author: "dabaicai"
-	email: "dabaicai@gmail.com"
+    title: "api api"
+    desc: "websocket server"
+    author: "dabaicai"
+    email: "dabaicai@gmail.com"
 )
 
 import (
-	"user.api"
-	"bookstore.api"
-	"accounts.api"
-	"textsecure.api"
-	"messages.api"
-	"keys.api"
-	"new_ws.api"
-	"keepalive.api"
-	"certificate.api"
-	"prekey.api"
+    //"user.api"
+    // "bookstore.api"
+    "accounts.api"
+    "textsecure.api"
+    "messages.api"
+    "keys.api"
+    "keepalive.api"
+    "certificate.api"
+    "prekey.api"
+    "profile.api"
+    "provisioning.api"
+    "directory.api"
+    "device.api"
+    "channel.api"
+
 )
 
 type IndexReply {
-	Resp string `json:"resp"`
+    Resp string `json:"resp"`
 }
 
 service signalserver-api {
-	@handler IndexHandler
-	get /index () returns (IndexReply)
-	
+
+    // 获取频道列表(扩展协议)
+    // 创建频道(扩展协议)
+    // 编辑频道管理权限(扩展协议)
+    // 编辑频道资料(扩展协议)
+    // 用户加入频道(扩展协议)
+    // 用户离开频道(扩展协议)
+    // 设置群聊昵称(扩展协议)
+    // 添加频道成员(扩展协议)
+    // 获取成员信息(扩展协议)
+    // 移除频道成员(扩展协议)
+    // 发送消息(扩展协议)
+    // 获取历史消息(扩展协议)
+    // 读取消息标记(扩展协议)
+    // 获取指定消息(扩展协议)
+    // 编辑指定消息(扩展协议)
+    // 删除指定消息(扩展协议)
+    // 获取频道(扩展协议)
+    // 删除频道(扩展协议)
+    @handler IndexHandler
+    get /index () returns (IndexReply)
 }

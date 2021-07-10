@@ -6,4 +6,4 @@
 
 
 #goctl model mysql ddl  -src t_messages.sql -dir . -style go_zero
-goctl model mysql datasource -url="hopexdev:devhopex@tcp(127.0.0.1:3306)/privatedb" -table="t_pending_accounts"  -dir . -style go_zero
+goctl model mysql datasource -url="hopexdev:devhopex@tcp(127.0.0.1:3306)/privatedb" -table="t_usernames"  -dir . -style go_zero

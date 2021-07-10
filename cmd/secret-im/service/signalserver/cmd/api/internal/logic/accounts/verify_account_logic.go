@@ -188,7 +188,7 @@ func (l *VerifyAccountLogic) checkPin(number string,
 		//如果帐号有pin码或者有注册锁，且距第一次登录<7 天，
 		// c.rateLimiters.VerifyLimiter.Clear(number)
 
-		var credentials *auth.ExternalServiceCredentials
+		var credentials *types.ExternalServiceCredentials
 		timeRemaining := pkgUtils.DaysToMillis(7) - (pkgUtils.CurrentTimeMillis() - appAccount.GetLastSeen())
 
 		if len(appAccount.RegistrationLock) != 0 && len(appAccount.RegistrationLockSalt) != 0 {

@@ -89,7 +89,7 @@ func main() {
 
 
 
-	storage.InitStorage(ctx.RedisClient,ctx.AccountsModel,ctx.MsgsModel)
+	storage.InitStorage(ctx.RedisClient,ctx.AccountsModel,ctx.MsgsModel,ctx.ProfilesModel,ctx.UsernameModel)
     //websocket server.调试使用，可以通过网页看到ws结果，生产环境要关闭
     if isStartWss{
 

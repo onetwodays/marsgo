@@ -211,7 +211,7 @@ func (handler *AuthenticatedHandler) sendDeliveryReceiptFor(message *textsecure.
 		logx.Error("[Authenticated5] failed to send receipt ", "source:", device.Number, "destination:", message.GetSource(), "timestamp:", message.GetTimestamp(), "reason:", err)
 
 	}
-	//logx.Infof(" [Authenticated5](%s) send delivery receipt to 发送方(redis) ,from %s to  %s", message.ServerGuid, device.Number, message.GetSource())
+	logx.Infof(" [Authenticated5]接收方(%s) recved self msg,send  receipt to 发送方(%s) ",  device.Number, message.GetSource())
 }
 
 // 消息持久化

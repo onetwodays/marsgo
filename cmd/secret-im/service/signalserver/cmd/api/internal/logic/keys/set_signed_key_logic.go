@@ -3,7 +3,7 @@ package logic
 import (
 	"context"
 	"net/http"
-	"secret-im/service/signalserver/cmd/api/internal/entities"
+	"secret-im/service/signalserver/cmd/api/internal/logic"
 	"secret-im/service/signalserver/cmd/api/internal/storage"
 	"secret-im/service/signalserver/cmd/api/internal/svc"
 	"secret-im/service/signalserver/cmd/api/internal/types"
@@ -27,20 +27,17 @@ func NewSetSignedKeyLogic(ctx context.Context, svcCtx *svc.ServiceContext) SetSi
 }
 
 func (l *SetSignedKeyLogic) SetSignedKey(r *http.Request,req types.SignedPrekey) error {
-	appAccount := r.Context().Value(shared.HttpReqContextAccountKey)
-	if appAccount == nil {
-		reason := "check basic auth fail ,may by the handler not use middle"
-		logx.Error(reason)
-		return shared.Status(http.StatusUnauthorized, reason)
+	account,err:= logic.GetSourceAccount(r,l.svcCtx.AccountsModel)
+	if err!=nil{
+		return shared.Status(http.StatusUnauthorized,err.Error())
 	}
-	account := appAccount.(*entities.Account)
 
 	account.AuthenticatedDevice.SignedPreKey = & types.SignedPrekey{
 		PublicKey:req.PublicKey,
 		Signature: req.Signature,
 		KeyId: req.KeyId,
 	}
-	err := storage.AccountManager{}.Update(account)
+	err = storage.AccountManager{}.Update(account)
 	if err !=nil{
 		return shared.Status(http.StatusInternalServerError,err.Error())
 	}

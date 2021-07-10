@@ -64,4 +64,11 @@ type Config struct {
 		PersistDelayMinutes int64
 	}
 
+	DirectoryClient struct{
+		UserAuthenticationTokenSharedSecret string
+		UserAuthenticationTokenUserIdSecret string
+	}
+
+
+
 }

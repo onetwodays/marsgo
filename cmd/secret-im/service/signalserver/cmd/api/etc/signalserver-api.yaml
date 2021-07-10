@@ -10,15 +10,13 @@ LogConf:
 
 Mysql:
   DataSource: hopexdev:devhopex@tcp(127.0.0.1:3306)/privatedb?charset=utf8mb4&parseTime=true&loc=Asia%2FShanghai
-# 备份服务配置
-BackupService:
-  #UserAuthenticationTokenSharedSecret: ZBioTJ1mRxYRAHioSWu79v1IC3D3wjdc
-  user_authentication_token_shared_secret: ZBioTJ1mRxYRAHioSWu79v1IC3D3wjdc
+
 Auth:
   AccessSecret: ad879037-c7a4-4063-9236-6bfc35d54b7d
   AccessExpire: 86400
 EOSChainUrls:
-  - http://zhongyingying.qicp.io:38000
+  #- http://zhongyingying.qicp.io:38000
+  - http://192.168.0.137:8000
 
 CacheRedis:
   Addr: "127.0.0.1:6379"
@@ -48,5 +46,12 @@ ServerCertificate:
   ExpiresDays: 365
 MessageCache:
   PersistDelayMinutes: 30
+# 备份服务配置
+BackupService:
+  UserAuthenticationTokenSharedSecret: ZBioTJ1mRxYRAHioSWu79v1IC3D3wjdc
+# 联系人服务配置
+DirectoryClient:
+  UserAuthenticationTokenSharedSecret: ZBioTJ1mRxYRAHioSWu79v1IC3D3wjdc
+  UserAuthenticationTokenUserIdSecret: ZBioTJ1mRxYRAHioSWu79v1IC3D3wjdc
 
 
