@@ -14,6 +14,7 @@ require (
 	github.com/grpc-ecosystem/go-grpc-middleware v1.2.0 // indirect
 	github.com/kr/text v0.2.0 // indirect
 	github.com/marsofsnow/eos-go v0.11.7
+	github.com/marsofsnow/zkgroup v1.0.0
 	github.com/nats-io/nats-server/v2 v2.3.1 // indirect
 	github.com/nats-io/nats.go v1.11.1-0.20210623165838-4b75fc59ae30
 	github.com/niemeyer/pretty v0.0.0-20200227124842-a10e7caefd8e // indirect

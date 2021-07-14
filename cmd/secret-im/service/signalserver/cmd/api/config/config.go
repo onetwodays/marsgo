@@ -69,6 +69,23 @@ type Config struct {
 		UserAuthenticationTokenUserIdSecret string
 	}
 
+	Cdn struct{
+		AccessKey string
+		AccessSecret string
+		Bucket string
+		Region string
+	}
+
+
+
+	ZkConfig struct{
+		ServerSecret string
+		ServerPublic string
+		Enabled bool
+	}
+
+
+
 
 
 }

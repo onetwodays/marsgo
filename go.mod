@@ -26,7 +26,9 @@ require (
 	github.com/google/wire v0.4.0
 	github.com/json-iterator/go v1.1.9
 	github.com/kennygrant/sanitize v1.2.4 // indirect
+	github.com/marsofsnow/zkgroup v1.0.0 // indirect
 	github.com/montanaflynn/stats v0.6.3
+	github.com/nanu-c/zkgroup v0.8.7 // indirect
 	github.com/openzipkin/zipkin-go v0.2.2
 	github.com/philchia/agollo v2.1.0+incompatible
 	github.com/philchia/agollo/v3 v3.1.1 // indirect
@@ -37,13 +39,13 @@ require (
 	github.com/sirupsen/logrus v1.4.2
 	github.com/skip2/go-qrcode v0.0.0-20191027152451-9434209cb086
 	github.com/spf13/viper v1.3.2
-	github.com/stretchr/testify v1.5.1
+	github.com/stretchr/testify v1.6.1
 	github.com/temoto/robotstxt v1.1.1 // indirect
 	github.com/tidwall/gjson v1.5.0
 	github.com/tsuna/gohbase v0.0.0-20190823190353-a66bcc9075db
 	go.etcd.io/etcd v3.3.20+incompatible
-	golang.org/x/net v0.0.0-20200707034311-ab3426394381
-	golang.org/x/sys v0.0.0-20200802091954-4b90ce9b60b3
+	golang.org/x/net v0.0.0-20201021035429-f5854403a974
+	golang.org/x/sys v0.0.0-20200930185726-fdedc70b468f
 	golang.org/x/text v0.3.3 // indirect
 	google.golang.org/genproto v0.0.0-20200731012542-8145dea6a485
 	google.golang.org/grpc v1.31.0

@@ -337,3 +337,56 @@ type VerificationCode struct {
 	Timestamp int64  `json:"timestamp"`
 	PushCode  string `json:"pushCode,optional"`
 }
+
+type ChannelInputParticipant struct {
+	UUID string `json:"uuid" validate:"gte=36,lte=36"`
+	Name string `json:"name" validate:"gte=1,lte=16"`
+}
+
+type ChannelCreationInfo struct {
+	Title        string                    `json:"title" validate:"gte=1,lte=16"`
+	Public       bool                      `json:"public"`
+	Participants []ChannelInputParticipant `json:"participants" validate:"min=0,max=100"`
+}
+
+type ChannelMessageAction struct {
+	Action       string   `json:"action"`
+	Title        string   `json:"title,omitempty"`
+	Photo        string   `json:"photo,omitempty"`
+	Participants []string `json:"participants,omitempty"`
+	MessageID    int64    `json:"messageId,omitempty"`
+	Operator     string   `json:"operator,omitempty"`
+}
+
+type OutgoingChannelMessage struct {
+	ID              int64                 `json:"id"`
+	ChannelID       string                `json:"channelId"`
+	Type            string                `json:"type"`
+	Source          string                `json:"source,omitempty"`
+	SourceDeviceID  int64                 `json:"sourceDevice,omitempty"`
+	Content         string                `json:"content,omitempty"`
+	Action          *ChannelMessageAction `json:"action,omitempty"`
+	Relay           string                `json:"relay,omitempty"`
+	Editor          string                `json:"editor,omitempty"`
+	EditedAt        int64                 `json:"editedAt,omitempty"`
+	Deleted         bool                  `json:"deleted"`
+	Timestamp       int64                 `json:"timestamp"`
+	ServerTimestamp int64                 `json:"serverTimestamp"`
+}
+
+type Channel struct {
+	ID             string                  `json:"id"`
+	Title          string                  `json:"title"`
+	Photo          *string                 `json:"photo"`
+	About          string                  `json:"about"`
+	Creator        string                  `json:"creator"`
+	Public         bool                    `json:"public"`
+	IsParticipant  bool                    `json:"participant"`
+	Left           bool                    `json:"left,omitempty"`
+	Kicked         bool                    `json:"kicked,omitempty"`
+	Deactivated    bool                    `json:"deactivated,omitempty"`
+	Unread         int                     `json:"unread"`
+	LatestMessage  *OutgoingChannelMessage `json:"latestMessage"`
+	LastAckMessage int64                   `json:"lastAckMessage"`
+	Date           int64                   `json:"date"`
+}

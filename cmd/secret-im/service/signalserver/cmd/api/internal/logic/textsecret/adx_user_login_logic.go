@@ -9,10 +9,10 @@ import (
 	"github.com/tal-tech/go-zero/core/stores/sqlx"
 	"net/http"
 	"secret-im/service/signalserver/cmd/api/internal/storage"
-	shared "secret-im/service/signalserver/cmd/api/shared"
+	"secret-im/service/signalserver/cmd/api/shared"
 	"secret-im/service/signalserver/cmd/api/util"
 
-	//"secret-im/service/signalserver/cmd/api/util"
+
 	"secret-im/service/signalserver/cmd/api/internal/model"
 	"time"
 

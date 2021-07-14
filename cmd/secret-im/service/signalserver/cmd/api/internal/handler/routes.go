@@ -6,6 +6,7 @@ import (
 
 	accounts "secret-im/service/signalserver/cmd/api/internal/handler/accounts"
 	certificate "secret-im/service/signalserver/cmd/api/internal/handler/certificate"
+	channel "secret-im/service/signalserver/cmd/api/internal/handler/channel"
 	device "secret-im/service/signalserver/cmd/api/internal/handler/device"
 	directory "secret-im/service/signalserver/cmd/api/internal/handler/directory"
 	keepalive "secret-im/service/signalserver/cmd/api/internal/handler/keepalive"
@@ -347,6 +348,19 @@ func RegisterHandlers(engine *rest.Server, serverCtx *svc.ServiceContext) {
 					Method:  http.MethodPut,
 					Path:    "/v1/devices/:verification_code",
 					Handler: device.VerifyDeviceTokenHandler(serverCtx),
+				},
+			}...,
+		),
+	)
+
+	engine.AddRoutes(
+		rest.WithMiddlewares(
+			[]rest.Middleware{serverCtx.CheckBasicAuth},
+			[]rest.Route{
+				{
+					Method:  http.MethodPost,
+					Path:    "/v1/channels",
+					Handler: channel.CreateChannelHandler(serverCtx),
 				},
 			}...,
 		),

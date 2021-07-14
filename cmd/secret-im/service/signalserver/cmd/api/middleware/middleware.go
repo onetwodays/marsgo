@@ -19,6 +19,7 @@ func GlobalMWLogFunc(next http.HandlerFunc) http.HandlerFunc {
 		}
 		next(w, r)
 
+
 		//logx.Info("reponse ... ")
 	}
 }

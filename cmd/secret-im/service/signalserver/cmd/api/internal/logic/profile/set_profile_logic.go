@@ -7,6 +7,7 @@ import (
 	"github.com/tal-tech/go-zero/core/stores/sqlx"
 	"net/http"
 	"secret-im/service/signalserver/cmd/api/internal/entities"
+	"secret-im/service/signalserver/cmd/api/internal/logic"
 	"secret-im/service/signalserver/cmd/api/internal/storage"
 	"secret-im/service/signalserver/cmd/api/shared"
 	"strings"
@@ -16,6 +17,7 @@ import (
 	"secret-im/service/signalserver/cmd/api/internal/types"
 
 	"github.com/tal-tech/go-zero/core/logx"
+
 )
 
 type SetProfileLogic struct {
@@ -32,14 +34,13 @@ func NewSetProfileLogic(ctx context.Context, svcCtx *svc.ServiceContext) SetProf
 	}
 }
 
+
 func (l *SetProfileLogic) SetProfile(r *http.Request,req types.CreateProfileRequest) (*types.ProfileAvatarUploadAttributes, error) {
-	appAccount := r.Context().Value(shared.HttpReqContextAccountKey)
-	if appAccount == nil  {
-		reason := "check basic auth fail ,may by the handler not use middle"
-		logx.Error(reason)
-		return nil,shared.Status(http.StatusUnauthorized, reason)
+
+	account,err := logic.GetSourceAccount(r,l.svcCtx.AccountsModel)
+	if err!=nil{
+		return nil, shared.Status(http.StatusUnauthorized,err.Error())
 	}
-	account := appAccount.(*entities.Account)
 	currentProfile,err:=storage.ProfileManager{}.Get(account.UUID,req.Version)
 	if err!=nil && err!=sqlx.ErrNotFound {
 		return nil, shared.Status(http.StatusInternalServerError,err.Error())
@@ -55,7 +56,7 @@ func (l *SetProfileLogic) SetProfile(r *http.Request,req types.CreateProfileRequ
 		Version: req.Version,
 		Name: req.Name,
 		Avatar: avatar,
-		Commitment: req.Commitment,
+		Commitment: req.Commitment, //要用base64 编解码
 	})
 	if err!=nil{
 		return nil,shared.Status(http.StatusInternalServerError,err.Error())
@@ -78,13 +79,17 @@ func (l *SetProfileLogic) SetProfile(r *http.Request,req types.CreateProfileRequ
 			//删除currentAvatar
 
 		}
+		now:=time.Now().UTC()
+		credential, policy := l.svcCtx.PolicyGenerator.CreateFor(now, avatar, 10*1024*1024)
+		signature:=l.svcCtx.PolicySigner.GetSignature(now,policy)
 		res=&types.ProfileAvatarUploadAttributes{
 			Key: avatar,
-			Credential:"",
-			Policy: "",
+			Credential:credential,
+			Policy: policy,
 			Acl: "private",
-			Date:time.Now().Format("20060102T150405Z07:00"),
-			Signature: "",
+			Algorithm: "AWS4-HMAC-SHA256",
+			Date:now.Format("20060102T150405Z07:00"),
+			Signature: signature,
 		}
 	}
 	account.Name=req.Name
@@ -95,6 +100,7 @@ func (l *SetProfileLogic) SetProfile(r *http.Request,req types.CreateProfileRequ
 	if err!=nil{
 		return nil, shared.Status(http.StatusInternalServerError,err.Error())
 	}
+
 	return res, nil
 }
 

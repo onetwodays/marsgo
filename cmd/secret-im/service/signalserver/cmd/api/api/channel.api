@@ -8,20 +8,72 @@ info(
     version: "type version here"
 )
 
-
-type request {
-    // TODO: add members here and delete this comment
+// 输入频道成员信息
+type ChannelInputParticipant struct {
+    UUID string `json:"uuid" validate:"gte=36,lte=36"`
+    Name string `json:"name" validate:"gte=1,lte=16"`
 }
 
-type response {
-    // TODO: add members here and delete this comment
+// 频道创建信息
+type ChannelCreationInfo struct {
+    Title        string                    `json:"title" validate:"gte=1,lte=16"`
+    Public       bool                      `json:"public"`
+    Participants []ChannelInputParticipant `json:"participants" validate:"min=0,max=100"`
 }
+
+// 操作消息
+type ChannelMessageAction struct {
+    Action       string   `json:"action"`
+    Title        string   `json:"title,omitempty"`
+    Photo        string   `json:"photo,omitempty"`
+    Participants []string `json:"participants,omitempty"`
+    MessageID    int64    `json:"messageId,omitempty"`
+    Operator     string   `json:"operator,omitempty"`
+}
+
+// 传出频道消息
+type OutgoingChannelMessage struct {
+    ID              int64                 `json:"id"`
+    ChannelID       string                `json:"channelId"`
+    Type            string                `json:"type"`
+    Source          string               `json:"source,omitempty"`
+    SourceDeviceID  int64                `json:"sourceDevice,omitempty"`
+    Content         string               `json:"content,omitempty"`
+    Action          *ChannelMessageAction `json:"action,omitempty"`
+    Relay           string               `json:"relay,omitempty"`
+    Editor          string               `json:"editor,omitempty"`
+    EditedAt        int64                `json:"editedAt,omitempty"`
+    Deleted         bool                  `json:"deleted"`
+    Timestamp       int64                 `json:"timestamp"`
+    ServerTimestamp int64                 `json:"serverTimestamp"`
+}
+
+
+// 频道信息
+type Channel struct {
+    ID             string                  `json:"id"`
+    Title          string                  `json:"title"`
+    Photo          *string                 `json:"photo"`
+    About          string                  `json:"about"`
+    Creator        string                  `json:"creator"`
+    Public         bool                    `json:"public"`
+    IsParticipant  bool                    `json:"participant"`
+    Left           bool                    `json:"left,omitempty"`
+    Kicked         bool                    `json:"kicked,omitempty"`
+    Deactivated    bool                    `json:"deactivated,omitempty"`
+    Unread         int                     `json:"unread"`
+    LatestMessage  *OutgoingChannelMessage  `json:"latestMessage"`
+    LastAckMessage int64                   `json:"lastAckMessage"`
+    Date           int64                   `json:"date"`
+}
+
+
 
 @server(
-    jwt: Auth
-    group: template
+    middleware : CheckBasicAuth
+    group: channel
 )
-service template {
-    @handler handlerName // TODO: replace handler name and delete this comment
-    get /users/id/:userId (request) returns (response)
+service signalserver-api {
+    @handler CreateChannelHandler
+    post /v1/channels (ChannelCreationInfo) returns (Channel)
 }

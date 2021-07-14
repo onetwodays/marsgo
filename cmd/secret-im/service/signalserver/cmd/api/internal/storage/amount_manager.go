@@ -80,6 +80,46 @@ func (m AccountManager) GetByNumber(number string) (*entities.Account, error) {
 	return DbAccount2AppAccount(dbAccount)
 }
 
+func (m AccountManager) GetByNumbers(numbers []string) (map[string]entities.Account, error) {
+
+	mapper := make(map[string]entities.Account)
+	/*
+	var nocache []string
+	accounts, err := m.redisGetByNumbers(numbers)
+	if err != nil {
+		nocache = numbers
+	} else {
+		for idx, account := range accounts {
+			if account == nil {
+				nocache = append(nocache, numbers[idx])
+				continue
+			}
+			mapper[account.Number] = *account
+		}
+	}
+
+	if len(nocache) == 0 {
+		return mapper, nil
+	}
+
+	 */
+
+	list, err := internal.accountDB.FindManyByNumbers(numbers)
+	if err != nil {
+		return nil, err
+	}
+	for i:= range list {
+		//m.redisSet(&account)
+		item,err:= DbAccount2AppAccount(&list[i])
+		if err!=nil{
+			return nil, err
+		}
+		mapper[list[i].Uuid]=*item
+	}
+	return mapper, nil
+}
+
+
 
 func (m AccountManager) GetByUuid(uuid string) (*entities.Account, error) {
 
@@ -88,6 +128,46 @@ func (m AccountManager) GetByUuid(uuid string) (*entities.Account, error) {
 		return nil, err
 	}
 	return DbAccount2AppAccount(dbAccount)
+}
+
+
+func (m AccountManager) GetByUUIDs(ids []string) (map[string]entities.Account, error) {
+	mapper := make(map[string]entities.Account)
+	/*
+	var nocache []string
+
+	accounts, err := m.redisGetByUUIDs(ids)
+	if err != nil {
+		nocache = ids
+	} else {
+		for idx, account := range accounts {
+			if account == nil {
+				nocache = append(nocache, ids[idx])
+				continue
+			}
+			mapper[account.UUID] = *account
+		}
+	}
+
+	if len(nocache) == 0 {
+		return mapper, nil
+	}
+
+	 */
+
+	list, err := internal.accountDB.FindManyByUuids(ids)
+	if err != nil {
+		return nil, err
+	}
+	for i:= range list {
+		//m.redisSet(&account)
+		item,err:= DbAccount2AppAccount(&list[i])
+		if err!=nil{
+			return nil, err
+		}
+		mapper[list[i].Uuid]=*item
+	}
+	return mapper, nil
 }
 
 func (m AccountManager)  CreateDBAccount(number, password,userAgent string, accountAttributes *types.AccountAttributes) (*model.TAccounts, error) {

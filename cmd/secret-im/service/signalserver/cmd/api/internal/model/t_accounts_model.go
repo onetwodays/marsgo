@@ -25,7 +25,9 @@ type (
 		Insert(data TAccounts) (sql.Result, error)
 		FindOne(id int64) (*TAccounts, error)
 		FindOneByNumber(number string) (*TAccounts, error)
+		FindManyByNumbers (numbers []string) ([]TAccounts,error)
 		FindOneByUuid(uuid string) (*TAccounts, error)
+		FindManyByUuids (uuids []string) ([]TAccounts,error)
 		Update(data TAccounts) error
 		UpdateDataByUuid(data sql.NullString,uuid string) error
 		Delete(id int64) error
@@ -95,6 +97,34 @@ func (m *defaultTAccountsModel) FindOneByUuid(uuid string) (*TAccounts, error) {
 	switch err {
 	case nil:
 		return &resp, nil
+	case sqlc.ErrNotFound:
+		return nil, ErrNotFound
+	default:
+		return nil, err
+	}
+}
+
+func (m *defaultTAccountsModel) FindManyByUuids (uuids []string) ([]TAccounts,error){
+	var resp []TAccounts
+	query := fmt.Sprintf("select %s from %s where `uuid` in ?  ", tAccountsRows, m.table)
+	err:=m.conn.QueryRows(&resp,query,` (`+strings.Join(uuids,",")+`) `)
+	switch err {
+	case nil:
+		return resp, nil
+	case sqlc.ErrNotFound:
+		return nil, ErrNotFound
+	default:
+		return nil, err
+	}
+}
+
+func (m *defaultTAccountsModel) FindManyByNumbers (numbers []string) ([]TAccounts,error){
+	var resp []TAccounts
+	query := fmt.Sprintf("select %s from %s where `number` in ?  ", tAccountsRows, m.table)
+	err:=m.conn.QueryRows(&resp,query,` (`+strings.Join(numbers,",")+`) `)
+	switch err {
+	case nil:
+		return resp, nil
 	case sqlc.ErrNotFound:
 		return nil, ErrNotFound
 	default:

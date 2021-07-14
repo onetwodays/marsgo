@@ -2,9 +2,12 @@ package logic
 
 import (
 	"context"
+	"encoding/base64"
+	"encoding/hex"
 	"net/http"
 	"secret-im/service/signalserver/cmd/api/internal/auth"
 	"secret-im/service/signalserver/cmd/api/internal/auth/helper"
+	"secret-im/service/signalserver/cmd/api/internal/entities"
 	"secret-im/service/signalserver/cmd/api/internal/logic"
 	"secret-im/service/signalserver/cmd/api/internal/storage"
 	"secret-im/service/signalserver/cmd/api/shared"
@@ -20,6 +23,7 @@ type GetProfileByUuidCredentiaLogic struct {
 	ctx    context.Context
 	svcCtx *svc.ServiceContext
 }
+
 
 func NewGetProfileByUuidCredentiaLogic(ctx context.Context, svcCtx *svc.ServiceContext) GetProfileByUuidCredentiaLogic {
 	return GetProfileByUuidCredentiaLogic{
@@ -39,7 +43,7 @@ func (l *GetProfileByUuidCredentiaLogic) GetProfileByUuidCredentia(r *http.Reque
 	if accessKey == nil && source==nil {
 		return nil, shared.Status(http.StatusUnauthorized, err.Error())
 	}
-
+    // 得到目的帐号
 	dstAccount,err:=storage.AccountManager{}.GetByUuid(req.Uuid)
 	if err!=nil {
 		return nil,shared.Status(http.StatusNotFound,err.Error())
@@ -47,9 +51,7 @@ func (l *GetProfileByUuidCredentiaLogic) GetProfileByUuidCredentia(r *http.Reque
 
 	code, ok := helper.OptionalAccess{}.Verify(source, accessKey, dstAccount)
 	if !ok {
-		reason:="helper.OptionalAccess{}.Verify(source,accessKey,destination) fail"
-		logx.Error(reason)
-		return nil,shared.Status(code,reason)
+		return nil,shared.Status(code,"helper.OptionalAccess{}.Verify(source,accessKey,destination) fail")
 	}
 
 
@@ -58,15 +60,24 @@ func (l *GetProfileByUuidCredentiaLogic) GetProfileByUuidCredentia(r *http.Reque
 		return nil, shared.Status(http.StatusNotFound,err.Error())
 	}
 	username,_:=storage.UsernamesManager{}.GetUsernameForUUID(dstAccount.UUID)
-	name:=versionedProfile.Name
-	avatar:=versionedProfile.Avatar
-	credential:=""
+	name:=dstAccount.Name
+	avatar:=dstAccount.Avatar
 
-	return &types.Profile{
+	if versionedProfile!=nil{
+		name=versionedProfile.Name
+		avatar=versionedProfile.Avatar
+	}
+
+	credential,err:=l.getProfileCredential(req.CredentialRequest,versionedProfile,req.Uuid)
+	if err!=nil{
+		return nil,shared.Status(http.StatusInternalServerError,err.Error())
+	}
+	unidentifiedAccessKey,_:=base64.StdEncoding.DecodeString(dstAccount.UnidentifiedAccessKey)
+	resp:= &types.Profile{
 		IdentityKey:dstAccount.IdentityKey,
 		Name:name,
 		Avatar :avatar,
-		UnidentifiedAccess:"", //todo 这里是计算一个hash值的
+		UnidentifiedAccess:logic.GetUnidentifiedAccessChecksum(unidentifiedAccessKey), //todo 这里是计算一个hash值的
 		UnrestrictedUnidentifiedAccess:dstAccount.UnrestrictedUnidentifiedAccess,
 		Capabilities:types.UserCapabilities{
 			Uuid: true,
@@ -76,5 +87,27 @@ func (l *GetProfileByUuidCredentiaLogic) GetProfileByUuidCredentia(r *http.Reque
 		Uuid:dstAccount.UUID,
 		Credential: credential,
 
-	}, nil
+	}
+	logic.Print(resp)
+
+	return resp,  nil
 }
+
+func (l *GetProfileByUuidCredentiaLogic)getProfileCredential(credentialRequest string , profile *entities.VersionedProfile,uuid string ) (string,error) {
+	// 1.credentialRequest 如果为空
+	if len(credentialRequest)==0 || profile==nil{
+		return "",nil
+	}
+	commitment,_:=base64.StdEncoding.DecodeString(profile.Commitment)
+	request,_:=hex.DecodeString(credentialRequest)
+	b,err:=l.svcCtx.ServerZkProfileOperations.IssueProfileKeyCredential(request,[]byte(uuid),commitment)
+	if err!=nil{
+		return "", err
+	}
+	return base64.StdEncoding.EncodeToString(b),nil
+
+
+
+}
+
+

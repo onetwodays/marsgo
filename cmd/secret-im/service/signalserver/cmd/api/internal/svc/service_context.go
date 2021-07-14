@@ -7,6 +7,7 @@ import (
 	"encoding/base64"
 	"github.com/go-redis/redis"
 	eos "github.com/marsofsnow/eos-go"
+	"github.com/marsofsnow/zkgroup"
 	"github.com/tal-tech/go-zero/core/logx"
 	"github.com/tal-tech/go-zero/core/stores/sqlx"
 	"github.com/tal-tech/go-zero/rest"
@@ -16,6 +17,7 @@ import (
 	"secret-im/service/signalserver/cmd/api/internal/crypto"
 	"secret-im/service/signalserver/cmd/api/internal/middleware"
 	"secret-im/service/signalserver/cmd/api/internal/model"
+	"secret-im/service/signalserver/cmd/api/internal/svc/profile"
 	"secret-im/service/signalserver/cmd/api/internal/svc/pubsub"
 	"secret-im/service/signalserver/cmd/api/internal/svc/pubsub/dispatch"
 	"secret-im/service/signalserver/cmd/api/internal/svc/push"
@@ -26,8 +28,14 @@ var preKeysInsertStmt string = `insert into t_keys (number,device_id,key_id,publ
 
 type ServiceContext struct {
 	Config config.Config
-	//Hub       *chat.Hub
 	MatchUserNameRegx *regexp.Regexp
+	PolicySigner    *profile.PolicySigner
+	PolicyGenerator *profile.PostPolicyGenerator
+	ZKServerSecretParams    zkgroup.ServerSecretParams
+	ServerZkAuthOperations *zkgroup.ServerZkAuthOperations
+	ServerZkProfileOperations *zkgroup.ServerZkProfileOperations
+
+
 
 
 	UserModel model.UserModel //CRUD
@@ -143,10 +151,20 @@ func NewServiceContext(c config.Config) *ServiceContext {
 	})
 
 	matchUsername, _:= regexp.Compile("^[a-z_][a-z0-9_]+$")
+	zkServerSecret,_:=base64.StdEncoding.DecodeString(c.ZkConfig.ServerSecret)
+	zkServerSecretParams,err:=zkgroup.GenerateServerSecretParamsDeterministic(zkServerSecret)
+	serverZkAuthOperations:=zkgroup.NewServerZkAuthOperations(zkServerSecretParams)
+	serverZkProfileOperations:=zkgroup.NewServerZkProfileOperations(zkServerSecret)
 
 	return &ServiceContext{
 		Config:          c,
 		MatchUserNameRegx: matchUsername,
+		PolicyGenerator: profile.NewPostPolicyGenerator(c.Cdn.Region,c.Cdn.Bucket,c.Cdn.AccessKey),
+		PolicySigner: profile.NewPolicySigner(c.Cdn.AccessSecret,c.Cdn.Region),
+		ZKServerSecretParams: zkServerSecretParams,
+		ServerZkProfileOperations: serverZkProfileOperations,
+		ServerZkAuthOperations: serverZkAuthOperations,
+
 
 		PreKeysInsertor: preKeysInsertor,
 

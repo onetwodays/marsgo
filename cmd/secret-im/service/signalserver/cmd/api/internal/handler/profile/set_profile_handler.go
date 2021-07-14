@@ -2,7 +2,6 @@ package handler
 
 import (
 	"net/http"
-
 	"secret-im/service/signalserver/cmd/api/internal/logic/profile"
 	"secret-im/service/signalserver/cmd/api/internal/svc"
 	"secret-im/service/signalserver/cmd/api/internal/types"
@@ -23,6 +22,8 @@ func SetProfileHandler(ctx *svc.ServiceContext) http.HandlerFunc {
 		if err != nil {
 			httpx.Error(w, err)
 		} else {
+
+
 			httpx.OkJson(w, resp)
 		}
 	}

@@ -2,6 +2,7 @@ package shared
 
 import (
 	"encoding/json"
+	"github.com/tal-tech/go-zero/core/logx"
 	"net/http"
 	"path"
 	"runtime"
@@ -18,6 +19,7 @@ type ResponseStatus struct {
 
 func (rs *ResponseStatus) Error() string{
 	jsb,_:=json.Marshal(rs)
+	logx.Error(jsb)
 	return string(jsb)
 }
 
