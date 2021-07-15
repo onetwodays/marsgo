@@ -11,6 +11,7 @@ import (
 	"secret-im/service/signalserver/cmd/api/internal/logic"
 	"secret-im/service/signalserver/cmd/api/internal/storage"
 	"secret-im/service/signalserver/cmd/api/shared"
+	"strings"
 
 	"secret-im/service/signalserver/cmd/api/internal/svc"
 	"secret-im/service/signalserver/cmd/api/internal/types"
@@ -99,7 +100,18 @@ func (l *GetProfileByUuidCredentiaLogic)getProfileCredential(credentialRequest s
 		return "",nil
 	}
 	commitment,_:=base64.StdEncoding.DecodeString(profile.Commitment)
-	request,_:=hex.DecodeString(credentialRequest)
+	credentialRequest=strings.ReplaceAll(credentialRequest,"(byte)0x","")
+	request,err:=hex.DecodeString(credentialRequest)
+
+	/*
+	sp,err:= zkgroup.GenerateServerSecretParams()
+	if err!=nil{
+		return "", err
+	}
+	logx.Infof("====(%s)========",base64.StdEncoding.EncodeToString(sp))
+	po:=zkgroup.NewServerZkProfileOperations(sp)
+	 */
+
 	b,err:=l.svcCtx.ServerZkProfileOperations.IssueProfileKeyCredential(request,[]byte(uuid),commitment)
 	if err!=nil{
 		return "", err

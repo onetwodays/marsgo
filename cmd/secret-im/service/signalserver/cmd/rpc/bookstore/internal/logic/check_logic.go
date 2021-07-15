@@ -25,6 +25,7 @@ func NewCheckLogic(ctx context.Context, svcCtx *svc.ServiceContext) *CheckLogic 
 
 func (l *CheckLogic) Check(in *bookstore.CheckReq) (*bookstore.CheckResp, error) {
 	// todo: add your logic here and delete this line
+	/*
 	resp,err:=l.svcCtx.BookModel.FindOne(in.Book)
 	if err!=nil{
 		return nil, err
@@ -34,4 +35,8 @@ func (l *CheckLogic) Check(in *bookstore.CheckReq) (*bookstore.CheckResp, error)
 		Found: true,
 		Price: int32(resp.Price),
 	}, nil
+	
+	 */
+
+	return nil, nil
 }

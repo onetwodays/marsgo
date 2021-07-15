@@ -12,6 +12,7 @@ import (
 	"github.com/tal-tech/go-zero/core/stores/sqlx"
 	"github.com/tal-tech/go-zero/rest"
 	"regexp"
+	"secret-im/pkg/driver/cassa"
 	"secret-im/service/signalserver/cmd/api/config"
 	"secret-im/service/signalserver/cmd/api/internal/auth"
 	"secret-im/service/signalserver/cmd/api/internal/crypto"
@@ -69,6 +70,7 @@ type ServiceContext struct {
 	CertificateGenerator *auth.CertificateGenerator
 
 	RedisClient *redis.Client
+	CassandraConn *cassa.Conn
 
 	RedisOperation *push.RedisOperation
 	Dispatcher     *dispatch.RedisDispatchManager
@@ -89,9 +91,23 @@ func NewServiceContext(c config.Config) *ServiceContext {
 	pingRes := redisClient.Ping()
 	if pingRes.Err() != nil {
 		logx.Error("ping redis error:", pingRes.Err())
-		return nil
+		panic(pingRes.Err())
 	} else {
 		logx.Info(pingRes.String())
+	}
+
+	var cassandraConn cassa.Conn
+	cassandraConn,err:=cassa.Open(cassa.Options{
+		NodeIPs: config.AppConfig.Cassandra.Nodes,
+		KeySpace: config.AppConfig.Cassandra.Keyspace,
+		Username: config.AppConfig.Cassandra.Username,
+		Password: config.AppConfig.Cassandra.Password,
+		NumConns: config.AppConfig.Cassandra.NumConns,
+	})
+	if err!=nil{
+		logx.Error("cassa client open connnect error:",err)
+		//panic(err)
+
 	}
 
 	redisOperation, err := push.NewRedisOperation(redisClient)
@@ -152,7 +168,11 @@ func NewServiceContext(c config.Config) *ServiceContext {
 
 	matchUsername, _:= regexp.Compile("^[a-z_][a-z0-9_]+$")
 	zkServerSecret,_:=base64.StdEncoding.DecodeString(c.ZkConfig.ServerSecret)
+	//logx.Infof("===%x",zkServerSecret)
 	zkServerSecretParams,err:=zkgroup.GenerateServerSecretParamsDeterministic(zkServerSecret)
+	if err!=nil{
+		panic(err)
+	}
 	serverZkAuthOperations:=zkgroup.NewServerZkAuthOperations(zkServerSecretParams)
 	serverZkProfileOperations:=zkgroup.NewServerZkProfileOperations(zkServerSecret)
 
@@ -193,6 +213,7 @@ func NewServiceContext(c config.Config) *ServiceContext {
 			true),
 		CertificateGenerator:       certificateGenerator,
 		RedisClient:                redisClient,
+		CassandraConn: &cassandraConn,
 		RedisOperation:             redisOperation,
 		Dispatcher:                 dispatcher,
 		PubSubManager:              pubSubManager,

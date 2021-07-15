@@ -19,7 +19,7 @@ type ResponseStatus struct {
 
 func (rs *ResponseStatus) Error() string{
 	jsb,_:=json.Marshal(rs)
-	logx.Error(jsb)
+	logx.Error(string(jsb))
 	return string(jsb)
 }
 

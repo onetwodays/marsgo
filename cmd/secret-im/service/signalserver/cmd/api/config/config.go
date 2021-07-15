@@ -84,8 +84,11 @@ type Config struct {
 		Enabled bool
 	}
 
-
-
-
-
+	Cassandra struct{
+		Nodes []string
+		Keyspace string
+		Username string
+		Password string
+		NumConns int
+	}
 }

@@ -8,13 +8,17 @@ require (
 	github.com/dgrijalva/jwt-go v3.2.0+incompatible
 	github.com/dustin/go-humanize v1.0.0 // indirect
 	github.com/go-redis/redis v6.15.7+incompatible
+	github.com/gocassa/gocassa v1.2.0
+	github.com/gocql/gocql v0.0.0-20210707082121-9a3953d1826d
 	github.com/golang/protobuf v1.4.2
 	github.com/google/go-cmp v0.5.4 // indirect
 	github.com/gorilla/websocket v1.4.2
 	github.com/grpc-ecosystem/go-grpc-middleware v1.2.0 // indirect
+	github.com/hailocab/gocassa v1.2.0 // indirect
 	github.com/kr/text v0.2.0 // indirect
 	github.com/marsofsnow/eos-go v0.11.7
 	github.com/marsofsnow/zkgroup v1.0.0
+	github.com/mitchellh/mapstructure v1.4.1 // indirect
 	github.com/nats-io/nats-server/v2 v2.3.1 // indirect
 	github.com/nats-io/nats.go v1.11.1-0.20210623165838-4b75fc59ae30
 	github.com/niemeyer/pretty v0.0.0-20200227124842-a10e7caefd8e // indirect

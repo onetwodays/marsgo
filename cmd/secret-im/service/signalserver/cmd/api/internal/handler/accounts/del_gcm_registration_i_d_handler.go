@@ -17,6 +17,7 @@ func DelGcmRegistrationIDHandler(ctx *svc.ServiceContext) http.HandlerFunc {
 			httpx.Error(w, err)
 		} else {
 			httpx.Ok(w)
+
 		}
 	}
 }

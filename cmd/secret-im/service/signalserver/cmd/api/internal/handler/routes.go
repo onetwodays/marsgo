@@ -9,6 +9,7 @@ import (
 	channel "secret-im/service/signalserver/cmd/api/internal/handler/channel"
 	device "secret-im/service/signalserver/cmd/api/internal/handler/device"
 	directory "secret-im/service/signalserver/cmd/api/internal/handler/directory"
+	group "secret-im/service/signalserver/cmd/api/internal/handler/group"
 	keepalive "secret-im/service/signalserver/cmd/api/internal/handler/keepalive"
 	keys "secret-im/service/signalserver/cmd/api/internal/handler/keys"
 	messages "secret-im/service/signalserver/cmd/api/internal/handler/messages"
@@ -364,5 +365,15 @@ func RegisterHandlers(engine *rest.Server, serverCtx *svc.ServiceContext) {
 				},
 			}...,
 		),
+	)
+
+	engine.AddRoutes(
+		[]rest.Route{
+			{
+				Method:  http.MethodPut,
+				Path:    "/v1/groups",
+				Handler: group.CreateGroupHandler(serverCtx),
+			},
+		},
 	)
 }

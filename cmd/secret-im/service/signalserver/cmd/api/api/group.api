@@ -1,0 +1,24 @@
+syntax = "v2"
+
+info(
+    title: "type title here"
+    desc: "type desc here"
+    author: "type author here"
+    email: "type email here"
+    version: "type version here"
+)
+
+type Resp {
+    Obj interface{} `json:"obj"`
+}
+
+
+@server(
+
+    group: group
+)
+service signalserver-api {
+
+    @handler CreateGroupHandler
+    put /v1/groups () returns (Resp)
+}

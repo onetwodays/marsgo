@@ -390,3 +390,7 @@ type Channel struct {
 	LastAckMessage int64                   `json:"lastAckMessage"`
 	Date           int64                   `json:"date"`
 }
+
+type Resp struct {
+	Obj interface{} `json:"obj"`
+}

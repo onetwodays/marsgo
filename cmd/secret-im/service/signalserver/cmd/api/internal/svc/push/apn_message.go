@@ -3,7 +3,6 @@ package push
 import (
 	"fmt"
 	"secret-im/service/signalserver/cmd/api/queue"
-	"secret-im/service/signalserver/cmd/api/textsecure"
 	"time"
 )
 
@@ -43,7 +42,7 @@ func AddToApnMessageQueue(msg ApnMessage) error {
 
 	message := msg.GetMessage()
 	expirationTime := msg.GetExpirationTime().Unix()
-	return queue.Publish(queue.SendApnMessageTopic, &textsecure.SendApnMessage{
+	return queue.Publish(queue.SendApnMessageTopic, &queue.SendApnMessage{
 		ApnId:          msg.ApnID,
 		Topic:          topic,
 		Number:         msg.Number,

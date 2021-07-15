@@ -4,6 +4,7 @@ import (
 	"context"
 	uuid "github.com/satori/go.uuid"
 	"net/http"
+	"secret-im/pkg/utils-tools"
 	"secret-im/service/signalserver/cmd/api/internal/auth"
 	"secret-im/service/signalserver/cmd/api/internal/entities"
 	"secret-im/service/signalserver/cmd/api/internal/logic"
@@ -47,7 +48,7 @@ func (l *CreateChannelLogic) CreateChannel(r *http.Request,req types.ChannelCrea
 	addParticipants = append(addParticipants, req.Participants...)
 
 	for _, participant := range addParticipants {
-		identifier := auth.NewAmbiguousIdentifier(participant.UUID)
+		identifier := auth.NewAmbiguousIdentifier(participant.UUID) //兼容number和uuid
 		if  len(identifier.UUID)!= 0 {
 			ids = append(ids, identifier.UUID)
 		} else {
@@ -66,7 +67,6 @@ func (l *CreateChannelLogic) CreateChannel(r *http.Request,req types.ChannelCrea
 			return nil,shared.Status(http.StatusInternalServerError,err.Error())
 		}
 		for key, val := range accounts {
-			ids=append(ids,key)
 			accountMapper[key] = val
 		}
 	}
@@ -81,6 +81,7 @@ func (l *CreateChannelLogic) CreateChannel(r *http.Request,req types.ChannelCrea
 			return nil,shared.Status(http.StatusInternalServerError,err.Error())
 		}
 		for key, val := range accounts {
+			ids=append(ids,key)
 			accountMapper[key] = val
 		}
 	}
@@ -123,16 +124,35 @@ func (l *CreateChannelLogic) CreateChannel(r *http.Request,req types.ChannelCrea
 	}
 
 	// 插入频道信息
-	/*
-	channel:=entities.Channel{
+
+	channel:=storage.Channel{
 		ChannelID: channelID,
 		Creator: currAccount.UUID,
-		Profile: entities.ChannelProfile{
+		Profile: storage.ChannelProfile{
 			Title: req.Title,
 		},
 		Public: req.Public,
 		Date: time.Now().Unix(),
-	}*/
+	}
 
-	return &types.Channel{}, nil
+	if err:=new(storage.Channels).Insert(&channel,participants);err!=nil{
+		logx.Error("[Channel::createChannel] failed to create channel",
+			" uuid:",  currAccount.UUID,
+			" reason:", err,)
+		return nil, shared.Status(http.StatusInternalServerError,err.Error())
+
+	}
+
+	//发送操作消息
+
+	ids = utils.StringSlice{}.Distinct(ids)
+	/*
+	sendActionMessage(channelID, textsecure.MessageAction{
+		Action: textsecure.MessageAction_ChannelCreate, Title: req.Title, Participants: ids})
+
+	 */
+
+	return &types.Channel{
+
+	}, nil
 }

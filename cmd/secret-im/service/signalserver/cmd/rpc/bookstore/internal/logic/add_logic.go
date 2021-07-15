@@ -2,8 +2,6 @@ package logic
 
 import (
 	"context"
-	"secret-im/service/signalserver/cmd/api/internal/model"
-
 	"secret-im/service/signalserver/cmd/rpc/bookstore/bookstore"
 	"secret-im/service/signalserver/cmd/rpc/bookstore/internal/svc"
 
@@ -26,6 +24,7 @@ func NewAddLogic(ctx context.Context, svcCtx *svc.ServiceContext) *AddLogic {
 
 func (l *AddLogic) Add(in *bookstore.AddReq) (*bookstore.AddResp, error) {
 	// todo: add your logic here and delete this line
+	/*
 	_,err:=l.svcCtx.BookModel.Insert(model.Book{
 		Book: in.Book,
 		Price: int64(in.Price),
@@ -33,6 +32,8 @@ func (l *AddLogic) Add(in *bookstore.AddReq) (*bookstore.AddResp, error) {
 	if err!=nil{
 		return nil, err
 	}
+
+	 */
 
 	return &bookstore.AddResp{
 		Ok:true,
