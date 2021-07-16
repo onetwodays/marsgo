@@ -19,6 +19,7 @@ type Channels struct {
 // 插入频道信息
 func (Channels) Insert(channel *Channel, users []ChannelParticipant) error {
 	// 插入基本信息
+	// channel的资料信息
 	profile, err := json.Marshal(channel.Profile)
 	if err != nil {
 		return err
@@ -40,9 +41,10 @@ func (Channels) Insert(channel *Channel, users []ChannelParticipant) error {
 		Public:      channel.Public,
 		Date:        time.Unix(channel.Date, 0),
 	}
+	// 插入频道
 	batch := internal.cassa.Model(record).Set(record)
 
-	// 插入已加入频道
+	// 插入已加入频道成员信息
 	ops := make([]gocassa.Op, 0)
 	ids := make([]string, 0, len(users))
 	data := make([]ChannelJoined, 0, len(users))

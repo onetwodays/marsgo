@@ -5,6 +5,6 @@ type ChannelJoined struct {
 	UserID    string `json:"userId"`
 	ChannelID string `json:"channelId"`
 	Left      bool   `json:"left"`
-	Kicked    bool   `json:"kicked"`
+	Kicked    bool   `json:"kicked"` // 被踢
 }
 

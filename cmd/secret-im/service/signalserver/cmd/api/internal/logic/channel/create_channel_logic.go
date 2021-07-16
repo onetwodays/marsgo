@@ -10,6 +10,7 @@ import (
 	"secret-im/service/signalserver/cmd/api/internal/logic"
 	"secret-im/service/signalserver/cmd/api/internal/storage"
 	"secret-im/service/signalserver/cmd/api/shared"
+	"secret-im/service/signalserver/cmd/api/textsecure"
 	"time"
 
 	"secret-im/service/signalserver/cmd/api/internal/svc"
@@ -33,14 +34,63 @@ func NewCreateChannelLogic(ctx context.Context, svcCtx *svc.ServiceContext) Crea
 }
 
 func (l *CreateChannelLogic) CreateChannel(r *http.Request,req types.ChannelCreationInfo) (*types.Channel, error) {
+
+	//群主
 	currAccount,err:= logic.GetSourceAccount(r,l.svcCtx.AccountsModel)
 	if err!=nil{
 		return nil,shared.Status(http.StatusUnauthorized,err.Error())
 	}
 
+	//群里所有的成员的帐号信息入参
+	addInputParticipants,accountMapper,uuids,err:=l.getGroupUseAccounts(currAccount,req)
+	if err!=nil{
+		return nil,err
+	}
+
+	//要保村到数据库的群成员信息
+	participants,channelID:=l.createChannelParticipants(currAccount,addInputParticipants,accountMapper)
+
+
+	// 要插入频道信息
+	channel:=storage.Channel{
+		ChannelID: channelID,
+		Creator: currAccount.UUID,
+		Profile: storage.ChannelProfile{
+			Title: req.Title,
+		},
+		Public: req.Public,
+		Date: time.Now().Unix(),
+	}
+
+	// 群和群成员入库
+	if err:=new(storage.Channels).Insert(&channel,participants);err!=nil{
+		logx.Error("[Channel::createChannel] failed to create channel",
+			" uuid:",  currAccount.UUID,
+			" reason:", err,)
+		return nil, shared.Status(http.StatusInternalServerError,err.Error())
+
+	}
+
+	//发送操作消息
+
+	uuids = utils.StringSlice{}.Distinct(uuids)
+
+	logic.SendActionMessage(channelID, textsecure.MessageAction{
+		Action: textsecure.MessageAction_ChannelCreate, Title: req.Title, Participants: uuids})
+
+
+
+	return newChannelEntity(channel,true,false,false),nil
+}
+
+
+
+func (l *CreateChannelLogic) getGroupUseAccounts(currAccount *entities.Account,req types.ChannelCreationInfo) ([]types.ChannelInputParticipant,map[string]entities.Account,[]string,error)  {
+
 	// 获取用户列表
 	var ids []string
 	var numbers []string
+	// 群主加入群组
 	addParticipants := []types.ChannelInputParticipant{{
 		UUID: currAccount.UUID,
 		Name: "超级管理员",
@@ -55,6 +105,7 @@ func (l *CreateChannelLogic) CreateChannel(r *http.Request,req types.ChannelCrea
 			numbers = append(numbers, identifier.Number)
 		}
 	}
+	// 得到这些人的帐号
 	accountMapper := make(map[string]entities.Account)
 
 	if len(ids) > 0 {
@@ -64,7 +115,7 @@ func (l *CreateChannelLogic) CreateChannel(r *http.Request,req types.ChannelCrea
 				" uuid:",   currAccount.UUID,
 				" numbers:", numbers,
 				" reason:", err)
-			return nil,shared.Status(http.StatusInternalServerError,err.Error())
+			return nil,nil,nil,shared.Status(http.StatusInternalServerError,err.Error())
 		}
 		for key, val := range accounts {
 			accountMapper[key] = val
@@ -78,14 +129,19 @@ func (l *CreateChannelLogic) CreateChannel(r *http.Request,req types.ChannelCrea
 				" uuid:",   currAccount.UUID,
 				" ids:",    ids,
 				" reason:", err)
-			return nil,shared.Status(http.StatusInternalServerError,err.Error())
+			return nil,nil,nil,shared.Status(http.StatusInternalServerError,err.Error())
 		}
 		for key, val := range accounts {
 			ids=append(ids,key)
 			accountMapper[key] = val
 		}
 	}
+	return addParticipants,accountMapper,ids,nil
 
+
+}
+
+func (l *CreateChannelLogic) createChannelParticipants(currAccount *entities.Account,addParticipants []types.ChannelInputParticipant,accountMapper map[string]entities.Account) ([]storage.ChannelParticipant,string)  {
 
 	// 生成用户列表
 	set := make(map[string]struct{})
@@ -122,37 +178,24 @@ func (l *CreateChannelLogic) CreateChannel(r *http.Request,req types.ChannelCrea
 		}
 		participants = append(participants, participant)
 	}
+	return participants,channelID
 
-	// 插入频道信息
+}
 
-	channel:=storage.Channel{
-		ChannelID: channelID,
-		Creator: currAccount.UUID,
-		Profile: storage.ChannelProfile{
-			Title: req.Title,
-		},
-		Public: req.Public,
-		Date: time.Now().Unix(),
-	}
 
-	if err:=new(storage.Channels).Insert(&channel,participants);err!=nil{
-		logx.Error("[Channel::createChannel] failed to create channel",
-			" uuid:",  currAccount.UUID,
-			" reason:", err,)
-		return nil, shared.Status(http.StatusInternalServerError,err.Error())
-
-	}
-
-	//发送操作消息
-
-	ids = utils.StringSlice{}.Distinct(ids)
-	/*
-	sendActionMessage(channelID, textsecure.MessageAction{
-		Action: textsecure.MessageAction_ChannelCreate, Title: req.Title, Participants: ids})
-
-	 */
-
+// 创建频道信息
+func newChannelEntity(channel storage.Channel, participant, left, kicked bool) *types.Channel {
 	return &types.Channel{
-
-	}, nil
+		ID:            channel.ChannelID,
+		Title:         channel.Profile.Title,
+		Photo:         channel.Profile.Photo,
+		About:         channel.Profile.About,
+		Creator:       channel.Creator,
+		Public:        channel.Public,
+		IsParticipant: participant,
+		Left:          left,
+		Kicked:        kicked,
+		Deactivated:   channel.Deactivated,
+		Date:          channel.Date,
+	}
 }

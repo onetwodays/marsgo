@@ -1,0 +1,20 @@
+POST http://127.0.0.1:38888/v1/channels
+Content-Type: application/json
+x-user-name: zhouhao12344
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE2MjEzMjQ1MDAsImlhdCI6MTYyMTIzODEwMCwibmFtZSI6Im90Y2V4Y2hhbmdlIn0.wGlrSPtsAkChPSMLF6j1hi3VmzWM49GMXYztzTtB_2U
+
+{
+  "title": "test",
+  "public":true,
+  "participants": [
+    {
+      "name": "tt1tttt33531",
+      "uuid": "5b0d77e2-3176-4b3f-b0cf-fa7092d6533b"
+    },
+    {
+      "name": "tt1tttt33534",
+      "uuid": "9f2ec9a7-9685-4595-b36f-7b0a2d640cf0"
+    }
+  ]
+
+}

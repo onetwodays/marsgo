@@ -3,6 +3,7 @@ package model
 import (
 	"database/sql"
 	"fmt"
+	"github.com/tal-tech/go-zero/core/logx"
 	"strings"
 	"time"
 
@@ -106,8 +107,10 @@ func (m *defaultTAccountsModel) FindOneByUuid(uuid string) (*TAccounts, error) {
 
 func (m *defaultTAccountsModel) FindManyByUuids (uuids []string) ([]TAccounts,error){
 	var resp []TAccounts
-	query := fmt.Sprintf("select %s from %s where `uuid` in ?  ", tAccountsRows, m.table)
-	err:=m.conn.QueryRows(&resp,query,` (`+strings.Join(uuids,",")+`) `)
+	query := fmt.Sprintf("select %s from %s where `uuid` in   ", tAccountsRows, m.table)
+	query+= ` (`+strings.Join(uuids,",")+`) `
+	logx.Info(query)
+	err:=m.conn.QueryRows(&resp,query)
 	switch err {
 	case nil:
 		return resp, nil

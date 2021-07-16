@@ -96,7 +96,7 @@ func NewServiceContext(c config.Config) *ServiceContext {
 		logx.Info(pingRes.String())
 	}
 
-	var cassandraConn cassa.Conn
+
 	cassandraConn,err:=cassa.Open(cassa.Options{
 		NodeIPs: config.AppConfig.Cassandra.Nodes,
 		KeySpace: config.AppConfig.Cassandra.Keyspace,

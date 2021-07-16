@@ -78,6 +78,7 @@ func Open(options Options) (Conn, error) {
 	err = conn.CreateKeySpace(options.KeySpace)
 	if err != nil {
 		if _, ok := err.(*gocql.RequestErrAlreadyExists); !ok {
+			panic(err)
 			return Conn{}, err
 		}
 	}
@@ -95,12 +96,15 @@ func Open(options Options) (Conn, error) {
 
 func newGoCQLBackend(options Options) (gocassa.QueryExecutor, *gocql.Session, error) {
 	cluster := gocql.NewCluster(options.NodeIPs...)
+	cluster.Keyspace=options.KeySpace
 	cluster.NumConns = options.NumConns
+	cluster.ProtoVersion=4
 	cluster.Consistency = gocql.One
 	cluster.Authenticator = gocql.PasswordAuthenticator{
 		Username: options.Username,
 		Password: options.Password,
 	}
+
 	sess, err := cluster.CreateSession()
 	if err != nil {
 		return nil, nil, err
