@@ -68,12 +68,201 @@ type Channel struct {
 }
 
 
+// 频道列表
+type Channels struct {
+    Channels []Channel `json:"channels"`
+}
+
+// 频道列表参数
+type ChannelsParams struct {
+    MaxID *string `form:"maxId"`
+    Limit int     `form:"limit" validate:"max=100"`
+}
+
+// 频道管理权限
+type ChannelAdminRights struct {
+    ChangeInfo     bool `json:"changeInfo,omitempty"`
+    EditMessages   bool `json:"editMessages,omitempty"`
+    DeleteMessages bool `json:"deleteMessages,omitempty"`
+    BanUsers       bool `json:"banUsers,omitempty"`
+    InviteUsers    bool `json:"inviteUsers,omitempty"`
+    PinMessages    bool `json:"pinMessages,omitempty"`
+    AddAdmins      bool `json:"addAdmins,omitempty"`
+}
+
+type  EditAdminRightParams {
+    ChannelId string `path:"channel_id"`
+    UserID      string             `json:"userId" validate:"uuid"`
+    AdminRights ChannelAdminRights `json:"adminRights,omitempty"`
+}
+
+type  EditChannelProfileParams {
+    ChannelId string `path:"channel_id"`
+    Title string  `json:"title" validate:"gte=1,lte=32"`
+    Photo *string `json:"photo,omitempty" validate:"omitempty,lte=128"`
+    About string  `json:"about,omitempty" validate:"omitempty,lte=1024"`
+}
+type JoinChannelParams{
+    ChannelId string `path:"channel_id"`
+}
+
+type LeaveChannelParams{
+    ChannelId string `path:"channel_id"`
+}
+
+type SetUserNameParams{
+    ChannelId string `path:"channel_id"`
+    Name string `path:"name"`
+}
+
+type AddParticipantParams{
+    ChannelId string `path:"channel_id"`
+    UUID string `json:"uuid" validate:"gte=36,lte=36"`
+    Name string `json:"name" validate:"gte=1,lte=16"`
+}
+
+type GetParicipantParams{
+    ChannelId string `path:"channel_id"`
+    Id    string  `path:"id"`
+}
+
+// 频道成员信息
+type ChannelParticipant struct {
+    UUID         string              `json:"uuid"`
+    Name         string              `json:"name,omitempty"`
+    Avatar       string              `json:"avatar,omitempty"`
+    AvatarDigest string              `json:"avatarDigest,omitempty"`
+    Banned       bool                `json:"banned,omitempty"`
+    AdminRights  *ChannelAdminRights `json:"adminRights,omitempty"`
+}
+
+type RemoveParticipantParams{
+    ChannelId string `path:"channel_id"`
+    Id    string  `path:"id"`
+}
+
+type GetChannelParams {
+    ChannelId string `path:"channel_id"`
+}
+
+type DeleteChannelParams {
+    ChannelId string `path:"channel_id"`
+}
+
+type SendMessageParams{
+    ChannelId string `path:"channel_id"`
+    Content   string  `json:"content" validate:"gte=1,lte=1024"`
+    Relay     *string `json:"relay,omitempty"`
+    Timestamp int64   `json:"timestamp" validate:"min=1"`
+}
+
+// 频道消息ID
+type ChannelMessageID struct {
+    ChannelID string `json:"channelId"`
+    MessageID int64  `json:"messageId"`
+}
+
+type ChannelMessagesParams{
+    ChannelId string `path:"channel_id"`
+    Start int64 `form:"start" validate:"min=1"`
+    Limit int64 `form:"limit" validate:"min=1,max=100"`
+}
+
+type ChannelMessages{
+    Messages []OutgoingChannelMessage `json:"messages"`
+}
+
+
+type ReadMessageParams{
+    ChannelId string `path:"channel_id"`
+    Id    string  `path:"id"`
+}
+
+type GetMessageParams{
+    ChannelId string `path:"channel_id"`
+    Id    string  `path:"id"`
+}
+
+type EditMessageParams{
+    ChannelId string `path:"channel_id"`
+    Id    string  `path:"id"`
+    Content string `json:"content" validate:"gte=1,lte=1024"`
+}
+
+type DeleteMessageParams{
+    ChannelId string `path:"channel_id"`
+    Id    string  `path:"id"`
+}
+
 
 @server(
     middleware : CheckBasicAuth
     group: channel
 )
 service signalserver-api {
+    @handler  GetChannelsHandler
+    get /v1/channels (ChannelsParams) returns (Channels)
+
     @handler CreateChannelHandler
     post /v1/channels (ChannelCreationInfo) returns (Channel)
+
+    @handler EditAdminRightsHandler
+    put /v1/channels/:channel_id/admin (EditAdminRightParams) returns()
+
+    @handler EditProfileHandler
+    put /v1/channels/:channel_id/profile (EditChannelProfileParams) returns ()
+
+    @handler JoinChannelHandler
+    post /v1/channels/:channel_id/join (JoinChannelParams) returns ()
+
+    @handler LeaveChannelHandler
+    delete /v1/channels/:channel_id/leave (LeaveChannelParams) returns()
+
+    // 设置群聊昵称(扩展协议)
+    @handler SetUserNameHandler
+    put /v1/channels/:channel_id/name/:name (SetUserNameParams)  returns()
+
+    // 添加频道成员[扩展]
+    @handler AddParticipantHandler
+    post /v1/channels/:channel_id/participants (AddParticipantParams) returns()
+
+    // 获取成员信息(扩展协议)
+    @handler GetParticipantHandler
+    get /v1/channels/:channel_id/participants/:id (GetParicipantParams) returns(ChannelParticipant)
+
+    // 移除频道成员(扩展协议)
+    @handler RemoveParticipantHandler
+    delete /v1/channels/:channel_id/participants/:id (RemoveParticipantParams) returns ()
+
+    // 获取频道(扩展协议)
+    @handler GetChannelHandler
+    get /v1/channels/:channel_id (GetChannelParams) returns (Channel)
+
+    // 删除频道(扩展协议)
+    @handler DeleteChannelHandler
+    delete /v1/channels/:channel_id (DeleteChannelParams) returns ()
+
+   // 发送消息[扩展]
+    @handler SendMessageHandler
+    post /v1/channels/:channel_id/messages (SendMessageParams) returns (ChannelMessageID)
+
+    // 获取历史消息(扩展协议)
+    @handler GetHistoryMsgsHandler
+    get /v1/channels/:channel_id/messages (ChannelMessagesParams) returns (ChannelMessages)
+
+    // 读取消息标记(扩展协议)
+    @handler ReadMessageHandler
+    put /v1/channels/:channel_id/messages/:id/read (ReadMessageParams) returns ()
+
+    // 取指定消息[扩展]
+    @handler GetMessageHandler
+    get /v1/channels/:channel_id/messages/:id (GetMessageParams) returns (OutgoingChannelMessage)
+
+    // 编辑指定消息(扩展协议)
+    @handler EditMessageHandler
+    put /v1/channels/:channel_id/messages/:id (EditMessageParams) returns ()
+    // 删除指定消息(扩展协议)
+    @handler DeleteMessageHandler
+    delete /v1/channels/:channel_id/messages/:id (EditMessageParams) returns ()
+
 }

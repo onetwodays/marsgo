@@ -107,8 +107,12 @@ func (m *defaultTAccountsModel) FindOneByUuid(uuid string) (*TAccounts, error) {
 
 func (m *defaultTAccountsModel) FindManyByUuids (uuids []string) ([]TAccounts,error){
 	var resp []TAccounts
+	var ps []string
+	for i:=range uuids{
+		ps=append(ps,fmt.Sprintf(`'%s'`,uuids[i]))
+	}
 	query := fmt.Sprintf("select %s from %s where `uuid` in   ", tAccountsRows, m.table)
-	query+= ` (`+strings.Join(uuids,",")+`) `
+	query+= ` (`+strings.Join(ps,",")+`) `
 	logx.Info(query)
 	err:=m.conn.QueryRows(&resp,query)
 	switch err {

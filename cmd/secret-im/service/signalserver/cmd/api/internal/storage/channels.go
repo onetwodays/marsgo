@@ -86,7 +86,7 @@ func (Channels) Insert(channel *Channel, users []ChannelParticipant) error {
 		return err
 	}
 
-	// 更新频道在线用户列表
+	// 更新频道在线用户列表(redis 操作)
 	devices, err := DevicesManager{}.GetOnlineDevices(ids)
 	if err == nil {
 		ChannelParticipantsManager{}.join(channel.ChannelID, devices)

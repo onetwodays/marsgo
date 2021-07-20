@@ -155,7 +155,7 @@ func (session *Session) handleRead() {
 	for {
 		messageType, data, err := session.conn.ReadMessage()
 		if err != nil {
-			logx.Error("websocket读消息发生错误:",err)
+			logx.Error("websocket读消息发生错误:",err.Error())
 			closeErr, ok := err.(*websocket.CloseError)
 			if ok {
 				code, text = closeErr.Code, closeErr.Text

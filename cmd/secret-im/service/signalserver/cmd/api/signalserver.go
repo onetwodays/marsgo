@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"github.com/nats-io/nats.go"
 	"github.com/tal-tech/go-zero/core/logx"
 	"github.com/tal-tech/go-zero/rest/httpx"
 	"net/http"
@@ -12,7 +13,8 @@ import (
 	"secret-im/service/signalserver/cmd/api/internal/storage"
 	"secret-im/service/signalserver/cmd/api/jobs"
 	"secret-im/service/signalserver/cmd/api/middleware"
-	shared "secret-im/service/signalserver/cmd/api/shared"
+	"secret-im/service/signalserver/cmd/api/queue"
+	"secret-im/service/signalserver/cmd/api/shared"
 	"secret-im/service/signalserver/cmd/api/websocket"
 	"strings"
 
@@ -121,7 +123,22 @@ func main() {
 	})
 
 	 */
-	js:=startJobs(ctx)
+
+	nc,err:=nats.Connect(strings.Join(config.AppConfig.Nats.Urls,","))
+	if err!=nil{
+		logx.Error("[Main] failed to open nats connection,reason:",err)
+		panic(err)
+	}
+	queue.InitModule(nc)
+	// 这里有一个清理redis缓存的op
+	err=storage.ClearUpRedis()
+	if err!=nil{
+		logx.Error("[Main] failed to clear up redis cache,reason:",err)
+		panic(err)
+	}
+	logx.Info("[Main] clear up redis cache successful")
+	js:=startJobs(nc,ctx)
+
 
 
 	fmt.Printf("Starting server at %s:%d...\n", config.AppConfig.Host, config.AppConfig.Port)
@@ -163,14 +180,25 @@ func registerDirHandlers(engine *rest.Server) {
 	}
 }
 
-func startJobs(serverCtx *svc.ServiceContext) []jobs.Job {
+func startJobs(nc *nats.Conn,serverCtx *svc.ServiceContext) []jobs.Job {
 	//消息持久化作业
 	messagePersistJob := jobs.NewMessagePersistJob(serverCtx.PushSender, serverCtx.PubSubManager)
 	if err:=messagePersistJob.Start();err!=nil{
 		logx.Error("[Main] failed to start message persist job,reason:",err)
 		panic(err)
 	}
-	js:=[]jobs.Job{messagePersistJob}
+
+	messageDeliverJob, err := jobs.NewMessageDeliverJob(nc, websocket.Authenticated)
+	if err != nil {
+		logx.Error("[Main] failed to new message deliver job,reason:",err)
+		panic(err)
+	}
+	if err = messageDeliverJob.Start(); err != nil {
+		logx.Error("[Main] failed to start message deliver job,reason:",err)
+		panic(err)
+	}
+
+	js:=[]jobs.Job{messagePersistJob,messageDeliverJob}
 	return js
 }
 

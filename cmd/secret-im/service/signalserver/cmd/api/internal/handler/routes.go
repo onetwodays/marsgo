@@ -359,9 +359,94 @@ func RegisterHandlers(engine *rest.Server, serverCtx *svc.ServiceContext) {
 			[]rest.Middleware{serverCtx.CheckBasicAuth},
 			[]rest.Route{
 				{
+					Method:  http.MethodGet,
+					Path:    "/v1/channels",
+					Handler: channel.GetChannelsHandler(serverCtx),
+				},
+				{
 					Method:  http.MethodPost,
 					Path:    "/v1/channels",
 					Handler: channel.CreateChannelHandler(serverCtx),
+				},
+				{
+					Method:  http.MethodPut,
+					Path:    "/v1/channels/:channel_id/admin",
+					Handler: channel.EditAdminRightsHandler(serverCtx),
+				},
+				{
+					Method:  http.MethodPut,
+					Path:    "/v1/channels/:channel_id/profile",
+					Handler: channel.EditProfileHandler(serverCtx),
+				},
+				{
+					Method:  http.MethodPost,
+					Path:    "/v1/channels/:channel_id/join",
+					Handler: channel.JoinChannelHandler(serverCtx),
+				},
+				{
+					Method:  http.MethodDelete,
+					Path:    "/v1/channels/:channel_id/leave",
+					Handler: channel.LeaveChannelHandler(serverCtx),
+				},
+				{
+					Method:  http.MethodPut,
+					Path:    "/v1/channels/:channel_id/name/:name",
+					Handler: channel.SetUserNameHandler(serverCtx),
+				},
+				{
+					Method:  http.MethodPost,
+					Path:    "/v1/channels/:channel_id/participants",
+					Handler: channel.AddParticipantHandler(serverCtx),
+				},
+				{
+					Method:  http.MethodGet,
+					Path:    "/v1/channels/:channel_id/participants/:id",
+					Handler: channel.GetParticipantHandler(serverCtx),
+				},
+				{
+					Method:  http.MethodDelete,
+					Path:    "/v1/channels/:channel_id/participants/:id",
+					Handler: channel.RemoveParticipantHandler(serverCtx),
+				},
+				{
+					Method:  http.MethodGet,
+					Path:    "/v1/channels/:channel_id",
+					Handler: channel.GetChannelHandler(serverCtx),
+				},
+				{
+					Method:  http.MethodDelete,
+					Path:    "/v1/channels/:channel_id",
+					Handler: channel.DeleteChannelHandler(serverCtx),
+				},
+				{
+					Method:  http.MethodPost,
+					Path:    "/v1/channels/:channel_id/messages",
+					Handler: channel.SendMessageHandler(serverCtx),
+				},
+				{
+					Method:  http.MethodGet,
+					Path:    "/v1/channels/:channel_id/messages",
+					Handler: channel.GetHistoryMsgsHandler(serverCtx),
+				},
+				{
+					Method:  http.MethodPut,
+					Path:    "/v1/channels/:channel_id/messages/:id/read",
+					Handler: channel.ReadMessageHandler(serverCtx),
+				},
+				{
+					Method:  http.MethodGet,
+					Path:    "/v1/channels/:channel_id/messages/:id",
+					Handler: channel.GetMessageHandler(serverCtx),
+				},
+				{
+					Method:  http.MethodPut,
+					Path:    "/v1/channels/:channel_id/messages/:id",
+					Handler: channel.EditMessageHandler(serverCtx),
+				},
+				{
+					Method:  http.MethodDelete,
+					Path:    "/v1/channels/:channel_id/messages/:id",
+					Handler: channel.DeleteMessageHandler(serverCtx),
 				},
 			}...,
 		),

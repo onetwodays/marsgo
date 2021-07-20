@@ -75,10 +75,8 @@ func (l *CreateChannelLogic) CreateChannel(r *http.Request,req types.ChannelCrea
 
 	uuids = utils.StringSlice{}.Distinct(uuids)
 
-	logic.SendActionMessage(channelID, textsecure.MessageAction{
+	sendActionMessage(channelID, textsecure.MessageAction{
 		Action: textsecure.MessageAction_ChannelCreate, Title: req.Title, Participants: uuids})
-
-
 
 	return newChannelEntity(channel,true,false,false),nil
 }
@@ -183,19 +181,3 @@ func (l *CreateChannelLogic) createChannelParticipants(currAccount *entities.Acc
 }
 
 
-// 创建频道信息
-func newChannelEntity(channel storage.Channel, participant, left, kicked bool) *types.Channel {
-	return &types.Channel{
-		ID:            channel.ChannelID,
-		Title:         channel.Profile.Title,
-		Photo:         channel.Profile.Photo,
-		About:         channel.Profile.About,
-		Creator:       channel.Creator,
-		Public:        channel.Public,
-		IsParticipant: participant,
-		Left:          left,
-		Kicked:        kicked,
-		Deactivated:   channel.Deactivated,
-		Date:          channel.Date,
-	}
-}

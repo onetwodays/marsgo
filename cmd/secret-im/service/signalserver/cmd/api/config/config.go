@@ -91,4 +91,11 @@ type Config struct {
 		Password string
 		NumConns int
 	}
+	PartitionID int
+
+	Nats struct{
+		Urls []string
+	}
+
+
 }

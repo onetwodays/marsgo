@@ -1,6 +1,8 @@
 package storage
 
-import "secret-im/service/signalserver/cmd/api/internal/entities"
+import (
+	"secret-im/service/signalserver/cmd/api/internal/types"
+)
 
 // 成员ID
 type ParticipantID struct {
@@ -21,8 +23,8 @@ const (
 	ChannelAdminRightAddAdmins
 )
 
-func (rights ChannelAdminRights) ToEntity() entities.ChannelAdminRights {
-	var entity entities.ChannelAdminRights
+func (rights ChannelAdminRights) ToEntity()  types.ChannelAdminRights {
+	var entity types.ChannelAdminRights
 	entity.ChangeInfo = rights&ChannelAdminRightChangeInfo > 0
 	entity.EditMessages = rights&ChannelAdminRightEditMessages > 0
 	entity.DeleteMessages = rights&ChannelAdminRightDeleteMessages > 0
@@ -33,7 +35,7 @@ func (rights ChannelAdminRights) ToEntity() entities.ChannelAdminRights {
 	return entity
 }
 
-func NewChannelAdminRightsFromEntity(rights entities.ChannelAdminRights) ChannelAdminRights {
+func NewChannelAdminRightsFromEntity(rights types.ChannelAdminRights) ChannelAdminRights {
 	var right ChannelAdminRights
 	if rights.ChangeInfo {
 		right |= ChannelAdminRightChangeInfo

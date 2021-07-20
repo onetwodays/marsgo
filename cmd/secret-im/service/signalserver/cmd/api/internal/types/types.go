@@ -391,6 +391,127 @@ type Channel struct {
 	Date           int64                   `json:"date"`
 }
 
+type Channels struct {
+	Channels []Channel `json:"channels"`
+}
+
+type ChannelsParams struct {
+	MaxID *string `form:"maxId"`
+	Limit int     `form:"limit" validate:"max=100"`
+}
+
+type ChannelAdminRights struct {
+	ChangeInfo     bool `json:"changeInfo,omitempty"`
+	EditMessages   bool `json:"editMessages,omitempty"`
+	DeleteMessages bool `json:"deleteMessages,omitempty"`
+	BanUsers       bool `json:"banUsers,omitempty"`
+	InviteUsers    bool `json:"inviteUsers,omitempty"`
+	PinMessages    bool `json:"pinMessages,omitempty"`
+	AddAdmins      bool `json:"addAdmins,omitempty"`
+}
+
+type EditAdminRightParams struct {
+	ChannelId   string             `path:"channel_id"`
+	UserID      string             `json:"userId" validate:"uuid"`
+	AdminRights ChannelAdminRights `json:"adminRights,omitempty"`
+}
+
+type EditChannelProfileParams struct {
+	ChannelId string  `path:"channel_id"`
+	Title     string  `json:"title" validate:"gte=1,lte=32"`
+	Photo     *string `json:"photo,omitempty" validate:"omitempty,lte=128"`
+	About     string  `json:"about,omitempty" validate:"omitempty,lte=1024"`
+}
+
+type JoinChannelParams struct {
+	ChannelId string `path:"channel_id"`
+}
+
+type LeaveChannelParams struct {
+	ChannelId string `path:"channel_id"`
+}
+
+type SetUserNameParams struct {
+	ChannelId string `path:"channel_id"`
+	Name      string `path:"name"`
+}
+
+type AddParticipantParams struct {
+	ChannelId string `path:"channel_id"`
+	UUID      string `json:"uuid" validate:"gte=36,lte=36"`
+	Name      string `json:"name" validate:"gte=1,lte=16"`
+}
+
+type GetParicipantParams struct {
+	ChannelId string `path:"channel_id"`
+	Id        string `path:"id"`
+}
+
+type ChannelParticipant struct {
+	UUID         string              `json:"uuid"`
+	Name         string              `json:"name,omitempty"`
+	Avatar       string              `json:"avatar,omitempty"`
+	AvatarDigest string              `json:"avatarDigest,omitempty"`
+	Banned       bool                `json:"banned,omitempty"`
+	AdminRights  *ChannelAdminRights `json:"adminRights,omitempty"`
+}
+
+type RemoveParticipantParams struct {
+	ChannelId string `path:"channel_id"`
+	Id        string `path:"id"`
+}
+
+type GetChannelParams struct {
+	ChannelId string `path:"channel_id"`
+}
+
+type DeleteChannelParams struct {
+	ChannelId string `path:"channel_id"`
+}
+
+type SendMessageParams struct {
+	ChannelId string  `path:"channel_id"`
+	Content   string  `json:"content" validate:"gte=1,lte=1024"`
+	Relay     *string `json:"relay,omitempty"`
+	Timestamp int64   `json:"timestamp" validate:"min=1"`
+}
+
+type ChannelMessageID struct {
+	ChannelID string `json:"channelId"`
+	MessageID int64  `json:"messageId"`
+}
+
+type ChannelMessagesParams struct {
+	ChannelId string `path:"channel_id"`
+	Start     int64  `form:"start" validate:"min=1"`
+	Limit     int64  `form:"limit" validate:"min=1,max=100"`
+}
+
+type ChannelMessages struct {
+	Messages []OutgoingChannelMessage `json:"messages"`
+}
+
+type ReadMessageParams struct {
+	ChannelId string `path:"channel_id"`
+	Id        string `path:"id"`
+}
+
+type GetMessageParams struct {
+	ChannelId string `path:"channel_id"`
+	Id        string `path:"id"`
+}
+
+type EditMessageParams struct {
+	ChannelId string `path:"channel_id"`
+	Id        string `path:"id"`
+	Content   string `json:"content" validate:"gte=1,lte=1024"`
+}
+
+type DeleteMessageParams struct {
+	ChannelId string `path:"channel_id"`
+	Id        string `path:"id"`
+}
+
 type Resp struct {
 	Obj interface{} `json:"obj"`
 }

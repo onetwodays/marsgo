@@ -1,3 +1,5 @@
+# 区域ID
+PartitionID: 1
 Name: api-api
 Host: 0.0.0.0
 Port: 38888
@@ -7,6 +9,11 @@ LogConf:
   Mode: console
   Path: ./deploy/logs/
   Level: info
+
+# nats配置
+Nats:
+  Urls:
+    - nats://127.0.0.1:4222
 
 Mysql:
   DataSource: hopexdev:devhopex@tcp(127.0.0.1:3306)/privatedb?charset=utf8mb4&parseTime=true&loc=Asia%2FShanghai

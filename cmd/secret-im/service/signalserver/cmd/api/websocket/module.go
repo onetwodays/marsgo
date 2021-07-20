@@ -5,10 +5,10 @@ import (
 	"secret-im/service/signalserver/cmd/api/internal/svc"
 )
 
-var authenticated *SessionManager
+var Authenticated *SessionManager
 
 func InitWebsocketEnv(ctx *svc.ServiceContext, router http.Handler) {
-	authenticated = NewSessionManager(ctx,
+	Authenticated = NewSessionManager(ctx,
 		                              router,
 		                              func() SessionHandler {
 		                                    return new(AuthenticatedHandler)
@@ -18,5 +18,5 @@ func InitWebsocketEnv(ctx *svc.ServiceContext, router http.Handler) {
 }
 
 func WsAcceptHandler(w http.ResponseWriter, r *http.Request)  {
-	authenticated.HandleAccept(w,r)
+	Authenticated.HandleAccept(w,r)
 }
