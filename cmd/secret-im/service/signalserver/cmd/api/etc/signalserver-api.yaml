@@ -23,7 +23,8 @@ Auth:
   AccessExpire: 86400
 EOSChainUrls:
   #- http://zhongyingying.qicp.io:38000
-  - http://192.168.0.137:8000
+  #- http://192.168.0.137:8000 #测试环境
+  - http://127.0.0.1:8000 #生产环境
 
 CacheRedis:
   Addr: "127.0.0.1:6379"
